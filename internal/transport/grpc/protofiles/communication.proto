@@ -1,0 +1,30 @@
+
+
+syntax = "proto3";
+option go_package = "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles";
+
+message UserRegisterRequest {
+  string Login = 1;
+  string Password = 2;
+  string RePassword = 3;
+
+}
+
+message UserRegisterResponse {
+  string Token = 1;
+}
+
+message UserLoginRequest {
+  string Login = 1;
+  string Password = 2;
+}
+
+message UserLoginResponse {
+  string Token = 1;
+}
+
+
+service UserSvc {
+  rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
+  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
+}
