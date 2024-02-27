@@ -2,7 +2,7 @@ package entities
 
 import "time"
 
-type Password struct {
+type Credential struct {
 	ID          string
 	Date        time.Time // date for last changing this line
 	Resource    string

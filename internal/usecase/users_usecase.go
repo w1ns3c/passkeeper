@@ -6,9 +6,11 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/golang-jwt/jwt/v4"
-	"golang.org/x/crypto/bcrypt"
 	"time"
+
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/w1nsec/go-examples/crypto"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/w1nsec/passkeeper/internal/entities"
 	"github.com/w1nsec/passkeeper/internal/storage"
@@ -23,6 +25,7 @@ type UserUsecase struct {
 	storage       storage.UserStorage
 	salt          string
 	tokenLifeTime time.Duration
+	userSecretLen int
 }
 
 func (u *UserUsecase) LoginUser(ctx context.Context, login string, password string) (token string, err error) {
@@ -36,7 +39,7 @@ func (u *UserUsecase) LoginUser(ctx context.Context, login string, password stri
 		return "", fmt.Errorf("wrong login/password: %v", err)
 	}
 
-	return user.Token, nil
+	return GenerateToken(user.ID, u.salt, u.tokenLifeTime)
 }
 
 func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password string, rePass string) (token string, err error) {
@@ -57,22 +60,27 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password s
 		return "", fmt.Errorf("can't generate hash of password: %v", err)
 	}
 
-	token, err = CreateToken(id, u.salt, u.tokenLifeTime)
+	secret, err := GenerateSecret(u.userSecretLen)
 	if err != nil {
-		return "", fmt.Errorf("can't generate user token: %v", err)
+		return "", fmt.Errorf("can't generate secret for user: %v", err)
 	}
 
 	user := &entities.User{
 		ID:    id,
 		Login: login,
-		//Password: password,
-		Hash:  hash,
-		Token: token,
+		//Credential: password,
+		Hash:   hash,
+		Secret: secret,
 	}
 
 	err = u.storage.SaveUser(ctx, user)
 	if err != nil {
 		return "", err
+	}
+
+	token, err = GenerateToken(user.ID, u.salt, u.tokenLifeTime)
+	if err != nil {
+		return "", fmt.Errorf("can't generate user token: %v", err)
 	}
 
 	return token, nil
@@ -88,6 +96,7 @@ func GenerateHash(password, salt string) (hash string, err error) {
 }
 
 func GenerateID(login, salt string) string {
+
 	hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, login, salt)))
 	return hex.EncodeToString(hash[:])
 }
@@ -97,7 +106,7 @@ type Claims struct {
 	UserID string
 }
 
-func CreateToken(userid string, secret string, lifetime time.Duration) (token string, err error) {
+func GenerateToken(userid string, secret string, lifetime time.Duration) (token string, err error) {
 	tokenLife := time.Now().Add(lifetime)
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -111,4 +120,13 @@ func CreateToken(userid string, secret string, lifetime time.Duration) (token st
 	}
 
 	return token, nil
+}
+
+func GenerateSecret(secretLen int) (secret string, err error) {
+	sl, err := crypto.GenRandSlice(secretLen)
+	if err != nil {
+		return "", nil
+	}
+
+	return hex.EncodeToString(sl), nil
 }

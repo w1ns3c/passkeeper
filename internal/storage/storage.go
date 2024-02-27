@@ -1,51 +1,28 @@
-package handlers
+package storage
 
 import (
 	"context"
-	"errors"
 
 	"github.com/w1nsec/passkeeper/internal/entities"
-	pb "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles"
-	"github.com/w1nsec/passkeeper/internal/usecase"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
-type UsersHandler struct {
-	pb.UnimplementedUserSvcServer
-	service usecase.UserUsecase
+type Storage interface {
+	Init(ctx context.Context) error
+	UserStorage
+	CredentialStorage
 }
 
-//rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
-//rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
-
-func (s *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegisterRequest) (resp *pb.UserRegisterResponse, err error) {
-	token, err := s.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
-	if err != nil {
-		if !errors.Is(err, entities.ErrUserNotFound) {
-			return nil, status.Errorf(codes.AlreadyExists, "user already exist: %v", err)
-		}
-		return nil, status.Errorf(codes.Canceled, "can't register user: %v", err)
-	}
-
-	resp = &pb.UserRegisterResponse{
-		// TODO change Err to Token
-		Err: token,
-	}
-
-	return resp, nil
+type UserStorage interface {
+	CheckUserExist(ctx context.Context, login string) (exist bool, err error)
+	RefreshToken(ctx context.Context, login string) error
+	LoginUser(ctx context.Context, login, hash string) (user *entities.User, err error)
+	SaveUser(ctx context.Context, u *entities.User) error
 }
 
-func (s *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginRequest) (resp *pb.UserLoginResponse, err error) {
-	token, err := s.service.LoginUser(ctx, request.Login, request.Password)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "can't register user: %v", err)
-
-	}
-
-	resp = &pb.UserLoginResponse{
-		Token: token,
-	}
-
-	return resp, nil
+type CredentialStorage interface {
+	AddCredential(ctx context.Context, userID string, password *entities.Credential) error
+	GetCredential(ctx context.Context, userID, passwordID string) (password *entities.Credential, err error)
+	GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.Credential, err error)
+	DeleteCredential(ctx context.Context, userID, passwordID string) error
+	UpdateCredential(ctx context.Context, userID string, password *entities.Credential) error
 }

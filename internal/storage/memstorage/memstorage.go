@@ -16,7 +16,7 @@ var (
 type MemStorage struct {
 	users     map[string]*entities.User
 	usersMU   *sync.RWMutex
-	passwords map[string][]*entities.Password
+	passwords map[string][]*entities.Credential
 	passMU    *sync.RWMutex
 }
 
@@ -34,7 +34,7 @@ func (m *MemStorage) Init(ctx context.Context) error {
 	}
 
 	if m.passwords == nil {
-		m.passwords = make(map[string][]*entities.Password)
+		m.passwords = make(map[string][]*entities.Credential)
 	}
 
 	return nil

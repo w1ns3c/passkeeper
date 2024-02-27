@@ -6,12 +6,12 @@ import (
 	"github.com/w1nsec/passkeeper/internal/entities"
 )
 
-func (m *MemStorage) AddPassword(ctx context.Context, userID string, password *entities.Password) error {
+func (m *MemStorage) AddCredential(ctx context.Context, userID string, password *entities.Credential) error {
 	m.passMU.Lock()
 	defer m.passMU.Unlock()
 
 	if m.passwords[userID] == nil {
-		m.passwords[userID] = make([]*entities.Password, 1)
+		m.passwords[userID] = make([]*entities.Credential, 1)
 		m.passwords[userID][0] = password
 		return nil
 	}
@@ -20,7 +20,7 @@ func (m *MemStorage) AddPassword(ctx context.Context, userID string, password *e
 	return nil
 }
 
-func (m *MemStorage) GetPassword(ctx context.Context, userID, passwordID string) (password *entities.Password, err error) {
+func (m *MemStorage) GetCredential(ctx context.Context, userID, passwordID string) (password *entities.Credential, err error) {
 	m.passMU.RLock()
 	defer m.passMU.RUnlock()
 
@@ -36,7 +36,7 @@ func (m *MemStorage) GetPassword(ctx context.Context, userID, passwordID string)
 	return nil, ErrPassNotFound
 }
 
-func (m *MemStorage) GetAllPasswords(ctx context.Context, userID string) (passwords []*entities.Password, err error) {
+func (m *MemStorage) GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.Credential, err error) {
 	m.passMU.RLock()
 	defer m.passMU.RUnlock()
 
@@ -48,7 +48,7 @@ func (m *MemStorage) GetAllPasswords(ctx context.Context, userID string) (passwo
 	return pass, nil
 }
 
-func (m *MemStorage) DeletePassword(ctx context.Context, userID, passwordID string) error {
+func (m *MemStorage) DeleteCredential(ctx context.Context, userID, passwordID string) error {
 	m.passMU.Lock()
 	defer m.passMU.Unlock()
 
@@ -67,7 +67,7 @@ func (m *MemStorage) DeletePassword(ctx context.Context, userID, passwordID stri
 	return ErrPassNotFound
 }
 
-func (m *MemStorage) UpdatePassword(ctx context.Context, userID string, password *entities.Password) error {
+func (m *MemStorage) UpdateCredential(ctx context.Context, userID string, password *entities.Credential) error {
 	m.passMU.Lock()
 	defer m.passMU.Unlock()
 

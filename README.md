@@ -1,2 +1,2 @@
 # passkeeper
-Password manager on Go (client/server)
+Credential manager on Go (client/server)

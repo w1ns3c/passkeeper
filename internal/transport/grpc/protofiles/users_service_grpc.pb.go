@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v3.12.4
-// source: internal/transport/grpc/protofiles/communication.proto
+// source: internal/transport/grpc/protofiles/users_service.proto
 
 package protofiles
 
@@ -23,7 +23,7 @@ const (
 	UserSvc_LoginUser_FullMethodName    = "/UserSvc/LoginUser"
 )
 
-// UserSvcClient is the client API for UserSvc usecase.
+// UserSvcClient is the client API for UserSvc service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserSvcClient interface {
@@ -57,7 +57,7 @@ func (c *userSvcClient) LoginUser(ctx context.Context, in *UserLoginRequest, opt
 	return out, nil
 }
 
-// UserSvcServer is the server API for UserSvc usecase.
+// UserSvcServer is the server API for UserSvc service.
 // All implementations must embed UnimplementedUserSvcServer
 // for forward compatibility
 type UserSvcServer interface {
@@ -78,7 +78,7 @@ func (UnimplementedUserSvcServer) LoginUser(context.Context, *UserLoginRequest) 
 }
 func (UnimplementedUserSvcServer) mustEmbedUnimplementedUserSvcServer() {}
 
-// UnsafeUserSvcServer may be embedded to opt out of forward compatibility for this usecase.
+// UnsafeUserSvcServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to UserSvcServer will
 // result in compilation errors.
 type UnsafeUserSvcServer interface {
@@ -125,7 +125,7 @@ func _UserSvc_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
-// UserSvc_ServiceDesc is the grpc.ServiceDesc for UserSvc usecase.
+// UserSvc_ServiceDesc is the grpc.ServiceDesc for UserSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UserSvc_ServiceDesc = grpc.ServiceDesc{
@@ -142,5 +142,5 @@ var UserSvc_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "internal/transport/grpc/protofiles/communication.proto",
+	Metadata: "internal/transport/grpc/protofiles/users_service.proto",
 }
