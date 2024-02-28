@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/w1nsec/passkeeper/internal/config"
@@ -19,15 +20,12 @@ type CredUsecaseInf interface {
 	UpdateCredential(ctx context.Context, userToken string, cred *entities.Credential) error
 	DeleteCredential(ctx context.Context, userToken, credID string) error
 	ListCredentials(ctx context.Context, userToken string) (creds []*entities.Credential, err error)
+
+	//VerifyCredDate(cred *entities.Credential) // check date/time in received credential
+
 	//EncryptPwd(ctx context.Context, password string) (encPwd string, err error)
 	//DecryptPass(ctx context.Context, encPwd string) (password string, err error)
 }
-
-//LoginUser(ctx context.Context,
-//			login string, password string) (token string, err error)
-
-//RegisterUser(ctx context.Context,
-//			login string, password string, rePass string) (token string, err error)
 
 type CredUsecase struct {
 	storage storage.CredentialStorage
@@ -35,6 +33,7 @@ type CredUsecase struct {
 	log     *zerolog.Logger
 }
 
+// TODO extract userID from userToken
 func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error) {
 	cred, err = u.storage.GetCredential(ctx, userToken, credID)
 	if err != nil {
@@ -59,6 +58,7 @@ func (u *CredUsecase) AddCredential(ctx context.Context,
 
 	cred.ID = GenerateID(sec, u.salt)
 	cred.Password, err = EncryptPass(cred.Password)
+	VerifyCredDate(cred)
 
 	return u.storage.AddCredential(ctx, userToken, cred)
 }
@@ -73,6 +73,7 @@ func (u *CredUsecase) UpdateCredential(ctx context.Context,
 
 	cred.ID = GenerateID(sec, u.salt)
 	cred.Password, err = EncryptPass(cred.Password)
+	VerifyCredDate(cred)
 
 	return u.storage.UpdateCredential(ctx, userToken, cred)
 }
@@ -101,6 +102,15 @@ func (u *CredUsecase) ListCredentials(ctx context.Context,
 	}
 
 	return creds, nil
+}
+
+// VerifyCredDate verify date/time in received credential
+// if date too old, update it
+func VerifyCredDate(cred *entities.Credential) {
+	now := time.Now()
+	if cred.Date.Sub(now) > time.Hour*24 {
+		cred.Date = now
+	}
 }
 
 func EncryptPass(password string) (encPass string, err error) {

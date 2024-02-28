@@ -53,12 +53,13 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password s
 		return "", fmt.Errorf("user is already exist:%v", err)
 	}
 
-	id := GenerateID(login, u.salt)
-
 	hash, err := GenerateHash(password, u.salt)
 	if err != nil {
 		return "", fmt.Errorf("can't generate hash of password: %v", err)
 	}
+
+	m := md5.Sum([]byte(hash))
+	id := GenerateID(hex.EncodeToString(m[:]), u.salt)
 
 	secret, err := GenerateSecret(u.userSecretLen)
 	if err != nil {
@@ -95,9 +96,9 @@ func GenerateHash(password, salt string) (hash string, err error) {
 	return string(h), nil
 }
 
-func GenerateID(login, salt string) string {
+func GenerateID(secret, salt string) string {
+	hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, secret, salt)))
 
-	hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, login, salt)))
 	return hex.EncodeToString(hash[:])
 }
 

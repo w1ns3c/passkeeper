@@ -8,6 +8,7 @@ package protofiles
 
 import (
 	context "context"
+	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -30,11 +31,11 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CredSvcClient interface {
-	CredAdd(ctx context.Context, in *CredAddRequest, opts ...grpc.CallOption) (*CredAddResponse, error)
+	CredAdd(ctx context.Context, in *CredAddRequest, opts ...grpc.CallOption) (*empty.Empty, error)
 	CredGet(ctx context.Context, in *CredGetRequest, opts ...grpc.CallOption) (*CredGetResponse, error)
-	CredUpd(ctx context.Context, in *CredUpdRequest, opts ...grpc.CallOption) (*CredUpdResponse, error)
-	CredDel(ctx context.Context, in *CredDelRequest, opts ...grpc.CallOption) (*CredDelResponse, error)
-	CredList(ctx context.Context, in *CredListRequest, opts ...grpc.CallOption) (*CredListResponse, error)
+	CredUpd(ctx context.Context, in *CredUpdRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	CredDel(ctx context.Context, in *CredDelRequest, opts ...grpc.CallOption) (*empty.Empty, error)
+	CredList(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CredListResponse, error)
 }
 
 type credSvcClient struct {
@@ -45,8 +46,8 @@ func NewCredSvcClient(cc grpc.ClientConnInterface) CredSvcClient {
 	return &credSvcClient{cc}
 }
 
-func (c *credSvcClient) CredAdd(ctx context.Context, in *CredAddRequest, opts ...grpc.CallOption) (*CredAddResponse, error) {
-	out := new(CredAddResponse)
+func (c *credSvcClient) CredAdd(ctx context.Context, in *CredAddRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, CredSvc_CredAdd_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -63,8 +64,8 @@ func (c *credSvcClient) CredGet(ctx context.Context, in *CredGetRequest, opts ..
 	return out, nil
 }
 
-func (c *credSvcClient) CredUpd(ctx context.Context, in *CredUpdRequest, opts ...grpc.CallOption) (*CredUpdResponse, error) {
-	out := new(CredUpdResponse)
+func (c *credSvcClient) CredUpd(ctx context.Context, in *CredUpdRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, CredSvc_CredUpd_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -72,8 +73,8 @@ func (c *credSvcClient) CredUpd(ctx context.Context, in *CredUpdRequest, opts ..
 	return out, nil
 }
 
-func (c *credSvcClient) CredDel(ctx context.Context, in *CredDelRequest, opts ...grpc.CallOption) (*CredDelResponse, error) {
-	out := new(CredDelResponse)
+func (c *credSvcClient) CredDel(ctx context.Context, in *CredDelRequest, opts ...grpc.CallOption) (*empty.Empty, error) {
+	out := new(empty.Empty)
 	err := c.cc.Invoke(ctx, CredSvc_CredDel_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -81,7 +82,7 @@ func (c *credSvcClient) CredDel(ctx context.Context, in *CredDelRequest, opts ..
 	return out, nil
 }
 
-func (c *credSvcClient) CredList(ctx context.Context, in *CredListRequest, opts ...grpc.CallOption) (*CredListResponse, error) {
+func (c *credSvcClient) CredList(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*CredListResponse, error) {
 	out := new(CredListResponse)
 	err := c.cc.Invoke(ctx, CredSvc_CredList_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -94,11 +95,11 @@ func (c *credSvcClient) CredList(ctx context.Context, in *CredListRequest, opts 
 // All implementations must embed UnimplementedCredSvcServer
 // for forward compatibility
 type CredSvcServer interface {
-	CredAdd(context.Context, *CredAddRequest) (*CredAddResponse, error)
+	CredAdd(context.Context, *CredAddRequest) (*empty.Empty, error)
 	CredGet(context.Context, *CredGetRequest) (*CredGetResponse, error)
-	CredUpd(context.Context, *CredUpdRequest) (*CredUpdResponse, error)
-	CredDel(context.Context, *CredDelRequest) (*CredDelResponse, error)
-	CredList(context.Context, *CredListRequest) (*CredListResponse, error)
+	CredUpd(context.Context, *CredUpdRequest) (*empty.Empty, error)
+	CredDel(context.Context, *CredDelRequest) (*empty.Empty, error)
+	CredList(context.Context, *empty.Empty) (*CredListResponse, error)
 	mustEmbedUnimplementedCredSvcServer()
 }
 
@@ -106,19 +107,19 @@ type CredSvcServer interface {
 type UnimplementedCredSvcServer struct {
 }
 
-func (UnimplementedCredSvcServer) CredAdd(context.Context, *CredAddRequest) (*CredAddResponse, error) {
+func (UnimplementedCredSvcServer) CredAdd(context.Context, *CredAddRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CredAdd not implemented")
 }
 func (UnimplementedCredSvcServer) CredGet(context.Context, *CredGetRequest) (*CredGetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CredGet not implemented")
 }
-func (UnimplementedCredSvcServer) CredUpd(context.Context, *CredUpdRequest) (*CredUpdResponse, error) {
+func (UnimplementedCredSvcServer) CredUpd(context.Context, *CredUpdRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CredUpd not implemented")
 }
-func (UnimplementedCredSvcServer) CredDel(context.Context, *CredDelRequest) (*CredDelResponse, error) {
+func (UnimplementedCredSvcServer) CredDel(context.Context, *CredDelRequest) (*empty.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CredDel not implemented")
 }
-func (UnimplementedCredSvcServer) CredList(context.Context, *CredListRequest) (*CredListResponse, error) {
+func (UnimplementedCredSvcServer) CredList(context.Context, *empty.Empty) (*CredListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CredList not implemented")
 }
 func (UnimplementedCredSvcServer) mustEmbedUnimplementedCredSvcServer() {}
@@ -207,7 +208,7 @@ func _CredSvc_CredDel_Handler(srv interface{}, ctx context.Context, dec func(int
 }
 
 func _CredSvc_CredList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CredListRequest)
+	in := new(empty.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -219,7 +220,7 @@ func _CredSvc_CredList_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: CredSvc_CredList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredSvcServer).CredList(ctx, req.(*CredListRequest))
+		return srv.(CredSvcServer).CredList(ctx, req.(*empty.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
