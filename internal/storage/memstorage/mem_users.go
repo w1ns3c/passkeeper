@@ -24,10 +24,6 @@ func (m *MemStorage) LoginUser(ctx context.Context, login, hash string) (user *e
 		return nil, fmt.Errorf("user %s not exist", login)
 	}
 
-	if user.Hash != hash {
-		return nil, fmt.Errorf("password %s is wrong", login)
-	}
-
 	return user, err
 }
 
@@ -38,4 +34,7 @@ func (m *MemStorage) SaveUser(ctx context.Context, u *entities.User) error {
 	m.users[u.Login] = u
 	//m.passwords[u.ID] = make([]entities.Credential, 0)
 	return nil
+}
+func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
+
 }

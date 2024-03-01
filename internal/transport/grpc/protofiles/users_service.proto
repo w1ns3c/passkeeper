@@ -1,7 +1,6 @@
-
-
 syntax = "proto3";
 option go_package = "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles";
+import "google/protobuf/empty.proto";
 
 message UserRegisterRequest {
   string Login = 1;
@@ -23,8 +22,15 @@ message UserLoginResponse {
   string Token = 1;
 }
 
+message UserChangePassReq {
+  string OldPass = 1;
+  string NewPass = 2;
+  string Repeat = 3;
+}
 
 service UserSvc {
   rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
   rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
+  rpc ChangePass(UserChangePassReq) returns (google.protobuf.Empty);
+
 }

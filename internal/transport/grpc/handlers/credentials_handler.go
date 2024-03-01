@@ -158,7 +158,7 @@ func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*em
 }
 
 func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb.CredListResponse, err error) {
-	token, err := ExtractUserToken(ctx)
+	userID, err := ExtractUserToken(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()
@@ -166,7 +166,7 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 		return nil, err
 	}
 
-	creds, err := h.service.ListCredentials(ctx, token)
+	creds, err := h.service.ListCredentials(ctx, userID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredListMsg)

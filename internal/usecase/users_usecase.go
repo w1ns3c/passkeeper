@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/rs/zerolog"
 	"github.com/w1nsec/go-examples/crypto"
 	"golang.org/x/crypto/bcrypt"
 
@@ -16,9 +17,18 @@ import (
 	"github.com/w1nsec/passkeeper/internal/storage"
 )
 
+var (
+	ErrGetUser       = fmt.Errorf("can't get user by ID")
+	ErrGenHash       = fmt.Errorf("can't generate hash of password")
+	ErrWrongPassword = fmt.Errorf("old password is wrong")
+	ErrRepassNotSame = fmt.Errorf("new pass and repeat not the same")
+	ErrWrongAuth     = fmt.Errorf("wrong user/password")
+)
+
 type UserUsecaseInf interface {
 	LoginUser(ctx context.Context, login string, password string) (token string, err error)
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token string, err error)
+	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
 }
 
 type UserUsecase struct {
@@ -26,6 +36,59 @@ type UserUsecase struct {
 	salt          string
 	tokenLifeTime time.Duration
 	userSecretLen int
+	log           *zerolog.Logger
+}
+
+func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error) {
+	user, err := u.storage.GetUserByID(ctx, userID)
+	if err != nil {
+		u.log.Error().Err(err).
+			Msg(ErrGetUser.Error())
+
+		return ErrGetUser
+	}
+
+	hOld, err := GenerateHash(oldPass, u.salt)
+	if err != nil {
+		u.log.Error().Err(err).
+			Msg(ErrGenHash.Error())
+
+		return ErrGenHash
+	}
+
+	if hOld != user.Hash {
+		u.log.Error().
+			Err(ErrWrongPassword).Send()
+
+		return ErrWrongPassword
+	}
+
+	hNew1, err := GenerateHash(newPass, u.salt)
+	if err != nil {
+		u.log.Error().Err(err).
+			Msg(ErrGenHash.Error())
+
+		return ErrGenHash
+	}
+
+	hNew2, err := GenerateHash(reNewPass, u.salt)
+	if err != nil {
+		u.log.Error().Err(err).
+			Msg(ErrGenHash.Error())
+
+		return ErrGenHash
+	}
+
+	if hNew1 != hNew2 {
+		u.log.Error().
+			Err(ErrRepassNotSame).Send()
+
+		return ErrRepassNotSame
+	}
+
+	user.Hash = hNew1
+	return u.storage.SaveUser(ctx, user)
+
 }
 
 func (u *UserUsecase) LoginUser(ctx context.Context, login string, password string) (token string, err error) {
@@ -36,7 +99,11 @@ func (u *UserUsecase) LoginUser(ctx context.Context, login string, password stri
 
 	user, err := u.storage.LoginUser(ctx, login, hash)
 	if err != nil {
-		return "", fmt.Errorf("wrong login/password: %v", err)
+		return "", fmt.Errorf("wrong login: %v", err)
+	}
+
+	if user.Hash != hash {
+		return "", fmt.Errorf("wrong auth for user: %s", login)
 	}
 
 	return GenerateToken(user.ID, u.salt, u.tokenLifeTime)

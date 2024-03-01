@@ -13,6 +13,7 @@ type Storage interface {
 }
 
 type UserStorage interface {
+	GetUserByID(cxt context.Context, userID string) (user *entities.User, err error)
 	CheckUserExist(ctx context.Context, login string) (exist bool, err error)
 	RefreshToken(ctx context.Context, login string) error
 	LoginUser(ctx context.Context, login, hash string) (user *entities.User, err error)

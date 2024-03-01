@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
 	"github.com/w1nsec/passkeeper/internal/entities"
 	pb "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles"
@@ -68,4 +69,19 @@ func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginReque
 	}
 
 	return resp, nil
+}
+
+func (h *UsersHandler) ChangePass(ctx context.Context, req *pb.UserChangePassReq) (*empty.Empty, error) {
+	userID, err := ExtractUserToken(ctx)
+	if err != nil {
+		h.log.Error().
+			Err(err).Send()
+
+		return nil, err
+	}
+
+	err = h.service.ChangePassword(ctx, userID,
+		req.OldPass, req.NewPass, req.Repeat)
+	
+	return nil, err
 }
