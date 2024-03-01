@@ -45,7 +45,7 @@ type CredsHandler struct {
 }
 
 func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*empty.Empty, error) {
-	token, err := ExtractUserToken(ctx)
+	userID, err := ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()
@@ -61,7 +61,7 @@ func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*em
 		Description: req.Cred.Description,
 	}
 
-	err = h.service.AddCredential(ctx, token, cred)
+	err = h.service.AddCredential(ctx, userID, cred)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredAddMsg)
@@ -73,7 +73,7 @@ func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*em
 }
 
 func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (resp *pb.CredGetResponse, err error) {
-	token, err := ExtractUserToken(ctx)
+	userID, err := ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()
@@ -81,7 +81,7 @@ func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (res
 		return nil, err
 	}
 
-	cr, err := h.service.GetCredential(ctx, token, req.CredID)
+	cr, err := h.service.GetCredential(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredGetMsg)
@@ -102,7 +102,7 @@ func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (res
 }
 
 func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*empty.Empty, error) {
-	token, err := ExtractUserToken(ctx)
+	userID, err := ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()
@@ -126,7 +126,7 @@ func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*em
 		Description: req.Cred.Description,
 	}
 
-	err = h.service.AddCredential(ctx, token, cred)
+	err = h.service.AddCredential(ctx, userID, cred)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredUpdMsg)
@@ -138,7 +138,7 @@ func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*em
 }
 
 func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*empty.Empty, error) {
-	token, err := ExtractUserToken(ctx)
+	userID, err := ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()
@@ -146,7 +146,7 @@ func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*em
 		return nil, err
 	}
 
-	err = h.service.DeleteCredential(ctx, token, req.CredID)
+	err = h.service.DeleteCredential(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredDelMsg)
@@ -158,7 +158,7 @@ func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*em
 }
 
 func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb.CredListResponse, err error) {
-	userID, err := ExtractUserToken(ctx)
+	userID, err := ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()
@@ -188,7 +188,7 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 	return resp, nil
 }
 
-func ExtractUserToken(ctx context.Context) (token string, err error) {
+func ExtractUserInfo(ctx context.Context) (token string, err error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return "", ErrNoToken

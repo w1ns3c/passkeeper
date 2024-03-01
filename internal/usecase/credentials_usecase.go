@@ -33,7 +33,6 @@ type CredUsecase struct {
 	log     *zerolog.Logger
 }
 
-// TODO extract userID from userToken
 func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error) {
 	cred, err = u.storage.GetCredential(ctx, userToken, credID)
 	if err != nil {

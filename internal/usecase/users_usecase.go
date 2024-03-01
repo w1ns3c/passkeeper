@@ -23,12 +23,14 @@ var (
 	ErrWrongPassword = fmt.Errorf("old password is wrong")
 	ErrRepassNotSame = fmt.Errorf("new pass and repeat not the same")
 	ErrWrongAuth     = fmt.Errorf("wrong user/password")
+	ErrInvalidToken  = fmt.Errorf("token sign is not valid")
 )
 
 type UserUsecaseInf interface {
 	LoginUser(ctx context.Context, login string, password string) (token string, err error)
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token string, err error)
 	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
+	GetTokenSalt() string
 }
 
 type UserUsecase struct {
@@ -169,9 +171,22 @@ func GenerateID(secret, salt string) string {
 	return hex.EncodeToString(hash[:])
 }
 
+func (u *UserUsecase) GetTokenSalt() string {
+	return u.salt
+}
+
 type Claims struct {
 	jwt.RegisteredClaims
 	UserID string
+}
+
+func GenerateSecret(secretLen int) (secret string, err error) {
+	sl, err := crypto.GenRandSlice(secretLen)
+	if err != nil {
+		return "", nil
+	}
+
+	return hex.EncodeToString(sl), nil
 }
 
 func GenerateToken(userid string, secret string, lifetime time.Duration) (token string, err error) {
@@ -190,11 +205,23 @@ func GenerateToken(userid string, secret string, lifetime time.Duration) (token 
 	return token, nil
 }
 
-func GenerateSecret(secretLen int) (secret string, err error) {
-	sl, err := crypto.GenRandSlice(secretLen)
+func CheckToken(tokenstr, secret string) (userID string, err error) {
+	claims := &Claims{}
+	token, err := jwt.ParseWithClaims(tokenstr, claims,
+		func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+			}
+			return []byte(secret), nil
+		})
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
-	return hex.EncodeToString(sl), nil
+	if !token.Valid {
+		return "", errors.ErrInvalidCookie
+	}
+
+	// возвращаем ID пользователя в читаемом виде
+	return claims.UserID, nil
 }

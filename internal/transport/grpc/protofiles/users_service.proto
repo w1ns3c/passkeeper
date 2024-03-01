@@ -22,15 +22,7 @@ message UserLoginResponse {
   string Token = 1;
 }
 
-message UserChangePassReq {
-  string OldPass = 1;
-  string NewPass = 2;
-  string Repeat = 3;
-}
-
 service UserSvc {
   rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
   rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
-  rpc ChangePass(UserChangePassReq) returns (google.protobuf.Empty);
-
-}
+  }
