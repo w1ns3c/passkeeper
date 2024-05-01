@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	ErrUserNotExist = fmt.Errorf("user %s not exist", login)
+	ErrUserNotExist = fmt.Errorf("user not exist")
 )
 
 func (m *MemStorage) CheckUserExist(ctx context.Context, login string) (exist bool, err error) {
