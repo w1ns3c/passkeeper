@@ -13,6 +13,8 @@
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+*.elf
+*.exe
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
@@ -22,3 +24,4 @@ go.work
 
 # IDE
 .idea/
+vendor/
