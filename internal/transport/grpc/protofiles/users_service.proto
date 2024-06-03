@@ -1,11 +1,12 @@
 syntax = "proto3";
-option go_package = "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles";
+option go_package = "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto";
 import "google/protobuf/empty.proto";
 
 message UserRegisterRequest {
   string Login = 1;
   string Password = 2;
   string RePassword = 3;
+  string Email = 4;
 
 }
 

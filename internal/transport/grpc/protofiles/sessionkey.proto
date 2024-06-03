@@ -1,5 +1,5 @@
 syntax = "proto3";
-option go_package = "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles";
+option go_package = "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles";
 
 message SessionKeyReq {
   string rsaN = 1;
