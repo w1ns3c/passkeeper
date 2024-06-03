@@ -25,3 +25,12 @@ go.work
 # IDE
 .idea/
 vendor/
+
+
+# old files
+*.old
+*_old
+*old
+
+# protoc command
+protoc_recompile
