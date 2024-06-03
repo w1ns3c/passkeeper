@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/w1nsec/passkeeper/internal/entities"
+	"github.com/w1ns3c/passkeeper/internal/entities"
 )
 
 var (

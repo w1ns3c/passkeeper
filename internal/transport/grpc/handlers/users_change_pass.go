@@ -5,8 +5,8 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
-	pb "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles"
-	"github.com/w1nsec/passkeeper/internal/usecase"
+	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
+	"github.com/w1ns3c/passkeeper/internal/usecase"
 )
 
 type UserPassHandler struct {

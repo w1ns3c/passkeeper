@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/w1nsec/passkeeper/internal/config"
-	"github.com/w1nsec/passkeeper/internal/entities"
-	"github.com/w1nsec/passkeeper/internal/storage"
+	"github.com/w1ns3c/passkeeper/internal/config"
+	"github.com/w1ns3c/passkeeper/internal/entities"
+	"github.com/w1ns3c/passkeeper/internal/storage"
 )
 
 var (

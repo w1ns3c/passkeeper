@@ -5,9 +5,9 @@ import (
 	"errors"
 
 	"github.com/rs/zerolog"
-	"github.com/w1nsec/passkeeper/internal/entities"
-	pb "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles"
-	"github.com/w1nsec/passkeeper/internal/usecase"
+	"github.com/w1ns3c/passkeeper/internal/entities"
+	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
+	"github.com/w1ns3c/passkeeper/internal/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

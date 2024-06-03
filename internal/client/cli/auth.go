@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	pb "github.com/w1nsec/passkeeper/internal/transport/grpc/protofiles"
+	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -55,7 +55,7 @@ func (c *Client) Login(login, password string) error {
 	return nil
 }
 
-func (c *Client) Register(login, password, repeat string) error {
+func (c *Client) Register(login, password, repeat, email string) error {
 	hash1 := Hash(password)
 	hash2 := Hash(repeat)
 	if hash1 != hash2 {

@@ -10,11 +10,11 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rs/zerolog"
-	"github.com/w1nsec/go-examples/crypto"
+	"github.com/w1ns3c/go-examples/crypto"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/w1nsec/passkeeper/internal/entities"
-	"github.com/w1nsec/passkeeper/internal/storage"
+	"github.com/w1ns3c/passkeeper/internal/entities"
+	"github.com/w1ns3c/passkeeper/internal/storage"
 )
 
 var (
