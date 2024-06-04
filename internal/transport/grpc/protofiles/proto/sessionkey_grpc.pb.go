@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: sessionkey.proto
 
-package protofiles
+package proto
 
 import (
 	context "context"

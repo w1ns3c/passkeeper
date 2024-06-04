@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: users_change_pwd.proto
 
-package protofiles
+package proto
 
 import (
 	context "context"

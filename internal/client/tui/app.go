@@ -13,8 +13,6 @@ import (
 const MinPassLen = 8
 
 var (
-	//TuiApp.App               = tview.NewtuiApp.Application()
-	//pages             = tview.NewPages()
 	PageMain            = "Auth"
 	PageLogin           = "Login"
 	PageRegister        = "Register"

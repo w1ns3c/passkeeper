@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles"
+	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
