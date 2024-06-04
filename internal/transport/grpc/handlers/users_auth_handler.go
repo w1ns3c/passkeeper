@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 	"errors"
+	"github.com/w1ns3c/passkeeper/internal/config"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/rs/zerolog"
 	"github.com/w1ns3c/passkeeper/internal/entities"
@@ -22,6 +24,9 @@ var (
 
 	ErrWrongLoginMsg = "can't login user, wrong login/password"
 	ErrWrongLogin    = status.Errorf(codes.PermissionDenied, ErrWrongLoginMsg)
+
+	ErrGenChallengeMsg = "can't generate challenge"
+	ErrGenChallenge    = status.Errorf(codes.Internal, ErrGenChallengeMsg)
 )
 
 type UsersHandler struct {
@@ -54,8 +59,24 @@ func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegiste
 	return resp, nil
 }
 
-func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginRequest) (resp *pb.UserLoginResponse, err error) {
-	token, err := h.service.LoginUser(ctx, request.Login, request.Password)
+//func (h *UsersHandler) ChallengeRequest(ctx context.Context, request *pb.UserChallengeRequest) (resp *pb.UserChallengeResponse, err error) {
+//	token, err := h.service.LoginUser(ctx, request.Login, request.Password)
+//	if err != nil {
+//		h.log.Error().
+//			Err(err).Msg(ErrWrongLoginMsg)
+//
+//		return nil, ErrWrongLogin
+//	}
+//
+//	resp = &pb.UserLoginResponse{
+//		Token: token,
+//	}
+//
+//	return resp, nil
+//}
+
+func (h *UsersHandler) ChallengeRequest(ctx context.Context, request *pb.UserChallengeRequest) (resp *pb.UserChallengeResponse, err error) {
+	challenge, err := h.service.ChallengeGenerate(ctx, request.Login)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrWrongLoginMsg)
@@ -63,8 +84,31 @@ func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginReque
 		return nil, ErrWrongLogin
 	}
 
+	resp = &pb.UserChallengeResponse{
+		Challenge: challenge,
+	}
+
+	return resp, nil
+}
+
+func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserChallengeResult) (resp *pb.UserLoginResponse, err error) {
+	token, err := h.service.LoginUser(ctx, request.Login, request.Challenge)
+	if err != nil {
+		h.log.Error().
+			Err(err).Msg(ErrWrongLoginMsg)
+
+		return nil, ErrWrongLogin
+	}
+
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		md.Append(config.TokenHeader, token)
+	}
+
+	ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
+
 	resp = &pb.UserLoginResponse{
-		Token: token,
+		//Token: token,
 	}
 
 	return resp, nil

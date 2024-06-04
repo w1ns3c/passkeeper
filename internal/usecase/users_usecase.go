@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"github.com/w1ns3c/passkeeper/internal/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -22,15 +23,23 @@ var (
 	ErrGenHash       = fmt.Errorf("can't generate hash of password")
 	ErrWrongPassword = fmt.Errorf("old password is wrong")
 	ErrRepassNotSame = fmt.Errorf("new pass and repeat not the same")
-	ErrWrongAuth     = fmt.Errorf("wrong user/password")
-	ErrInvalidToken  = fmt.Errorf("token sign is not valid")
+
+	ErrChallengeGen  = fmt.Errorf("can't generate challenge")
+	ErrChallengeLife = fmt.Errorf("challenge too old")
+
+	ErrWrongAuth    = fmt.Errorf("wrong user/password")
+	ErrInvalidToken = fmt.Errorf("token sign is not valid")
 )
 
 type UserUsecaseInf interface {
-	LoginUser(ctx context.Context, login string, password string) (token string, err error)
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token string, err error)
+
 	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
 	GetTokenSalt() string
+
+	ChallengeGenerate(ctx context.Context, login string) (challenge string, err error)
+
+	LoginUser(ctx context.Context, login string, password string) (token string, err error)
 }
 
 type UserUsecase struct {
@@ -39,6 +48,37 @@ type UserUsecase struct {
 	tokenLifeTime time.Duration
 	userSecretLen int
 	log           *zerolog.Logger
+}
+
+func (u *UserUsecase) ChallengeGenerate(ctx context.Context, login string) (challenge string, err error) {
+	exist, err := u.storage.CheckUserExist(ctx, login)
+	if !exist {
+		u.log.Error().Err(err).Msg("requested auth for non existed user")
+
+		return "", ErrChallengeGen
+	}
+
+	if err != nil {
+		u.log.Error().Err(err).Msg("can't check user exists")
+
+		return "", ErrChallengeGen
+	}
+
+	challenge, err = crypto.GenRandStr(config.ChallengeLen)
+	if err != nil {
+		u.log.Error().Err(err).Msg("can't generate rand string")
+
+		return "", ErrChallengeGen
+	}
+
+	err = u.storage.SaveChallenge(ctx, challenge)
+	if err != nil {
+		u.log.Error().Err(err).Msg("can't save current user challenge")
+
+		return "", ErrChallengeGen
+	}
+
+	return challenge, nil
 }
 
 func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error) {
@@ -93,22 +133,37 @@ func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPa
 
 }
 
-func (u *UserUsecase) LoginUser(ctx context.Context, login string, password string) (token string, err error) {
-	hash, err := GenerateHash(password, u.salt)
+func (u *UserUsecase) LoginUser(ctx context.Context, login string, challengeRes string) (token string, err error) {
+
+	user, err := u.storage.GetUserByLogin(ctx, login)
 	if err != nil {
-		return "", fmt.Errorf("can't generate hash of password: %v", err)
+		return "", ErrWrongAuth
 	}
 
-	user, err := u.storage.LoginUser(ctx, login, hash)
-	if err != nil {
-		return "", fmt.Errorf("wrong login: %v", err)
-	}
+	same := u.CompareChallenges(challengeRes, user)
 
-	if user.Hash != hash {
+	if !same {
 		return "", fmt.Errorf("wrong auth for user: %s", login)
 	}
 
 	return GenerateToken(user.ID, u.salt, u.tokenLifeTime)
+}
+
+func (u *UserUsecase) CompareChallenges(actualChallenge string, user *entities.User) bool {
+	if time.Since(user.ChallengeTime).Minutes() > config.ChallengeLifeTime {
+		u.log.Error().Err(ErrChallengeLife).Msg("can't generate challenge")
+
+		return false
+	}
+
+	decChallenge, err := crypto.DecryptAES([]byte(actualChallenge), []byte(user.Hash))
+	if err != nil {
+		u.log.Error().Err(err).Msg("can't decrypt challenge")
+
+		return false
+	}
+
+	return string(decChallenge) == actualChallenge
 }
 
 func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password string, rePass string) (token string, err error) {
@@ -219,9 +274,9 @@ func CheckToken(tokenstr, secret string) (userID string, err error) {
 	}
 
 	if !token.Valid {
-		return "", errors.ErrInvalidCookie
+		return "", ErrInvalidToken
 	}
 
-	// возвращаем ID пользователя в читаемом виде
+	// return user ID in readable format
 	return claims.UserID, nil
 }

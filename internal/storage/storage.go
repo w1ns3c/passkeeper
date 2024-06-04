@@ -14,10 +14,12 @@ type Storage interface {
 
 type UserStorage interface {
 	GetUserByID(cxt context.Context, userID string) (user *entities.User, err error)
+	GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error)
 	CheckUserExist(ctx context.Context, login string) (exist bool, err error)
 	RefreshToken(ctx context.Context, login string) error
-	LoginUser(ctx context.Context, login, hash string) (user *entities.User, err error)
+	//LoginUser(ctx context.Context, login, hash string) (user *entities.User, err error)
 	SaveUser(ctx context.Context, u *entities.User) error
+	SaveChallenge(ctx context.Context, challenge string) error
 }
 
 type CredentialStorage interface {

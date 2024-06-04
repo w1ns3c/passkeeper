@@ -28,8 +28,8 @@ github.com/rivo/uniseg v0.4.7/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUc
 github.com/rs/xid v1.5.0/go.mod h1:trrq9SKmegXys3aeAKXMUTdJsYXVwGY3RLcfgqegfbg=
 github.com/rs/zerolog v1.33.0 h1:1cU2KZkvPxNyfgEmhHAz/1A9Bz+llsdYzklWFzgp0r8=
 github.com/rs/zerolog v1.33.0/go.mod h1:/7mN4D5sKwJLZQ2b/znpjC3/GQWY/xaDXUM0kKWRHss=
-github.com/w1ns3c/go-examples v0.0.2 h1:o/+mntRKr81EUPBkTCT0L5+XkPwSSpgCGLB99g6R8lA=
-github.com/w1ns3c/go-examples v0.0.2/go.mod h1:k86nJzd6l7efFstIva0Lypl4in0PeBzbKLVkZKuebmE=
+github.com/w1ns3c/go-examples v0.0.3 h1:2k0K6Q4P1Harm7MXjk/P6Tiyo0jBtDxVrJBrTQ0kdSI=
+github.com/w1ns3c/go-examples v0.0.3/go.mod h1:k86nJzd6l7efFstIva0Lypl4in0PeBzbKLVkZKuebmE=
 github.com/yuin/goldmark v1.4.13/go.mod h1:6yULJ656Px+3vBD8DxQVa3kxgyrAnzto9xy5taEt/CY=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210921155107-089bfa567519/go.mod h1:GvvjBRRGRdwPK5ydBHafDWAxML/pGHZbMvKqRZ5+Abc=

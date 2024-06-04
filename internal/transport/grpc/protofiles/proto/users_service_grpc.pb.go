@@ -22,8 +22,11 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserSvcClient interface {
+	// register service
 	RegisterUser(ctx context.Context, in *UserRegisterRequest, opts ...grpc.CallOption) (*UserRegisterResponse, error)
-	LoginUser(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
+	// login service
+	ChallengeRequest(ctx context.Context, in *UserChallengeRequest, opts ...grpc.CallOption) (*UserChallengeResponse, error)
+	LoginUser(ctx context.Context, in *UserChallengeResult, opts ...grpc.CallOption) (*UserLoginResponse, error)
 }
 
 type userSvcClient struct {
@@ -43,7 +46,16 @@ func (c *userSvcClient) RegisterUser(ctx context.Context, in *UserRegisterReques
 	return out, nil
 }
 
-func (c *userSvcClient) LoginUser(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error) {
+func (c *userSvcClient) ChallengeRequest(ctx context.Context, in *UserChallengeRequest, opts ...grpc.CallOption) (*UserChallengeResponse, error) {
+	out := new(UserChallengeResponse)
+	err := c.cc.Invoke(ctx, "/UserSvc/ChallengeRequest", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userSvcClient) LoginUser(ctx context.Context, in *UserChallengeResult, opts ...grpc.CallOption) (*UserLoginResponse, error) {
 	out := new(UserLoginResponse)
 	err := c.cc.Invoke(ctx, "/UserSvc/LoginUser", in, out, opts...)
 	if err != nil {
@@ -56,8 +68,11 @@ func (c *userSvcClient) LoginUser(ctx context.Context, in *UserLoginRequest, opt
 // All implementations must embed UnimplementedUserSvcServer
 // for forward compatibility
 type UserSvcServer interface {
+	// register service
 	RegisterUser(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error)
-	LoginUser(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
+	// login service
+	ChallengeRequest(context.Context, *UserChallengeRequest) (*UserChallengeResponse, error)
+	LoginUser(context.Context, *UserChallengeResult) (*UserLoginResponse, error)
 	mustEmbedUnimplementedUserSvcServer()
 }
 
@@ -68,7 +83,10 @@ type UnimplementedUserSvcServer struct {
 func (UnimplementedUserSvcServer) RegisterUser(context.Context, *UserRegisterRequest) (*UserRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
 }
-func (UnimplementedUserSvcServer) LoginUser(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
+func (UnimplementedUserSvcServer) ChallengeRequest(context.Context, *UserChallengeRequest) (*UserChallengeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ChallengeRequest not implemented")
+}
+func (UnimplementedUserSvcServer) LoginUser(context.Context, *UserChallengeResult) (*UserLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
 }
 func (UnimplementedUserSvcServer) mustEmbedUnimplementedUserSvcServer() {}
@@ -102,8 +120,26 @@ func _UserSvc_RegisterUser_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserSvc_ChallengeRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserSvcServer).ChallengeRequest(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/UserSvc/ChallengeRequest",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserSvcServer).ChallengeRequest(ctx, req.(*UserChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserSvc_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserLoginRequest)
+	in := new(UserChallengeResult)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -115,7 +151,7 @@ func _UserSvc_LoginUser_Handler(srv interface{}, ctx context.Context, dec func(i
 		FullMethod: "/UserSvc/LoginUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserSvcServer).LoginUser(ctx, req.(*UserLoginRequest))
+		return srv.(UserSvcServer).LoginUser(ctx, req.(*UserChallengeResult))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -130,6 +166,10 @@ var UserSvc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterUser",
 			Handler:    _UserSvc_RegisterUser_Handler,
+		},
+		{
+			MethodName: "ChallengeRequest",
+			Handler:    _UserSvc_ChallengeRequest_Handler,
 		},
 		{
 			MethodName: "LoginUser",
