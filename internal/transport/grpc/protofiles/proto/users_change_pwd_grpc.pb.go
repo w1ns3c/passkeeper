@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: users_change_pwd.proto
+// source: internal/transport/grpc/protofiles/users_change_pwd.proto
 
 package proto
 
@@ -102,5 +102,5 @@ var UserPassSvc_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "users_change_pwd.proto",
+	Metadata: "internal/transport/grpc/protofiles/users_change_pwd.proto",
 }

@@ -164,7 +164,7 @@ func (app *TUI) FilterUserRegValues(email, username, password, passRepeat string
 	return nil
 }
 
-func Login(username, password string) bool {
+func (app *TUI) Login(username, password string) bool {
 	pass, ok := users[username]
 	if !ok {
 		return false

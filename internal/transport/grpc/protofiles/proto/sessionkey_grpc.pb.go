@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.12.4
-// source: sessionkey.proto
+// source: internal/transport/grpc/protofiles/sessionkey.proto
 
 package proto
 
@@ -101,5 +101,5 @@ var SessionKeySvc_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "sessionkey.proto",
+	Metadata: "internal/transport/grpc/protofiles/sessionkey.proto",
 }
