@@ -5,10 +5,11 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-
+	"github.com/w1ns3c/passkeeper/internal/config"
 	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 var (
@@ -16,8 +17,9 @@ var (
 )
 
 type Client struct {
-	ctx   context.Context
-	Token string
+	ctx        context.Context
+	Token      string
+	SecretHash string
 
 	userSvc pb.UserSvcClient
 	passSvc pb.UserPassSvcClient
@@ -37,12 +39,11 @@ func NewClient(ctx context.Context, addr string) (cli *Client, err error) {
 	}, nil
 }
 
-func (c *Client) Login(login, password string) error {
-	hash := Hash(password)
+func (c *Client) Login(ctx context.Context, login, password string) error {
 
 	req := &pb.UserLoginRequest{
-		Login:    login,
-		Password: hash,
+		Login:    "",
+		Password: "",
 	}
 
 	resp, err := c.userSvc.LoginUser(c.ctx, req)
@@ -50,7 +51,16 @@ func (c *Client) Login(login, password string) error {
 		return err
 	}
 
-	c.Token = resp.Token
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		tokens := md.Get(config.TokenHeader)
+		if len(tokens) < 1 {
+			return fmt.Errorf("no token in response")
+		}
+		c.Token = tokens[0]
+	}
+
+	c.SecretHash = resp.GetSecret()
 
 	return nil
 }

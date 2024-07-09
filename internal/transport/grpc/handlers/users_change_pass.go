@@ -2,16 +2,16 @@ package handlers
 
 import (
 	"context"
+	"github.com/w1ns3c/passkeeper/internal/usecase/srv"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
 	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
-	"github.com/w1ns3c/passkeeper/internal/usecase"
 )
 
 type UserPassHandler struct {
 	pb.UnimplementedUserPassSvcServer
-	service usecase.UserUsecaseInf
+	service srv.UserUsecaseInf
 	log     *zerolog.Logger
 }
 

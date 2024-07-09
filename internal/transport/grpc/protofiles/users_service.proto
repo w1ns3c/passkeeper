@@ -19,32 +19,38 @@ message UserLoginRequest {
   string Password = 2;
 }
 
-// create challenge / response auth
-// request challenge
-message UserChallengeRequest {
-  string Login = 1;
-}
-
-// response challenge
-message UserChallengeResponse {
-  string Challenge = 1;
-}
-
-// send challenge calculation
-message UserChallengeResult {
-  string Challenge = 1;
-  string Login = 2;
-}
-
 message UserLoginResponse {
-//  string Token = 1;
+  //  string Token = 1;
+  string Secret = 1;
 }
+
+//// create challenge / response auth
+//// request challenge
+//message UserChallengeRequest {
+//  string Login = 1;
+//}
+//
+//// response challenge
+//message UserChallengeResponse {
+//  string Challenge = 1;
+//}
+//
+//// send challenge calculation
+//message UserChallengeResult {
+//  string Challenge = 1;
+//  string Login = 2;
+//}
+//
+
 
 service UserSvc {
   // register service
   rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
 
   // login service
-  rpc ChallengeRequest(UserChallengeRequest) returns (UserChallengeResponse);
-  rpc LoginUser(UserChallengeResult) returns (UserLoginResponse);
+  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
+
+  // old login service
+  //  rpc ChallengeRequest(UserChallengeRequest) returns (UserChallengeResponse);
+  //  rpc LoginUser(UserChallengeResult) returns (UserLoginResponse);
   }

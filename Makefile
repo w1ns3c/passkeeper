@@ -1,7 +1,7 @@
 
 
 proto:
-	rm internal/transport/grpc/protofiles/*.go
+	rm -f internal/transport/grpc/protofiles/*.go
 
 	/usr/bin/protoc --go_out=. --go_opt=paths=source_relative \
             --go-grpc_out=. --go-grpc_opt=paths=source_relative \

@@ -2,10 +2,10 @@ package interceptors
 
 import (
 	"context"
+	"github.com/w1ns3c/passkeeper/internal/usecase/srv"
 
 	"github.com/w1ns3c/passkeeper/internal/config"
 	"github.com/w1ns3c/passkeeper/internal/transport/grpc/handlers"
-	"github.com/w1ns3c/passkeeper/internal/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -16,7 +16,7 @@ var (
 )
 
 type AuthInterceptor struct {
-	service usecase.UserUsecaseInf
+	service srv.UserUsecaseInf
 }
 
 func (in *AuthInterceptor) AuthFunc(ctx context.Context) (context.Context, error) {
@@ -25,7 +25,7 @@ func (in *AuthInterceptor) AuthFunc(ctx context.Context) (context.Context, error
 		return nil, err
 	}
 
-	userID, err := usecase.CheckToken(token, in.service.GetTokenSalt())
+	userID, err := srv.CheckToken(token, in.service.GetTokenSalt())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
 	}

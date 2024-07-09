@@ -1,12 +1,12 @@
-package usecase
+package srv
 
 import (
 	"context"
 	"crypto/md5"
+	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"github.com/w1ns3c/passkeeper/internal/config"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -24,11 +24,10 @@ var (
 	ErrWrongPassword = fmt.Errorf("old password is wrong")
 	ErrRepassNotSame = fmt.Errorf("new pass and repeat not the same")
 
-	ErrChallengeGen  = fmt.Errorf("can't generate challenge")
-	ErrChallengeLife = fmt.Errorf("challenge too old")
-
 	ErrWrongAuth    = fmt.Errorf("wrong user/password")
 	ErrInvalidToken = fmt.Errorf("token sign is not valid")
+
+	ErrUserSecret = fmt.Errorf("can't generate user secret hash")
 )
 
 type UserUsecaseInf interface {
@@ -37,9 +36,7 @@ type UserUsecaseInf interface {
 	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
 	GetTokenSalt() string
 
-	ChallengeGenerate(ctx context.Context, login string) (challenge string, err error)
-
-	LoginUser(ctx context.Context, login string, password string) (token string, err error)
+	LoginUser(ctx context.Context, login string, password string) (token, secret string, err error)
 }
 
 type UserUsecase struct {
@@ -48,37 +45,6 @@ type UserUsecase struct {
 	tokenLifeTime time.Duration
 	userSecretLen int
 	log           *zerolog.Logger
-}
-
-func (u *UserUsecase) ChallengeGenerate(ctx context.Context, login string) (challenge string, err error) {
-	exist, err := u.storage.CheckUserExist(ctx, login)
-	if !exist {
-		u.log.Error().Err(err).Msg("requested auth for non existed user")
-
-		return "", ErrChallengeGen
-	}
-
-	if err != nil {
-		u.log.Error().Err(err).Msg("can't check user exists")
-
-		return "", ErrChallengeGen
-	}
-
-	challenge, err = crypto.GenRandStr(config.ChallengeLen)
-	if err != nil {
-		u.log.Error().Err(err).Msg("can't generate rand string")
-
-		return "", ErrChallengeGen
-	}
-
-	err = u.storage.SaveChallenge(ctx, challenge)
-	if err != nil {
-		u.log.Error().Err(err).Msg("can't save current user challenge")
-
-		return "", ErrChallengeGen
-	}
-
-	return challenge, nil
 }
 
 func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error) {
@@ -90,42 +56,27 @@ func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPa
 		return ErrGetUser
 	}
 
-	hOld, err := GenerateHash(oldPass, u.salt)
-	if err != nil {
-		u.log.Error().Err(err).
-			Msg(ErrGenHash.Error())
-
-		return ErrGenHash
-	}
-
-	if hOld != user.Hash {
+	equal := ComparePassAndCryptoHash(oldPass, user.Hash, u.salt)
+	if !equal {
 		u.log.Error().
 			Err(ErrWrongPassword).Send()
 
 		return ErrWrongPassword
 	}
 
-	hNew1, err := GenerateHash(newPass, u.salt)
-	if err != nil {
-		u.log.Error().Err(err).
-			Msg(ErrGenHash.Error())
-
-		return ErrGenHash
-	}
-
-	hNew2, err := GenerateHash(reNewPass, u.salt)
-	if err != nil {
-		u.log.Error().Err(err).
-			Msg(ErrGenHash.Error())
-
-		return ErrGenHash
-	}
-
-	if hNew1 != hNew2 {
+	if newPass != reNewPass {
 		u.log.Error().
 			Err(ErrRepassNotSame).Send()
 
 		return ErrRepassNotSame
+	}
+
+	hNew1, err := GenerateCryptoHash(newPass, u.salt)
+	if err != nil {
+		u.log.Error().Err(err).
+			Msg(ErrGenHash.Error())
+
+		return ErrGenHash
 	}
 
 	user.Hash = hNew1
@@ -133,53 +84,49 @@ func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPa
 
 }
 
-func (u *UserUsecase) LoginUser(ctx context.Context, login string, challengeRes string) (token string, err error) {
+func (u *UserUsecase) LoginUser(ctx context.Context, login string, password string) (token string, secret string, err error) {
 
 	user, err := u.storage.GetUserByLogin(ctx, login)
 	if err != nil {
-		return "", ErrWrongAuth
+		return "", "", ErrWrongAuth
 	}
 
-	same := u.CompareChallenges(challengeRes, user)
-
+	same := ComparePassAndCryptoHash(password, user.Hash, u.salt)
 	if !same {
-		return "", fmt.Errorf("wrong auth for user: %s", login)
+		u.log.Error().Err(err).
+			Msg(ErrWrongPassword.Error())
+
+		return "", "", ErrWrongPassword
 	}
 
-	return GenerateToken(user.ID, u.salt, u.tokenLifeTime)
-}
-
-func (u *UserUsecase) CompareChallenges(actualChallenge string, user *entities.User) bool {
-	if time.Since(user.ChallengeTime).Minutes() > config.ChallengeLifeTime {
-		u.log.Error().Err(ErrChallengeLife).Msg("can't generate challenge")
-
-		return false
-	}
-
-	decChallenge, err := crypto.DecryptAES([]byte(actualChallenge), []byte(user.Hash))
+	hashedSecret, err := HashSecret(user.Secret)
 	if err != nil {
-		u.log.Error().Err(err).Msg("can't decrypt challenge")
+		u.log.Error().Err(err).
+			Msg(ErrUserSecret.Error())
 
-		return false
+		return "", "", ErrWrongPassword
 	}
 
-	return string(decChallenge) == actualChallenge
+	token, err = GenerateToken(user.ID, user.Secret, u.tokenLifeTime)
+	return token, hashedSecret, err
 }
 
-func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password string, rePass string) (token string, err error) {
+func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
+	password string, rePass string) (token, secretForCreds string, err error) {
+
 	if password != rePass {
-		return "", entities.ErrPassNotTheSame
+		return "", "", entities.ErrPassNotTheSame
 	}
 
 	// checking login free
 	exist, err := u.storage.CheckUserExist(ctx, login)
 	if !errors.Is(err, entities.ErrUserNotFound) || exist {
-		return "", fmt.Errorf("user is already exist:%v", err)
+		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
 
-	hash, err := GenerateHash(password, u.salt)
+	hash, err := GenerateCryptoHash(password, u.salt)
 	if err != nil {
-		return "", fmt.Errorf("can't generate hash of password: %v", err)
+		return "", "", fmt.Errorf("can't generate hash of password: %v", err)
 	}
 
 	m := md5.Sum([]byte(hash))
@@ -187,7 +134,7 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password s
 
 	secret, err := GenerateSecret(u.userSecretLen)
 	if err != nil {
-		return "", fmt.Errorf("can't generate secret for user: %v", err)
+		return "", "", fmt.Errorf("can't generate secret for user: %v", err)
 	}
 
 	user := &entities.User{
@@ -200,24 +147,62 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string, password s
 
 	err = u.storage.SaveUser(ctx, user)
 	if err != nil {
+		return "", "", err
+	}
+
+	hashedSecret, err := HashSecret(user.Secret)
+	if err != nil {
+		u.log.Error().Err(err).
+			Msg(ErrUserSecret.Error())
+
+		return "", "", ErrWrongPassword
+	}
+
+	token, err = GenerateToken(user.ID, user.Secret, u.tokenLifeTime)
+	if err != nil {
+		return "", "", fmt.Errorf("can't generate user token: %v", err)
+	}
+
+	return token, hashedSecret, nil
+}
+
+// HashSecret save secret before sent to client
+// User secret
+// Send secret: 		md5(aes256(user.secret, key:user.secret))
+// Secret for token: 	user.secret
+func HashSecret(secret string) (hash string, err error) {
+	key := sha256.Sum256([]byte(secret))
+	secretAES, err := crypto.EncryptAES([]byte(secret), key[:])
+	if err != nil {
 		return "", err
 	}
 
-	token, err = GenerateToken(user.ID, u.salt, u.tokenLifeTime)
-	if err != nil {
-		return "", fmt.Errorf("can't generate user token: %v", err)
-	}
+	hashedSecret := fmt.Sprintf("%x", md5.Sum(secretAES))
 
-	return token, nil
+	return hashedSecret, nil
 }
 
-func GenerateHash(password, salt string) (hash string, err error) {
+func GenerateHash(password, salt string) string {
 	password = fmt.Sprintf("%s-%s.%s.%s", string(salt), string(password), string(password), string(salt))
+	return password
+}
+
+func GenerateCryptoHash(password, salt string) (hash string, err error) {
+	password = GenerateHash(password, salt)
 	h, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
 	return string(h), nil
+}
+
+func ComparePassAndCryptoHash(password, hash string, salt string) bool {
+	genHash := GenerateHash(password, salt)
+
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(genHash)); err != nil {
+		return false
+	}
+	return true
 }
 
 func GenerateID(secret, salt string) string {
@@ -260,9 +245,9 @@ func GenerateToken(userid string, secret string, lifetime time.Duration) (token 
 	return token, nil
 }
 
-func CheckToken(tokenstr, secret string) (userID string, err error) {
+func CheckToken(tokenStr, secret string) (userID string, err error) {
 	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenstr, claims,
+	token, err := jwt.ParseWithClaims(tokenStr, claims,
 		func(t *jwt.Token) (interface{}, error) {
 			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])

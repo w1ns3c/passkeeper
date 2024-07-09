@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"github.com/w1ns3c/passkeeper/internal/config"
+	"github.com/w1ns3c/passkeeper/internal/usecase/srv"
 	"google.golang.org/grpc/metadata"
 
 	"github.com/rs/zerolog"
 	"github.com/w1ns3c/passkeeper/internal/entities"
 	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
-	"github.com/w1ns3c/passkeeper/internal/usecase"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -31,7 +31,7 @@ var (
 
 type UsersHandler struct {
 	pb.UnimplementedUserSvcServer
-	service usecase.UserUsecaseInf
+	service srv.UserUsecaseInf
 	log     *zerolog.Logger
 }
 
@@ -59,40 +59,8 @@ func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegiste
 	return resp, nil
 }
 
-//func (h *UsersHandler) ChallengeRequest(ctx context.Context, request *pb.UserChallengeRequest) (resp *pb.UserChallengeResponse, err error) {
-//	token, err := h.service.LoginUser(ctx, request.Login, request.Password)
-//	if err != nil {
-//		h.log.Error().
-//			Err(err).Msg(ErrWrongLoginMsg)
-//
-//		return nil, ErrWrongLogin
-//	}
-//
-//	resp = &pb.UserLoginResponse{
-//		Token: token,
-//	}
-//
-//	return resp, nil
-//}
-
-func (h *UsersHandler) ChallengeRequest(ctx context.Context, request *pb.UserChallengeRequest) (resp *pb.UserChallengeResponse, err error) {
-	challenge, err := h.service.ChallengeGenerate(ctx, request.Login)
-	if err != nil {
-		h.log.Error().
-			Err(err).Msg(ErrWrongLoginMsg)
-
-		return nil, ErrWrongLogin
-	}
-
-	resp = &pb.UserChallengeResponse{
-		Challenge: challenge,
-	}
-
-	return resp, nil
-}
-
-func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserChallengeResult) (resp *pb.UserLoginResponse, err error) {
-	token, err := h.service.LoginUser(ctx, request.Login, request.Challenge)
+func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginRequest) (resp *pb.UserLoginResponse, err error) {
+	token, secret, err := h.service.LoginUser(ctx, request.Login, request.Password)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrWrongLoginMsg)
