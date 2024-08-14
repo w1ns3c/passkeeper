@@ -39,7 +39,7 @@ type UsersHandler struct {
 //rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
 
 func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegisterRequest) (resp *pb.UserRegisterResponse, err error) {
-	token, err := h.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
+	token, secret, err := h.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
 	if err != nil {
 		if !errors.Is(err, entities.ErrUserNotFound) {
 			h.log.Error().
@@ -52,15 +52,19 @@ func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegiste
 		return nil, ErrRegister
 	}
 
+	ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
+
 	resp = &pb.UserRegisterResponse{
-		Token: token,
+		Secret: secret,
 	}
 
 	return resp, nil
 }
 
-func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginRequest) (resp *pb.UserLoginResponse, err error) {
-	token, secret, err := h.service.LoginUser(ctx, request.Login, request.Password)
+func (h *UsersHandler) LoginUser(ctx context.Context,
+	req *pb.UserLoginRequest) (resp *pb.UserLoginResponse, err error) {
+
+	token, secret, err := h.service.LoginUser(ctx, req.Login, req.Password)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrWrongLoginMsg)
@@ -68,16 +72,13 @@ func (h *UsersHandler) LoginUser(ctx context.Context, request *pb.UserLoginReque
 		return nil, ErrWrongLogin
 	}
 
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		md.Append(config.TokenHeader, token)
-	}
-
 	ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
 
 	resp = &pb.UserLoginResponse{
 		//Token: token,
+		Secret: secret,
 	}
 
 	return resp, nil
+
 }

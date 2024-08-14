@@ -10,4 +10,6 @@ const (
 	ChallengeLifeTime = 5 // minutes
 
 	TokenHeader = "token"
+
+	MinPassLen = 8
 )

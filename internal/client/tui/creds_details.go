@@ -206,7 +206,6 @@ func (form *Details) Edit(ind int, list CredListInf) {
 		form.SetCurrentCred(form.tuiApp.Creds[ind])
 		form.tuiApp.App.SetFocus(list)
 	})
-	//}).SetFocus(0)
 
 }
 

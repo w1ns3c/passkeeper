@@ -32,5 +32,7 @@ vendor/
 *_old
 *old
 
+# schemes
+schemes/
 # protoc command
 protoc_recompile

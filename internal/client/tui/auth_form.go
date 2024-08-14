@@ -164,8 +164,10 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		pField := itemPass.(*tview.InputField)
 		password := pField.GetText()
 
-		authed := Login(username, password)
-		if !authed {
+		//authed := Login(username, password)
+		err := tuiApp.Usecase.Login(tuiApp.ctx, username, password)
+		if err != nil {
+			// not authed
 			errAuthForm := NewModalWithParams(tuiApp, "Wrong username/password!", PageLogin)
 			tuiApp.Pages.AddPage(PageAuthErr, errAuthForm, true, false)
 			tuiApp.Pages.SwitchToPage(PageAuthErr)
@@ -268,7 +270,7 @@ func NewRegisterForm(tuiApp *TUI) *tview.Flex {
 		pField2 := itemPass2.(*tview.InputField)
 		repeat := pField2.GetText()
 
-		if err := tuiApp.Register(email, username, password, repeat); err != nil {
+		if err := tuiApp.Usecase.Register(tuiApp.ctx, email, username, password, repeat); err != nil {
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageRegister)
 			tuiApp.Pages.AddPage(PageRegisterError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageRegisterError)

@@ -11,7 +11,7 @@ message UserRegisterRequest {
 }
 
 message UserRegisterResponse {
-  string Token = 1;
+  string Secret = 1;
 }
 
 message UserLoginRequest {

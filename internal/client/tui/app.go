@@ -1,16 +1,14 @@
 package tui
 
 import (
+	"context"
 	"fmt"
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"github.com/w1ns3c/passkeeper/internal/config"
 	"github.com/w1ns3c/passkeeper/internal/entities"
-	"net/mail"
-	"regexp"
-	"strings"
+	"github.com/w1ns3c/passkeeper/internal/usecase/cli"
 )
-
-const MinPassLen = 8
 
 var (
 	PageMain            = "Auth"
@@ -41,32 +39,48 @@ var (
 	PassHidden = "******"
 )
 
+// TUI struct is tui client app
 type TUI struct {
 	App        *tview.Application
 	Screen     tcell.Screen
 	Pages      *tview.Pages
 	MinPassLen int
 
+	// Actions
+	Usecase *cli.ClientUC
+	ctx     context.Context
+
 	// user info
 	User  *entities.User
 	Creds []entities.Credential
 }
 
-func NewTUI() (tui *TUI, err error) {
+// NewTUI func is constructor for TUI
+func NewTUI(addr string) (tui *TUI, err error) {
 	scr, err := tcell.NewScreen()
 	if err != nil {
 		return nil, err
 	}
 	pages := tview.NewPages()
 
+	ctx := context.Background()
+	usecase, err := cli.NewClientUC(addr)
+	if err != nil {
+		return nil, err
+	}
+
 	tuiApp := &TUI{
+
 		Screen: scr,
 		Pages:  pages,
 		App: tview.NewApplication().
 			SetScreen(scr).SetRoot(pages, true).
 			EnableMouse(false),
 		Creds:      make([]entities.Credential, 0),
-		MinPassLen: MinPassLen,
+		MinPassLen: config.MinPassLen,
+		Usecase:    usecase,
+
+		ctx: ctx,
 	}
 
 	//tuiApp.Creds = CredsList
@@ -115,60 +129,4 @@ func (app *TUI) Logout() error {
 	app.User = nil
 
 	return nil
-}
-
-func (app *TUI) Register(email, username, password, passRepeat string) error {
-	email = strings.TrimSpace(email)
-	username = strings.TrimSpace(username)
-
-	err := app.FilterUserRegValues(email, username, password, passRepeat)
-	if err != nil {
-		return err
-	}
-
-	// TODO Change this
-	users[username] = password
-
-	return nil
-}
-
-func (app *TUI) FilterUserRegValues(email, username, password, passRepeat string) error {
-	if username == "" {
-		return fmt.Errorf("username is empty")
-	}
-	if email == "" {
-		return fmt.Errorf("email is empty")
-	}
-
-	if _, err := mail.ParseAddress(email); err != nil {
-		return fmt.Errorf("email is not valid")
-	}
-	// from here https://emaillistvalidation.com/blog/mastering-email-validation-in-golang-crafting-robust-regex-patterns/
-	if result, _ := regexp.MatchString("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email); !result {
-		return fmt.Errorf("email is not valid by new regexp")
-	}
-
-	if password != passRepeat {
-		return fmt.Errorf("passwords are not the same")
-	}
-
-	// TODO Uncomment it
-	//if len(password) < app.MinPassLen {
-	//	return fmt.Errorf("password len should be a least %d signs", app.MinPassLen)
-	//}
-
-	if _, ok := users[username]; ok {
-		return fmt.Errorf("user already exist")
-	}
-
-	return nil
-}
-
-func (app *TUI) Login(username, password string) bool {
-	pass, ok := users[username]
-	if !ok {
-		return false
-	}
-
-	return pass == password
 }
