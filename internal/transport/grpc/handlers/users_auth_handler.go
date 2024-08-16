@@ -3,14 +3,16 @@ package handlers
 import (
 	"context"
 	"errors"
-	"github.com/w1ns3c/passkeeper/internal/config"
-	"github.com/w1ns3c/passkeeper/internal/usecase/srv"
-	"google.golang.org/grpc/metadata"
+
+	"passkeeper/internal/config"
+	"passkeeper/internal/entities"
+	"passkeeper/internal/usecase/srv/usersUC"
+
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 
 	"github.com/rs/zerolog"
-	"github.com/w1ns3c/passkeeper/internal/entities"
-	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -31,7 +33,7 @@ var (
 
 type UsersHandler struct {
 	pb.UnimplementedUserSvcServer
-	service srv.UserUsecaseInf
+	service usersUC.UserUsecaseInf
 	log     *zerolog.Logger
 }
 

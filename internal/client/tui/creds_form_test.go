@@ -4,7 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"forms/entities"
+	"passkeeper/internal/entities"
 	"testing"
 	"time"
 )
@@ -44,7 +44,7 @@ func TestSave(t *testing.T) {
 
 	t.Log(creds)
 	t.Log("123")
-	err := Save(creds, 0, tmpCred.Resource, tmpCred.Login, tmpCred.Password, tmpCred.Description)
+	err := entities.Save(creds, 0, tmpCred.Resource, tmpCred.Login, tmpCred.Password, tmpCred.Description)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -69,7 +69,7 @@ func TestSave(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := Save(tt.args.creds, tt.args.ind, tt.args.res, tt.args.login, tt.args.password, tt.args.desc); (err != nil) != tt.wantErr {
+			if err := entities.Save(tt.args.creds, tt.args.ind, tt.args.res, tt.args.login, tt.args.password, tt.args.desc); (err != nil) != tt.wantErr {
 				t.Errorf("Save() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -78,7 +78,7 @@ func TestSave(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	cred1 := entities.Credential{
-		ID:          GenHash("1"),
+		ID:          entities.GenHash("1"),
 		Resource:    "contoso.local",
 		Login:       "username",
 		Password:    "SomeSecret",
@@ -87,7 +87,7 @@ func TestAdd(t *testing.T) {
 	}
 
 	cred2 := entities.Credential{
-		ID:          GenHash("2"),
+		ID:          entities.GenHash("2"),
 		Resource:    "example.com",
 		Login:       "mike",
 		Password:    "password",
@@ -96,7 +96,7 @@ func TestAdd(t *testing.T) {
 	}
 
 	cred3 := entities.Credential{
-		ID:          GenHash("3"),
+		ID:          entities.GenHash("3"),
 		Resource:    "wiki.org",
 		Login:       "juice",
 		Password:    "secinfo",
@@ -105,7 +105,7 @@ func TestAdd(t *testing.T) {
 	}
 
 	newCred := entities.Credential{
-		ID:          GenHash("new"),
+		ID:          entities.GenHash("new"),
 		Resource:    "new",
 		Login:       "new_login",
 		Password:    "new_pass",
@@ -158,7 +158,7 @@ func TestAdd(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotNewCreds, err := Add(tt.args.creds, tt.args.new.Resource, tt.args.new.Login, tt.args.new.Password, tt.args.new.Description)
+			gotNewCreds, err := entities.Add(tt.args.creds, tt.args.new.Resource, tt.args.new.Login, tt.args.new.Password, tt.args.new.Description)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Add() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,6 +1,8 @@
-package srv
+package usersUC
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestGenerateCryptoHash(t *testing.T) {
 	type args struct {

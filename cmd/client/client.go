@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/w1ns3c/passkeeper/internal/client/tui"
+	"passkeeper/internal/client/tui"
 )
 
 func main() {

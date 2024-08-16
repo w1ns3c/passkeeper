@@ -1,37 +1,13 @@
-package srv
+package credentialsUC
 
 import (
 	"context"
 	"time"
 
-	"github.com/rs/zerolog"
-	"github.com/w1ns3c/passkeeper/internal/config"
-	"github.com/w1ns3c/passkeeper/internal/entities"
-	"github.com/w1ns3c/passkeeper/internal/storage"
+	"passkeeper/internal/config"
+	"passkeeper/internal/entities"
+	"passkeeper/internal/usecase/srv/usersUC"
 )
-
-var (
-	ErrNoDecrypt = "can't decrypt password"
-)
-
-type CredUsecaseInf interface {
-	GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error)
-	AddCredential(ctx context.Context, userToken string, cred *entities.Credential) error
-	UpdateCredential(ctx context.Context, userToken string, cred *entities.Credential) error
-	DeleteCredential(ctx context.Context, userToken, credID string) error
-	ListCredentials(ctx context.Context, userToken string) (creds []*entities.Credential, err error)
-
-	//VerifyCredDate(cred *entities.Credential) // check date/time in received credential
-
-	//EncryptPwd(ctx context.Context, password string) (encPwd string, err error)
-	//DecryptPass(ctx context.Context, encPwd string) (password string, err error)
-}
-
-type CredUsecase struct {
-	storage storage.CredentialStorage
-	salt    string
-	log     *zerolog.Logger
-}
 
 func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error) {
 	cred, err = u.storage.GetCredential(ctx, userToken, credID)
@@ -50,12 +26,12 @@ func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID strin
 func (u *CredUsecase) AddCredential(ctx context.Context,
 	userToken string, cred *entities.Credential) error {
 
-	sec, err := GenerateSecret(config.UserSecretLen)
+	sec, err := usersUC.GenerateSecret(config.UserSecretLen)
 	if err != nil {
 		return err
 	}
 
-	cred.ID = GenerateID(sec, u.salt)
+	cred.ID = usersUC.GenerateID(sec, u.salt)
 	cred.Password, err = EncryptPass(cred.Password)
 	VerifyCredDate(cred)
 
@@ -65,12 +41,12 @@ func (u *CredUsecase) AddCredential(ctx context.Context,
 func (u *CredUsecase) UpdateCredential(ctx context.Context,
 	userToken string, cred *entities.Credential) error {
 
-	sec, err := GenerateSecret(config.UserSecretLen)
+	sec, err := usersUC.GenerateSecret(config.UserSecretLen)
 	if err != nil {
 		return err
 	}
 
-	cred.ID = GenerateID(sec, u.salt)
+	cred.ID = usersUC.GenerateID(sec, u.salt)
 	cred.Password, err = EncryptPass(cred.Password)
 	VerifyCredDate(cred)
 
@@ -110,14 +86,4 @@ func VerifyCredDate(cred *entities.Credential) {
 	if cred.Date.Sub(now) > time.Hour*24 {
 		cred.Date = now
 	}
-}
-
-func EncryptPass(password string) (encPass string, err error) {
-	//TODO implement me
-	return password, nil
-}
-
-func DecryptPass(encPass string) (password string, err error) {
-	//TODO implement me
-	return encPass, nil
 }

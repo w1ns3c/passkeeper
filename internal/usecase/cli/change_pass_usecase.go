@@ -2,7 +2,8 @@ package cli
 
 import (
 	"context"
-	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
+
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
 
 func (c *ClientUC) ChangePass(ctx context.Context, curPass, newPass, repeat string) error {

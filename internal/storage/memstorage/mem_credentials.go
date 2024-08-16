@@ -3,7 +3,7 @@ package memstorage
 import (
 	"context"
 
-	"github.com/w1ns3c/passkeeper/internal/entities"
+	"passkeeper/internal/entities"
 )
 
 func (m *MemStorage) AddCredential(ctx context.Context, userID string, password *entities.Credential) error {

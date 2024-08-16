@@ -2,14 +2,16 @@ package handlers
 
 import (
 	"context"
-	"github.com/w1ns3c/passkeeper/internal/usecase/srv"
 	"time"
+
+	"passkeeper/internal/config"
+	"passkeeper/internal/entities"
+	"passkeeper/internal/usecase/srv/credentialsUC"
+
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
-	"github.com/w1ns3c/passkeeper/internal/config"
-	"github.com/w1ns3c/passkeeper/internal/entities"
-	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -40,7 +42,7 @@ var (
 
 type CredsHandler struct {
 	pb.UnimplementedCredSvcServer
-	service srv.CredUsecaseInf
+	service credentialsUC.CredUsecaseInf
 	log     *zerolog.Logger
 }
 

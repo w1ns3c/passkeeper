@@ -3,13 +3,15 @@ package cli
 import (
 	"context"
 	"fmt"
-	"github.com/w1ns3c/passkeeper/internal/config"
-	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
-	"github.com/w1ns3c/passkeeper/internal/utils/hashpass"
-	"google.golang.org/grpc/metadata"
 	"net/mail"
 	"regexp"
 	"strings"
+
+	"google.golang.org/grpc/metadata"
+
+	"passkeeper/internal/config"
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
+	"passkeeper/internal/utils/hashpass"
 )
 
 // Login func is client login logic for tui app
@@ -112,7 +114,7 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 	//}
 
 	// TODO Change User check
-	//if _, ok := users[username]; ok {
+	//if _, ok := usersUC[username]; ok {
 	//	return fmt.Errorf("user already exist")
 	//}
 

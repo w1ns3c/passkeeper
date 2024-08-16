@@ -3,7 +3,7 @@ package tui
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"github.com/w1ns3c/passkeeper/internal/entities"
+	"passkeeper/internal/entities"
 	"strings"
 )
 

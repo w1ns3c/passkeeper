@@ -1,7 +1,7 @@
 package tui
 
 import (
-	"github.com/w1ns3c/passkeeper/internal/entities"
+	"passkeeper/internal/entities"
 	"time"
 )
 

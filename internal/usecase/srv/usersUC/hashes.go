@@ -1,4 +1,17 @@
-package srv
+package usersUC
+
+import (
+	"crypto/md5"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"time"
+
+	"github.com/w1ns3c/go-examples/crypto"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
+)
 
 // GenerateHash func gen sha256 hash of (password with salt)
 func GenerateHash(password, salt string) string {
@@ -31,10 +44,6 @@ func GenerateID(secret, salt string) string {
 	hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, secret, salt)))
 
 	return hex.EncodeToString(hash[:])
-}
-
-func (u *UserUsecase) GetTokenSalt() string {
-	return u.salt
 }
 
 type Claims struct {

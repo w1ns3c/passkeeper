@@ -2,7 +2,7 @@ package tui
 
 import (
 	"github.com/rivo/tview"
-	"github.com/w1ns3c/passkeeper/internal/entities"
+	"passkeeper/internal/entities"
 )
 
 func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {

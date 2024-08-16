@@ -2,13 +2,8 @@ package memstorage
 
 import (
 	"context"
-	"fmt"
 
-	"github.com/w1ns3c/passkeeper/internal/entities"
-)
-
-var (
-	ErrUserNotExist = fmt.Errorf("user not exist")
+	"passkeeper/internal/entities"
 )
 
 func (m *MemStorage) CheckUserExist(ctx context.Context, login string) (exist bool, err error) {
@@ -25,7 +20,7 @@ func (m *MemStorage) LoginUser(ctx context.Context, login, hash string) (user *e
 
 	user, ok := m.users[login]
 	if !ok {
-		return nil, ErrUserNotExist
+		return nil, ErrUserNotFound
 	}
 
 	return user, err
@@ -47,5 +42,5 @@ func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *enti
 		}
 	}
 
-	return nil, ErrUserNotExist
+	return nil, ErrUserNotFound
 }

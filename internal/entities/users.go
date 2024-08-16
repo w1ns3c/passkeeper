@@ -12,4 +12,5 @@ type User struct {
 	ChallengeTime time.Time
 	Secret        string // for encrypt/decrypt passwords
 	Phone         string
+	Email         string
 }

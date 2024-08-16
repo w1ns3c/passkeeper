@@ -1,6 +1,8 @@
-package srv
+package usersUC
 
-import "context"
+import (
+	"context"
+)
 
 func (u *UserUsecase) LoginUser(ctx context.Context, login string, password string) (token string, secret string, err error) {
 

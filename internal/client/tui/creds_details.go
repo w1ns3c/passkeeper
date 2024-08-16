@@ -2,7 +2,8 @@ package tui
 
 import (
 	"github.com/rivo/tview"
-	"github.com/w1ns3c/passkeeper/internal/entities"
+
+	"passkeeper/internal/entities"
 )
 
 type Details struct {
@@ -165,7 +166,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 			return
 		}
 
-		// clear fields if there isn't any credentials
+		// clear fields if there isn't any credentialsUC
 		form.EmptyFields()
 		form.HideFields()
 	})

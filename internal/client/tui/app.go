@@ -3,11 +3,13 @@ package tui
 import (
 	"context"
 	"fmt"
+
+	"passkeeper/internal/config"
+	"passkeeper/internal/entities"
+	"passkeeper/internal/usecase/cli"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
-	"github.com/w1ns3c/passkeeper/internal/config"
-	"github.com/w1ns3c/passkeeper/internal/entities"
-	"github.com/w1ns3c/passkeeper/internal/usecase/cli"
 )
 
 var (
@@ -47,7 +49,7 @@ type TUI struct {
 	MinPassLen int
 
 	// Actions
-	Usecase *cli.ClientUC
+	Usecase cli.ClientUsecase
 	ctx     context.Context
 
 	// user info
@@ -118,7 +120,7 @@ func (app *TUI) GetCreds() (creds []entities.Credential, err error) {
 	}
 
 	if app.User.Login == "error" {
-		return nil, fmt.Errorf("can't get credentials")
+		return nil, fmt.Errorf("can't get credentialsUC")
 	}
 
 	return make([]entities.Credential, 0), nil

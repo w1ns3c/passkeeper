@@ -3,9 +3,11 @@ package cli
 import (
 	"context"
 	"fmt"
-	pb "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto"
+
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
 
 var (

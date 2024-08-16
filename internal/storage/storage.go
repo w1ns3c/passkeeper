@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"github.com/w1ns3c/passkeeper/internal/entities"
+	"passkeeper/internal/entities"
 )
 
 type Storage interface {
