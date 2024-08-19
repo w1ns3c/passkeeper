@@ -8,6 +8,6 @@ message UserChangePassReq {
   string Repeat = 3;
 }
 
-service UserPassSvc {
+service UserChangePassSvc {
   rpc ChangePass(UserChangePassReq) returns (google.protobuf.Empty);
 }

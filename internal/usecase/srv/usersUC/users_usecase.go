@@ -3,9 +3,11 @@ package usersUC
 import (
 	"context"
 	"fmt"
+	"passkeeper/internal/config"
 	"time"
 
 	"passkeeper/internal/storage"
+	"passkeeper/internal/storage/memstorage"
 
 	"github.com/rs/zerolog"
 )
@@ -26,19 +28,61 @@ type UserUsecaseInf interface {
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token, secret string, err error)
 
 	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
-	GetTokenSalt() string
+	//GetTokenSalt() string
 
 	LoginUser(ctx context.Context, login string, password string) (token, secret string, err error)
 }
 
 type UserUsecase struct {
-	storage       storage.UserStorage
-	salt          string
-	tokenLifeTime time.Duration
-	userSecretLen int
-	log           *zerolog.Logger
+	ctx             context.Context
+	storage         storage.UserStorage
+	tokenLifeTime   time.Duration
+	userSecretLen   int
+	userPassSaltLen int
+	log             *zerolog.Logger
 }
 
-func NewUserUsecase(storage storage.UserStorage, salt string, tokenLifeTime time.Duration, userSecretLen int, log *zerolog.Logger) *UserUsecase {
-	return &UserUsecase{storage: storage, salt: salt, tokenLifeTime: tokenLifeTime, userSecretLen: userSecretLen, log: log}
+func NewUserUsecase() *UserUsecase {
+	return &UserUsecase{
+		storage:         memstorage.NewMemStorage(),
+		tokenLifeTime:   config.TokenLifeTime,
+		userPassSaltLen: config.UserPassSaltLen,
+		userSecretLen:   config.UserSecretLen,
+	}
+}
+
+func (u *UserUsecase) SetStorage(storage storage.UserStorage) *UserUsecase {
+	u.storage = storage
+
+	return u
+}
+
+func (u *UserUsecase) SetTokenLifeTime(tokenLifeTime time.Duration) *UserUsecase {
+	u.tokenLifeTime = tokenLifeTime
+
+	return u
+}
+
+func (u *UserUsecase) SetLog(logger *zerolog.Logger) *UserUsecase {
+	u.log = logger
+
+	return u
+}
+
+func (u *UserUsecase) SetContext(ctx context.Context) *UserUsecase {
+	u.ctx = ctx
+
+	return u
+}
+
+func (u *UserUsecase) SetSecretLen(length int) *UserUsecase {
+	u.userSecretLen = length
+
+	return u
+}
+
+func (u *UserUsecase) SetSalttLen(length int) *UserUsecase {
+	u.userPassSaltLen = length
+
+	return u
 }

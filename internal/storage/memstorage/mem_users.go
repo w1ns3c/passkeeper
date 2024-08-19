@@ -36,6 +36,8 @@ func (m *MemStorage) SaveUser(ctx context.Context, u *entities.User) error {
 }
 
 func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
+	m.usersMU.Lock()
+	defer m.usersMU.Unlock()
 	for _, u := range m.users {
 		if u.ID == userID {
 			return nil, err
@@ -43,4 +45,21 @@ func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *enti
 	}
 
 	return nil, ErrUserNotFound
+}
+
+func (m *MemStorage) GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error) {
+	m.usersMU.Lock()
+	defer m.usersMU.Unlock()
+
+	u, ok := m.users[login]
+	if !ok {
+		return nil, ErrUserNotFound
+	}
+
+	return u, nil
+}
+
+func (m *MemStorage) SaveChallenge(ctx context.Context, challenge string) error {
+	//TODO implement me
+	panic("implement me")
 }

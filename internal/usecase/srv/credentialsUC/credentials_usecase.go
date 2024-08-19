@@ -2,7 +2,6 @@ package credentialsUC
 
 import (
 	"context"
-
 	"passkeeper/internal/storage/memstorage"
 
 	"github.com/rs/zerolog"
@@ -29,28 +28,37 @@ type CredUsecaseInf interface {
 }
 
 type CredUsecase struct {
+	ctx     context.Context
 	storage storage.CredentialStorage
-	salt    string
-	log     *zerolog.Logger
+	//salt    string
+	log *zerolog.Logger
 }
 
 type CredOption func(usecase *CredUsecase)
 
-func NewCredUsecase() *CredUsecase {
+func newCredUsecase() *CredUsecase {
 	return &CredUsecase{
-		salt:    "rand",
 		storage: memstorage.NewMemStorage(),
 	}
 }
 
-func WithSalt(salt string) CredOption {
-	return func(usecase *CredUsecase) {
-		usecase.salt = salt
+func NewCredUCopts(opts ...CredOption) *CredUsecase {
+	credsUC := newCredUsecase()
+	for _, opt := range opts {
+		opt(credsUC)
 	}
+
+	return credsUC
 }
 
 func WithStorage(db storage.Storage) CredOption {
 	return func(usecase *CredUsecase) {
 		usecase.storage = db
+	}
+}
+
+func WithContext(ctx context.Context) CredOption {
+	return func(usecase *CredUsecase) {
+		usecase.ctx = ctx
 	}
 }

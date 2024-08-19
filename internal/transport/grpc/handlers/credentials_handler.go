@@ -46,6 +46,14 @@ type CredsHandler struct {
 	log     *zerolog.Logger
 }
 
+func NewCredsHandler(logger *zerolog.Logger, service credentialsUC.CredUsecaseInf) *CredsHandler {
+	return &CredsHandler{
+		UnimplementedCredSvcServer: pb.UnimplementedCredSvcServer{},
+		service:                    service,
+		log:                        logger,
+	}
+}
+
 func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*empty.Empty, error) {
 	userID, err := ExtractUserInfo(ctx)
 	if err != nil {

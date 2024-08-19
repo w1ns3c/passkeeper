@@ -11,13 +11,21 @@ import (
 	"github.com/rs/zerolog"
 )
 
-type UserPassHandler struct {
-	pb.UnimplementedUserPassSvcServer
+type UserChangePassHandler struct {
+	pb.UnimplementedUserChangePassSvcServer
 	service usersUC.UserUsecaseInf
 	log     *zerolog.Logger
 }
 
-func (h *UserPassHandler) ChangePass(ctx context.Context, req *pb.UserChangePassReq) (*empty.Empty, error) {
+func NewUserChangePassHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *UserChangePassHandler {
+	return &UserChangePassHandler{
+		UnimplementedUserChangePassSvcServer: pb.UnimplementedUserChangePassSvcServer{},
+		service:                              service,
+		log:                                  logger,
+	}
+}
+
+func (h *UserChangePassHandler) ChangePass(ctx context.Context, req *pb.UserChangePassReq) (*empty.Empty, error) {
 	userID, err := ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().

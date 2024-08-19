@@ -49,7 +49,7 @@ func WithUsers(users map[string]*entities.User) MemOptions {
 
 // WithPasswords func allow init storage
 // with passwords
-func WithPasswords(passwords map[string]*entities.Credential) MemOptions {
+func WithPasswords(passwords map[string][]*entities.Credential) MemOptions {
 	return func(s *MemStorage) {
 		s.passwords = passwords
 	}

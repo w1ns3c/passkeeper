@@ -7,12 +7,14 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"passkeeper/internal/config"
 
 	"passkeeper/internal/entities"
 
 	"github.com/w1ns3c/go-examples/crypto"
 )
 
+// RegisterUser function for register user in app
 func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	password string, rePass string) (token, secretForCreds string, err error) {
 
@@ -26,13 +28,17 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
 
-	hash, err := GenerateCryptoHash(password, u.salt)
+	userSalt, err := crypto.GenRandStr(config.UserPassSaltLen)
+	if err != nil {
+		return "", "", fmt.Errorf("user is already exist:%v", err)
+	}
+	hash, err := GenerateCryptoHash(password, userSalt)
 	if err != nil {
 		return "", "", fmt.Errorf("can't generate hash of password: %v", err)
 	}
 
 	m := md5.Sum([]byte(hash))
-	id := GenerateID(hex.EncodeToString(m[:]), u.salt)
+	id := GenerateID(hex.EncodeToString(m[:]), userSalt)
 
 	secret, err := GenerateSecret(u.userSecretLen)
 	if err != nil {
@@ -40,10 +46,10 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	}
 
 	user := &entities.User{
-		ID:    id,
-		Login: login,
-		//Credential: password,
+		ID:     id,
+		Login:  login,
 		Hash:   hash,
+		Salt:   userSalt,
 		Secret: secret,
 	}
 

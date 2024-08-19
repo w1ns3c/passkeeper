@@ -37,6 +37,14 @@ type UsersHandler struct {
 	log     *zerolog.Logger
 }
 
+func NewUsersHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *UsersHandler {
+	return &UsersHandler{
+		UnimplementedUserSvcServer: pb.UnimplementedUserSvcServer{},
+		service:                    service,
+		log:                        logger,
+	}
+}
+
 //rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
 //rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
 

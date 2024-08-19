@@ -11,7 +11,7 @@ func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPa
 		return ErrGetUser
 	}
 
-	equal := ComparePassAndCryptoHash(oldPass, user.Hash, u.salt)
+	equal := ComparePassAndCryptoHash(oldPass, user.Hash, user.Salt)
 	if !equal {
 		u.log.Error().
 			Err(ErrWrongPassword).Send()
@@ -26,7 +26,7 @@ func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPa
 		return ErrRepassNotSame
 	}
 
-	hNew1, err := GenerateCryptoHash(newPass, u.salt)
+	hNew1, err := GenerateCryptoHash(newPass, user.Salt)
 	if err != nil {
 		u.log.Error().Err(err).
 			Msg(ErrGenHash.Error())
