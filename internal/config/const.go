@@ -15,4 +15,6 @@ const (
 	MinPassLen = 8
 
 	DefaultAddr = "localhost:8000"
+
+	Level = "Debug"
 )

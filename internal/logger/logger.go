@@ -2,27 +2,30 @@ package logger
 
 import (
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 	"os"
 	"strings"
 	"time"
 )
 
-func Init(level string) error {
+func Init(level string) *zerolog.Logger {
 	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMs
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	lvl := selectLevel(level)
-	zerolog.SetGlobalLevel(lvl)
-	log.Logger = log.Output(zerolog.ConsoleWriter{
+	lvl := SelectLevel(level)
+
+	logger := zerolog.New(os.Stderr).With().
+		Timestamp().Logger().Level(lvl)
+
+	logger = logger.Output(zerolog.ConsoleWriter{
 		Out:        os.Stdout,
 		TimeFormat: time.DateTime,
 	})
-	return nil
+
+	return &logger
 }
 
-func selectLevel(level string) zerolog.Level {
+func SelectLevel(level string) zerolog.Level {
 	level = strings.ToTitle(level)
 	switch level {
 	// INFO

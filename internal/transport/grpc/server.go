@@ -41,7 +41,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	}
 
 	// check users usecase
-	if srv.users != nil {
+	if srv.users == nil {
 		if srv.log != nil {
 			srv.log.Error().
 				Err(err).Msg("no users usecase")
@@ -51,7 +51,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	}
 
 	// check creds usecase
-	if srv.creds != nil {
+	if srv.creds == nil {
 		if srv.log != nil {
 			srv.log.Error().
 				Err(err).Msg("no creds usecase")
