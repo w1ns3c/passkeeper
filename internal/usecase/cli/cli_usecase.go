@@ -16,7 +16,7 @@ var (
 
 type ClientUsecase interface {
 	Login(ctx context.Context, login, password string) error
-	Register(ctx context.Context, login, password, repeat, email string) error
+	Register(ctx context.Context, email, login, password, repeat string) error
 }
 
 type ClientUC struct {
@@ -25,7 +25,7 @@ type ClientUC struct {
 	SecretHash string
 
 	userSvc pb.UserSvcClient
-	passSvc pb.UserPassSvcClient
+	passSvc pb.UserChangePassSvcClient
 }
 
 func NewClientUC(addr string) (cli *ClientUC, err error) {
@@ -37,6 +37,6 @@ func NewClientUC(addr string) (cli *ClientUC, err error) {
 
 	return &ClientUC{
 		userSvc: pb.NewUserSvcClient(conn),
-		passSvc: pb.NewUserPassSvcClient(conn),
+		passSvc: pb.NewUserChangePassSvcClient(conn),
 	}, nil
 }

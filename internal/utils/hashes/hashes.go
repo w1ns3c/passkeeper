@@ -1,16 +1,23 @@
-package usersUC
+package hashes
 
 import (
 	"crypto/md5"
 	"crypto/sha256"
+	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"hash"
+	"io"
 	"time"
 
 	"github.com/w1ns3c/go-examples/crypto"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrInvalidToken = fmt.Errorf("token sign is not valid")
 )
 
 // GenerateHash func gen sha256 hash of (password with salt)
@@ -40,10 +47,45 @@ func ComparePassAndCryptoHash(password, hash string, salt string) bool {
 	return true
 }
 
-func GenerateID(secret, salt string) string {
-	hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, secret, salt)))
+// GenerateUserID func to generate ID for any user before save it to storage
+func GenerateUserID(secret, salt string) string {
+	//hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, secret, salt)))
+	//return hex.EncodeToString(hash[:])
 
-	return hex.EncodeToString(hash[:])
+	h := md5.New()
+
+	return genID(secret, salt, h)
+}
+
+// GeneratePassID func to generate ID for any credential before save it to storage
+func GeneratePassID(secret, salt string) string {
+	h := sha512.New()
+
+	return genID(secret, salt, h)
+}
+
+func GeneratePassID2() string {
+	h := sha512.New()
+	n := 32
+	uid, err := crypto.GenRandStr(n)
+	if err != nil {
+		// TODO
+
+	}
+
+	_, _ = io.WriteString(h, uid)
+
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+// genID main scheme for generating ID, but with variable hash type
+func genID(secret, salt string, h hash.Hash) string {
+	_, err := io.WriteString(h, fmt.Sprintf("%s.%s.%s", salt, secret, salt))
+	if err != nil {
+		return ""
+	}
+
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 type Claims struct {
@@ -51,6 +93,7 @@ type Claims struct {
 	UserID string
 }
 
+// GenerateSecret func for generate random hex string
 func GenerateSecret(secretLen int) (secret string, err error) {
 	sl, err := crypto.GenRandSlice(secretLen)
 	if err != nil {
@@ -60,6 +103,7 @@ func GenerateSecret(secretLen int) (secret string, err error) {
 	return hex.EncodeToString(sl), nil
 }
 
+// GenerateToken func for generate JWT auth token
 func GenerateToken(userid string, secret string, lifetime time.Duration) (token string, err error) {
 	tokenLife := time.Now().Add(lifetime)
 	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
@@ -76,6 +120,7 @@ func GenerateToken(userid string, secret string, lifetime time.Duration) (token 
 	return token, nil
 }
 
+// CheckToken func for validate JWT auth token
 func CheckToken(tokenStr, secret string) (userID string, err error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims,

@@ -90,14 +90,19 @@ func WithUCcreds(uc credentialsUC.CredUsecaseInf) SrvOption {
 	}
 }
 
-func WithUCLevel(level string) SrvOption {
+func WithLogger(lg *zerolog.Logger) SrvOption {
 	return func(srv *Server) {
-		lvl := logger.SelectLevel(level)
-		srv.log.Level(lvl)
+		srv.log = lg
 	}
 }
 
 func (s Server) Run() error {
+	return s.transport.Run()
+}
 
+func (s Server) Stop() error {
+	s.users = nil
+	s.creds = nil
+	s.transport = nil
 	return nil
 }

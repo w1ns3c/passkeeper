@@ -2,6 +2,7 @@ package interceptors
 
 import (
 	"context"
+	"passkeeper/internal/utils/hashes"
 
 	"passkeeper/internal/config"
 	"passkeeper/internal/transport/grpc/handlers"
@@ -26,7 +27,7 @@ func (in *AuthInterceptor) AuthFunc(ctx context.Context) (context.Context, error
 		return nil, err
 	}
 
-	userID, err := usersUC.CheckToken(token, in.service.GetTokenSalt())
+	userID, err := hashes.CheckToken(token, in.service.GetTokenSalt())
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
 	}

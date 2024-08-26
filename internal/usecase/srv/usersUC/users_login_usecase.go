@@ -2,6 +2,7 @@ package usersUC
 
 import (
 	"context"
+	"passkeeper/internal/utils/hashes"
 )
 
 func (u *UserUsecase) LoginUser(ctx context.Context, login string, password string) (token string, secret string, err error) {
@@ -11,7 +12,7 @@ func (u *UserUsecase) LoginUser(ctx context.Context, login string, password stri
 		return "", "", ErrWrongAuth
 	}
 
-	same := ComparePassAndCryptoHash(password, user.Hash, user.Salt)
+	same := hashes.ComparePassAndCryptoHash(password, user.Hash, user.Salt)
 	if !same {
 		u.log.Error().Err(err).
 			Msg(ErrWrongPassword.Error())
@@ -27,6 +28,6 @@ func (u *UserUsecase) LoginUser(ctx context.Context, login string, password stri
 		return "", "", ErrWrongPassword
 	}
 
-	token, err = GenerateToken(user.ID, user.Secret, u.tokenLifeTime)
+	token, err = hashes.GenerateToken(user.ID, user.Secret, u.tokenLifeTime)
 	return token, hashedSecret, err
 }

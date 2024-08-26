@@ -18,8 +18,7 @@ var (
 	ErrWrongPassword = fmt.Errorf("old password is wrong")
 	ErrRepassNotSame = fmt.Errorf("new pass and repeat not the same")
 
-	ErrWrongAuth    = fmt.Errorf("wrong user/password")
-	ErrInvalidToken = fmt.Errorf("token sign is not valid")
+	ErrWrongAuth = fmt.Errorf("wrong user/password")
 
 	ErrUserSecret = fmt.Errorf("can't generate user secret hash")
 )
@@ -81,7 +80,7 @@ func (u *UserUsecase) SetSecretLen(length int) *UserUsecase {
 	return u
 }
 
-func (u *UserUsecase) SetSalttLen(length int) *UserUsecase {
+func (u *UserUsecase) SetSaltLen(length int) *UserUsecase {
 	u.userPassSaltLen = length
 
 	return u

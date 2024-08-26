@@ -1,6 +1,7 @@
 package usersUC
 
 import (
+	"passkeeper/internal/utils/hashes"
 	"testing"
 )
 
@@ -33,7 +34,7 @@ func TestGenerateCryptoHash(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotHash, err := GenerateCryptoHash(tt.args.password, tt.args.salt)
+			gotHash, err := hashes.GenerateCryptoHash(tt.args.password, tt.args.salt)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GenerateCryptoHash() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -90,7 +91,7 @@ func TestComparePassAndCryptoHash(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ComparePassAndCryptoHash(tt.args.password, tt.args.hash, tt.args.salt); got != tt.equal {
+			if got := hashes.ComparePassAndCryptoHash(tt.args.password, tt.args.hash, tt.args.salt); got != tt.equal {
 				t.Errorf("ComparePassAndCryptoHash() = %v, want %v", got, tt.equal)
 			}
 		})

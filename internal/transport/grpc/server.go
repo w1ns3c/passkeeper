@@ -60,6 +60,8 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 		return nil, errNotEnoughOptions
 	}
 
+	srv.srvRPC = grpc.NewServer()
+
 	// register handlers
 	srv.hndCreds = handlers.NewCredsHandler(srv.log, srv.creds)
 	srv.hndUsers = handlers.NewUsersHandler(srv.log, srv.users)

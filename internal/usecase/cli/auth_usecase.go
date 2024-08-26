@@ -3,7 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"net/mail"
 	"regexp"
 	"strings"
 
@@ -11,14 +10,23 @@ import (
 
 	"passkeeper/internal/config"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-	"passkeeper/internal/utils/hashpass"
+	"passkeeper/internal/utils/hashes"
+)
+
+var (
+	ErrInvalidEmail        = fmt.Errorf("email is not valid by new regexp")
+	ErrPassDiff            = fmt.Errorf("passwords are not the same")
+	ErrEmptyUsername       = fmt.Errorf("username is empty")
+	ErrEmptyEmail          = fmt.Errorf("email is empty")
+	ErrEmptyPassword       = fmt.Errorf("pass is empty")
+	ErrEmptyPasswordRepeat = fmt.Errorf("pass repeat is empty")
 )
 
 // Login func is client login logic for tui app
 // to interact with server login logic
 func (c *ClientUC) Login(ctx context.Context, login, password string) error {
 
-	hash := hashpass.Hash(password)
+	hash := hashes.Hash(password)
 
 	req := &pb.UserLoginRequest{
 		Login:    login,
@@ -46,7 +54,7 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) error {
 
 // Register func is client register logic for tui app
 // to interact with server register logic
-func (c *ClientUC) Register(ctx context.Context, login, password, repeat, email string) error {
+func (c *ClientUC) Register(ctx context.Context, email, login, password, repeat string) error {
 	email = strings.TrimSpace(email)
 	login = strings.TrimSpace(login)
 
@@ -55,8 +63,8 @@ func (c *ClientUC) Register(ctx context.Context, login, password, repeat, email 
 		return err
 	}
 
-	hash1 := hashpass.Hash(password)
-	hash2 := hashpass.Hash(repeat)
+	hash1 := hashes.Hash(password)
+	hash2 := hashes.Hash(repeat)
 	if hash1 != hash2 {
 		return ErrPassNotSame
 	}
@@ -89,23 +97,38 @@ func (c *ClientUC) Register(ctx context.Context, login, password, repeat, email 
 
 // FilterUserRegValues func filter user input values from tui app
 func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email string) error {
+	// check if user accidentally add space
+	username = strings.TrimSpace(username)
+	email = strings.TrimSpace(email)
+
+	// passwords should not trim space, because it can contain spaces
+
 	if username == "" {
-		return fmt.Errorf("username is empty")
+		return ErrEmptyUsername
 	}
 	if email == "" {
-		return fmt.Errorf("email is empty")
+		return ErrEmptyEmail
 	}
 
-	if _, err := mail.ParseAddress(email); err != nil {
-		return fmt.Errorf("email is not valid")
+	if password == "" {
+		return ErrEmptyPassword
 	}
+
+	if passRepeat == "" {
+		return ErrEmptyPasswordRepeat
+	}
+
+	//if _, err := mail.ParseAddress(email); err != nil {
+	//	return fmt.Errorf("email is not valid")
+	//}
+
 	// from here https://emaillistvalidation.com/blog/mastering-email-validation-in-golang-crafting-robust-regex-patterns/
-	if result, _ := regexp.MatchString("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email); !result {
-		return fmt.Errorf("email is not valid by new regexp")
+	if err := FilterEmail(email); err != nil {
+		return err
 	}
 
 	if password != passRepeat {
-		return fmt.Errorf("passwords are not the same")
+		return ErrPassDiff
 	}
 
 	// TODO Uncomment it
@@ -117,6 +140,21 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 	//if _, ok := usersUC[username]; ok {
 	//	return fmt.Errorf("user already exist")
 	//}
+
+	return nil
+}
+
+// FilterEmail check if email string is valid email
+func FilterEmail(email string) error {
+	pattern := "^[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9-.]+[a-zA-A0-9].[a-zA-Z]{2,}$"
+	if result, _ := regexp.MatchString(pattern, email); !result {
+		return ErrInvalidEmail
+	}
+
+	username := strings.Split(email, "@")[0]
+	if strings.Contains(username, "..") {
+		return ErrInvalidEmail // double dots in username
+	}
 
 	return nil
 }

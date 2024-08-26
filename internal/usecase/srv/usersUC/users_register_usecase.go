@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"passkeeper/internal/config"
+	"passkeeper/internal/utils/hashes"
 
 	"passkeeper/internal/entities"
 
@@ -24,7 +25,7 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 
 	// checking login free
 	exist, err := u.storage.CheckUserExist(ctx, login)
-	if !errors.Is(err, entities.ErrUserNotFound) || exist {
+	if (!errors.Is(err, entities.ErrUserNotFound) && err != nil) || exist {
 		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
 
@@ -32,15 +33,15 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	if err != nil {
 		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
-	hash, err := GenerateCryptoHash(password, userSalt)
+	hash, err := hashes.GenerateCryptoHash(password, userSalt)
 	if err != nil {
 		return "", "", fmt.Errorf("can't generate hash of password: %v", err)
 	}
 
 	m := md5.Sum([]byte(hash))
-	id := GenerateID(hex.EncodeToString(m[:]), userSalt)
+	id := hashes.GenerateUserID(hex.EncodeToString(m[:]), userSalt)
 
-	secret, err := GenerateSecret(u.userSecretLen)
+	secret, err := hashes.GenerateSecret(u.userSecretLen)
 	if err != nil {
 		return "", "", fmt.Errorf("can't generate secret for user: %v", err)
 	}
@@ -66,7 +67,7 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 		return "", "", ErrWrongPassword
 	}
 
-	token, err = GenerateToken(user.ID, user.Secret, u.tokenLifeTime)
+	token, err = hashes.GenerateToken(user.ID, user.Secret, u.tokenLifeTime)
 	if err != nil {
 		return "", "", fmt.Errorf("can't generate user token: %v", err)
 	}

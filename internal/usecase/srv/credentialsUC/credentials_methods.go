@@ -2,11 +2,10 @@ package credentialsUC
 
 import (
 	"context"
+	"passkeeper/internal/utils/hashes"
 	"time"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
-	"passkeeper/internal/usecase/srv/usersUC"
 )
 
 func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error) {
@@ -24,33 +23,30 @@ func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID strin
 }
 
 func (u *CredUsecase) AddCredential(ctx context.Context,
-	userToken string, cred *entities.Credential) error {
+	userID string, cred *entities.Credential) error {
 
-	sec, err := usersUC.GenerateSecret(config.UserSecretLen)
-	if err != nil {
-		return err
-	}
+	//cred.Password, err = EncryptPass(cred.Password)
+	//cred.ID = hashes.GeneratePassID(sec, salt)
 
-	cred.ID = usersUC.GenerateID(sec, u.salt)
-	cred.Password, err = EncryptPass(cred.Password)
+	cred.ID = hashes.GeneratePassID2()
 	VerifyCredDate(cred)
 
-	return u.storage.AddCredential(ctx, userToken, cred)
+	return u.storage.AddCredential(ctx, userID, cred)
 }
 
 func (u *CredUsecase) UpdateCredential(ctx context.Context,
-	userToken string, cred *entities.Credential) error {
+	userID string, cred *entities.Credential) error {
 
-	sec, err := usersUC.GenerateSecret(config.UserSecretLen)
-	if err != nil {
-		return err
-	}
+	//sec, err := usersUC.GenerateSecret(config.UserSecretLen)
+	//if err != nil {
+	//	return err
+	//}
 
-	cred.ID = usersUC.GenerateID(sec, u.salt)
-	cred.Password, err = EncryptPass(cred.Password)
+	//cred.ID = usersUC.GenerateID(sec, u.salt)
+	//cred.Password, err = EncryptPass(cred.Password)
 	VerifyCredDate(cred)
 
-	return u.storage.UpdateCredential(ctx, userToken, cred)
+	return u.storage.UpdateCredential(ctx, userID, cred)
 }
 
 func (u *CredUsecase) DeleteCredential(ctx context.Context,
@@ -86,4 +82,9 @@ func VerifyCredDate(cred *entities.Credential) {
 	if cred.Date.Sub(now) > time.Hour*24 {
 		cred.Date = now
 	}
+}
+
+func (u *CredUsecase) GetUserSecret(ctx context.Context, userToken string) string {
+	//TODO implement me
+	panic("implement me")
 }

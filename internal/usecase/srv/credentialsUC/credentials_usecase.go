@@ -15,6 +15,7 @@ var (
 )
 
 type CredUsecaseInf interface {
+	GetUserSecret(ctx context.Context, userToken string) string // return secret user string
 	GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error)
 	AddCredential(ctx context.Context, userToken string, cred *entities.Credential) error
 	UpdateCredential(ctx context.Context, userToken string, cred *entities.Credential) error
@@ -42,7 +43,7 @@ func newCredUsecase() *CredUsecase {
 	}
 }
 
-func NewCredUCopts(opts ...CredOption) *CredUsecase {
+func NewCredUCWithOpts(opts ...CredOption) *CredUsecase {
 	credsUC := newCredUsecase()
 	for _, opt := range opts {
 		opt(credsUC)
@@ -60,5 +61,11 @@ func WithStorage(db storage.Storage) CredOption {
 func WithContext(ctx context.Context) CredOption {
 	return func(usecase *CredUsecase) {
 		usecase.ctx = ctx
+	}
+}
+
+func WithLogger(logger *zerolog.Logger) CredOption {
+	return func(usecase *CredUsecase) {
+		usecase.log = logger
 	}
 }

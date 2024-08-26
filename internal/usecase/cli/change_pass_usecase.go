@@ -2,14 +2,15 @@ package cli
 
 import (
 	"context"
+	"passkeeper/internal/utils/hashes"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
 
 func (c *ClientUC) ChangePass(ctx context.Context, curPass, newPass, repeat string) error {
-	oldHash := Hash(curPass)
-	newHash := Hash(newPass)
-	repeatH := Hash(repeat)
+	oldHash := hashes.Hash(curPass)
+	newHash := hashes.Hash(newPass)
+	repeatH := hashes.Hash(repeat)
 
 	if newHash != repeatH {
 		return ErrPassNotSame
