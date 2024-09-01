@@ -3,6 +3,9 @@ package tui
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
+	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
 	"strings"
 )
@@ -166,8 +169,16 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		password := pField.GetText()
 
 		//authed := Login(username, password)
-		err := tuiApp.Usecase.Login(tuiApp.ctx, username, password)
+		token, fullSecret, userID, err := tuiApp.Usecase.Login(tuiApp.Ctx, username, password)
 		if err != nil {
+			stErr := status.FromContextError(err)
+			if strings.Contains(stErr.Message(), "connection refused") {
+				errAuthForm := NewModalWithParams(tuiApp, "Server is unavailable!", PageLogin)
+				tuiApp.Pages.AddPage(PageAuthErr, errAuthForm, true, false)
+				tuiApp.Pages.SwitchToPage(PageAuthErr)
+				return
+			}
+
 			// not authed
 			errAuthForm := NewModalWithParams(tuiApp, "Wrong username/password!", PageLogin)
 			tuiApp.Pages.AddPage(PageAuthErr, errAuthForm, true, false)
@@ -175,16 +186,28 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			return
 		}
 
+		tuiApp.Token = token
+
 		// TODO change this auth
+		//tuiApp.User = &entities.User{
+		//	ID:     "",
+		//	Login:  username,
+		//	Hash:   password,
+		//	CredsSecret: "",
+		//	Phone:  "",
+		//}
+
 		tuiApp.User = &entities.User{
-			ID:     "",
+			ID:     userID,
 			Login:  username,
 			Hash:   password,
-			Secret: "",
-			Phone:  "",
+			Secret: fullSecret,
 		}
 
-		creds, err := tuiApp.GetCreds()
+		md := metadata.New(map[string]string{config.TokenHeader: tuiApp.Token})
+		tuiApp.Ctx = metadata.NewOutgoingContext(tuiApp.Ctx, md)
+
+		creds, err := tuiApp.Usecase.GetCreds(tuiApp.Ctx)
 		if err != nil {
 			PageCredsErr := "credsError"
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageLogin)
@@ -271,7 +294,15 @@ func NewRegisterForm(tuiApp *TUI) *tview.Flex {
 		pField2 := itemPass2.(*tview.InputField)
 		repeat := pField2.GetText()
 
-		if err := tuiApp.Usecase.Register(tuiApp.ctx, email, username, password, repeat); err != nil {
+		if err := tuiApp.Usecase.Register(tuiApp.Ctx, email, username, password, repeat); err != nil {
+			stErr := status.FromContextError(err)
+			if strings.Contains(stErr.Message(), "connection refused") {
+				errAuthForm := NewModalWithParams(tuiApp, "Server is unavailable!", PageRegister)
+				tuiApp.Pages.AddPage(PageRegisterError, errAuthForm, true, false)
+				tuiApp.Pages.SwitchToPage(PageRegisterError)
+				return
+			}
+
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageRegister)
 			tuiApp.Pages.AddPage(PageRegisterError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageRegisterError)

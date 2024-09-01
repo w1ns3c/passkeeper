@@ -40,7 +40,7 @@ func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *enti
 	defer m.usersMU.Unlock()
 	for _, u := range m.users {
 		if u.ID == userID {
-			return nil, err
+			return u, nil
 		}
 	}
 

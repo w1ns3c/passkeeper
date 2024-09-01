@@ -16,20 +16,21 @@ var (
 )
 
 type ClientUsecase interface {
-	Login(ctx context.Context, login, password string) error
+	Login(ctx context.Context, login, password string) (token, secret, userID string, err error)
 	Register(ctx context.Context, email, login, password, repeat string) error
 	GetCreds(ctx context.Context) (creds []*entities.Credential, err error)
 }
 
 type ClientUC struct {
-	ctx    context.Context
-	Token  string // JWT token
-	UserID string // userID from JWT token
-	Secret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
+	Token       string // JWT token
+	UserID      string // userID from JWT token
+	CredsSecret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
 
 	userSvc  pb.UserSvcClient
 	passSvc  pb.UserChangePassSvcClient
 	credsSvc pb.CredSvcClient
+
+	TokenHeader string
 }
 
 func NewClientUC(addr string) (cli *ClientUC, err error) {

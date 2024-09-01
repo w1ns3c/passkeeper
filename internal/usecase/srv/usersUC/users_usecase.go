@@ -34,7 +34,7 @@ type UserUsecaseInf interface {
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token, secret string, err error)
 
 	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
-	GetTokenSalt() string
+	GetTokenSalt(ctx context.Context, userID string) string
 
 	LoginUser(ctx context.Context, login string, password string) (token, secret string, err error)
 }
@@ -48,8 +48,16 @@ type UserUsecase struct {
 	log             *zerolog.Logger
 }
 
-func (u *UserUsecase) GetTokenSalt() string {
-	panic("implement me")
+func (u *UserUsecase) GetTokenSalt(ctx context.Context, userID string) string {
+	user, err := u.storage.GetUserByID(ctx, userID)
+	if err != nil {
+		u.log.Error().
+			Err(err).Msg("can't get user's salt from storage")
+
+		return ""
+	}
+
+	return user.Salt
 }
 
 func NewUserUsecase() *UserUsecase {

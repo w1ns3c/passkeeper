@@ -16,6 +16,7 @@ import (
 func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	password string, rePass string) (token, secretForCreds string, err error) {
 
+	// here password should be hashes.Hash(password)
 	if password != rePass {
 		return "", "", ErrRepassNotSame
 	}
@@ -74,11 +75,12 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	//	return "", "", ErrWrongOldPassword
 	//}
 
-	token, err = hashes.GenerateToken(user.ID, secret, u.tokenLifeTime)
+	token, err = hashes.GenerateToken(user.ID, userSalt, u.tokenLifeTime)
 	if err != nil {
 		return "", "", fmt.Errorf("can't generate user token: %v", err)
 	}
 
+	// user.CredsSecret is hashes.EncryptSecret(secret, hashes.Hash(clearPassword))
 	return token, user.Secret, nil
 }
 

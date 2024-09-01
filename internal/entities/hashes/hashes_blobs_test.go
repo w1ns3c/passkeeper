@@ -2,6 +2,7 @@ package hashes
 
 import (
 	"github.com/stretchr/testify/require"
+	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
 	"testing"
 	"time"
@@ -14,7 +15,12 @@ func TestEncryptDecryptBlob(t *testing.T) {
 	}
 
 	var (
-		key = "123123"
+		pass   = "123"
+		hash   = Hash(pass)
+		userID = "new-user-id"
+		s, _   = GenerateSecret(config.UserSecretLen)
+		ss, _  = EncryptSecret(s, hash)
+		key, _ = GenerateCredsSecret(pass, userID, ss)
 
 		cred1 = &entities.Credential{
 			ID:          GeneratePassID2(),

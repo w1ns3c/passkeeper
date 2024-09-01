@@ -18,25 +18,14 @@ func (c *ClientUC) GetCreds(ctx context.Context) (creds []*entities.Credential, 
 
 	creds = make([]*entities.Credential, len(resp.Creds))
 
-	// client side, so there isn't interceptor that auto extract userID from token
-	token, err := hashes.ExtractUserInfo(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	userID, err := hashes.ExtractUserID(token)
-	if err != nil {
-		return nil, err
-	}
-
 	for i := 0; i < len(resp.Creds); i++ {
 		blob := &entities.CredBlob{
 			ID:     resp.Creds[i].ID,
-			UserID: userID,
+			UserID: c.UserID,
 			Blob:   resp.Creds[i].Blob,
 		}
 
-		cred, err := hashes.DecryptBlob(blob, c.Secret)
+		cred, err := hashes.DecryptBlob(blob, c.CredsSecret)
 		if err != nil {
 			// TODO handle ERRORS!!!
 		}

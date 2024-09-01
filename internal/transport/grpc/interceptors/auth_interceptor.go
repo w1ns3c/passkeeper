@@ -2,9 +2,9 @@ package interceptors
 
 import (
 	"context"
-	"passkeeper/internal/entities/hashes"
-
+	"google.golang.org/grpc"
 	"passkeeper/internal/config"
+	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/usecase/srv/usersUC"
 
 	"google.golang.org/grpc/codes"
@@ -18,22 +18,44 @@ var (
 
 type AuthInterceptor struct {
 	service usersUC.UserUsecaseInf
+	grpc.UnaryServerInterceptor
 }
 
-func (in *AuthInterceptor) AuthFunc(ctx context.Context) (context.Context, error) {
-	token, err := hashes.ExtractUserInfo(ctx)
-	if err != nil {
-		return nil, err
+func (in *AuthInterceptor) AuthFunc() grpc.UnaryServerInterceptor {
+	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
+
+		if info.FullMethod == "/UserSvc/LoginUser" ||
+			info.FullMethod == "/UserSvc/RegisterUser" {
+
+			return handler(ctx, req)
+		}
+
+		token, err := hashes.ExtractUserInfo(ctx)
+		if err != nil {
+
+		}
+
+		uncheckedID, err := hashes.ExtractUserID(token)
+		if err != nil {
+
+		}
+
+		salt := in.service.GetTokenSalt(ctx, uncheckedID)
+		userID, err := hashes.CheckToken(token, salt)
+		if err != nil {
+			return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
+		}
+
+		md, ok := metadata.FromIncomingContext(ctx)
+		if !ok {
+			return nil, status.Error(codes.Internal, "can't extract value from context")
+		}
+		md.Set(config.TokenHeader, userID)
+
+		ctx = metadata.NewIncomingContext(ctx, md)
+
+		return handler(ctx, req)
 	}
-
-	userID, err := hashes.CheckToken(token, in.service.GetTokenSalt())
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
-	}
-
-	metadata.AppendToOutgoingContext(ctx, config.TokenHeader, userID)
-
-	return ctx, nil
 }
 
 func NewAuthInterceptor(service usersUC.UserUsecaseInf) *AuthInterceptor {

@@ -21,7 +21,7 @@ var (
 
 // Login func is client login logic for tui app
 // to interact with server login logic
-func (c *ClientUC) Login(ctx context.Context, login, password string) error {
+func (c *ClientUC) Login(ctx context.Context, login, password string) (token, secret, userID string, err error) {
 
 	hash := hashes.Hash(password)
 
@@ -32,37 +32,25 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) error {
 
 	resp, err := c.userSvc.LoginUser(ctx, req)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
-
-	//md, ok := metadata.FromIncomingContext(ctx)
-	//if ok {
-	//	tokens := md.Get(config.TokenHeader)
-	//	if len(tokens) < 1 {
-	//		return fmt.Errorf("no token in response")
-	//	}
-	//	c.Token = tokens[0]
-	//}
-
-	//c.Token, err = hashes.ExtractUserInfo(ctx)
-	//if err != nil {
-	//	return err
-	//}
-	//
-
 	c.Token = resp.Token
 
-	userID, err := hashes.ExtractUserID(c.Token)
+	userID, err = hashes.ExtractUserID(resp.Token)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
+	c.UserID = userID
+	cryptSecret := resp.SrvSecret
+	//secret, err := hashes.DecryptSecret(cryptSecret, hash)
 
-	c.Secret, err = hashes.GenerateCredsSecret(password, userID, resp.SrvSecret)
+	fullSecret, err := hashes.GenerateCredsSecret(password, userID, cryptSecret)
 	if err != nil {
-		return err
+		return "", "", "", err
 	}
+	c.CredsSecret = fullSecret
 
-	return nil
+	return c.Token, c.CredsSecret, c.UserID, nil
 }
 
 // Register func is client register logic for tui app
@@ -89,38 +77,9 @@ func (c *ClientUC) Register(ctx context.Context, email, login, password, repeat 
 		RePassword: hash2,
 	}
 
-	resp, err := c.userSvc.RegisterUser(ctx, req)
-	if err != nil {
-		return err
-	}
+	_, err = c.userSvc.RegisterUser(ctx, req)
 
-	//md, ok := metadata.FromIncomingContext(ctx)
-	//if ok {
-	//	tokens := md.Get(config.TokenHeader)
-	//	if len(tokens) < 1 {
-	//		return fmt.Errorf("no token in response")
-	//	}
-	//	c.Token = tokens[0]
-	//}
-
-	//c.Token, err = hashes.ExtractUserInfo(ctx)
-	//if err != nil {
-	//	return err
-	//}
-
-	c.Token = resp.Token
-
-	userID, err := hashes.ExtractUserID(c.Token)
-	if err != nil {
-		return err
-	}
-
-	c.Secret, err = hashes.GenerateCredsSecret(password, userID, resp.SrvSecret)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // FilterUserRegValues func filter user input values from tui app

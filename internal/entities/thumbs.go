@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func Save(creds []Credential, ind int, res, login, password, desc string) error {
+func Save(creds []*Credential, ind int, res, login, password, desc string) error {
 	creds[ind].Resource = res
 	creds[ind].Login = login
 	creds[ind].Password = password
@@ -15,9 +15,9 @@ func Save(creds []Credential, ind int, res, login, password, desc string) error 
 	return nil
 }
 
-func Add(creds []Credential, res, login, password, desc string) (newCreds []Credential, err error) {
+func Add(creds []*Credential, res, login, password, desc string) (newCreds []*Credential, err error) {
 
-	tmpCred := Credential{
+	tmpCred := &Credential{
 		ID:          GenHash(res),
 		Date:        time.Now(),
 		Resource:    res,
@@ -30,7 +30,7 @@ func Add(creds []Credential, res, login, password, desc string) (newCreds []Cred
 		return append(creds, tmpCred), nil
 	}
 
-	creds = append(creds, Credential{})
+	creds = append(creds, &Credential{})
 
 	for i := len(creds) - 1; i > 0; i-- {
 		creds[i] = creds[i-1]
@@ -41,7 +41,7 @@ func Add(creds []Credential, res, login, password, desc string) (newCreds []Cred
 	return creds, nil
 }
 
-func Delete(creds []Credential, ind int) (newCreds []Credential, err error) {
+func Delete(creds []*Credential, ind int) (newCreds []*Credential, err error) {
 	for i := ind; i < len(creds)-1; i++ {
 		creds[i] = creds[i+1]
 	}

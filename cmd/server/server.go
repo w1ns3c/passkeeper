@@ -22,11 +22,13 @@ func main() {
 	saltLen := config.UserPassSaltLen
 
 	var (
-		login1 = "user1"
-		pass1  = "123"
+		login1  = "user1"
+		pass1   = "123"
+		userid1 = login1 + "_ID"
 
-		login2 = "user2"
-		pass2  = "password"
+		login2  = "user2"
+		pass2   = "password"
+		userid2 = login2 + "_ID"
 
 		hash1 = hashes.Hash(pass1)
 		hash2 = hashes.Hash(pass2)
@@ -43,7 +45,7 @@ func main() {
 		cryptSecret2, _ = hashes.EncryptSecret(secret2, hash2)
 
 		user1 = &entities.User{
-			ID:     login1,
+			ID:     userid1,
 			Login:  login1,
 			Hash:   cryptHash1,
 			Salt:   userSalt1,
@@ -51,7 +53,7 @@ func main() {
 		}
 
 		user2 = &entities.User{
-			ID:     login2,
+			ID:     userid2,
 			Login:  login2,
 			Hash:   cryptHash2,
 			Salt:   userSalt2,
@@ -85,8 +87,8 @@ func main() {
 		}
 	)
 
-	key1, _ := hashes.GenerateCredsSecret(pass1, user1.ID, secret1)
-	key2, _ := hashes.GenerateCredsSecret(pass2, user2.ID, secret2)
+	key1, _ := hashes.GenerateCredsSecret(pass1, user1.ID, cryptSecret1)
+	key2, _ := hashes.GenerateCredsSecret(pass2, user2.ID, cryptSecret2)
 
 	users := map[string]*entities.User{
 		login1: user1,
@@ -106,10 +108,10 @@ func main() {
 	blob3, _ := hashes.EncryptBlob(password3, key2)
 
 	blobs := map[string][]*entities.CredBlob{
-		login1: {
+		userid1: {
 			blob1, blob2,
 		},
-		login2: {
+		userid2: {
 			blob3,
 		},
 	}

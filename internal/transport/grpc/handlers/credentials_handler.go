@@ -160,7 +160,9 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 		return nil, ErrCredList
 	}
 
-	resp.Creds = make([]*pb.CredBlob, len(creds))
+	resp = &pb.CredListResponse{
+		Creds: make([]*pb.CredBlob, len(creds)),
+	}
 	for i := 0; i < len(creds); i++ {
 		resp.Creds[i] = &pb.CredBlob{
 			ID:   creds[i].ID,

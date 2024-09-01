@@ -63,9 +63,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 		return nil, errNotEnoughOptions
 	}
 
-	srv.srvRPC = grpc.NewServer()
-
-	//
+	// init intercepters
 	srv.authInterceptor = interceptors.NewAuthInterceptor(srv.users)
 
 	// init handlers
@@ -73,6 +71,10 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	srv.hndUsers = handlers.NewUsersHandler(srv.log, srv.users)
 
 	srv.hndChangePass = handlers.NewUserChangePassHandler(srv.log, srv.users)
+
+	srv.srvRPC = grpc.NewServer(
+		grpc.ChainUnaryInterceptor(srv.authInterceptor.AuthFunc()),
+	)
 
 	return
 }

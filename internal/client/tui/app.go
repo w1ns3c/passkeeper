@@ -39,6 +39,8 @@ var (
 			SetText(HintText)
 
 	PassHidden = "******"
+
+	ErrNotAuthed = fmt.Errorf("not authed")
 )
 
 // TUI struct is tui client app
@@ -50,11 +52,12 @@ type TUI struct {
 
 	// Actions
 	Usecase cli.ClientUsecase
-	ctx     context.Context
+	Ctx     context.Context
 
 	// user info
+	Token string
 	User  *entities.User
-	Creds []entities.Credential
+	Creds []*entities.Credential
 }
 
 // NewTUI func is constructor for TUI
@@ -65,7 +68,7 @@ func NewTUI(addr string) (tui *TUI, err error) {
 	}
 	pages := tview.NewPages()
 
-	ctx := context.Background()
+	//ctx := context.Background()
 	usecase, err := cli.NewClientUC(addr)
 	if err != nil {
 		return nil, err
@@ -78,11 +81,11 @@ func NewTUI(addr string) (tui *TUI, err error) {
 		App: tview.NewApplication().
 			SetScreen(scr).SetRoot(pages, true).
 			EnableMouse(false),
-		Creds:      make([]entities.Credential, 0),
+		Creds:      make([]*entities.Credential, 0),
 		MinPassLen: config.MinPassLen,
 		Usecase:    usecase,
 
-		ctx: ctx,
+		Ctx: context.Background(),
 	}
 
 	//tuiApp.Creds = CredsList
@@ -110,21 +113,21 @@ func NewTUI(addr string) (tui *TUI, err error) {
 	return tuiApp, nil
 }
 
-func (app *TUI) GetCreds() (creds []entities.Credential, err error) {
-	if app.User == nil {
-		return nil, fmt.Errorf("not authed")
-	}
-
-	if app.User.Login == "user" {
-		return CredsList, nil
-	}
-
-	if app.User.Login == "error" {
-		return nil, fmt.Errorf("can't get credentialsUC")
-	}
-
-	return make([]entities.Credential, 0), nil
-}
+//func (app *TUI) GetCreds() (creds []entities.Credential, err error) {
+//	if app.User == nil {
+//		return nil, ErrNotAuthed
+//	}
+//
+//	if app.User.Login == "user" {
+//		return CredsList, nil
+//	}
+//
+//	if app.User.Login == "error" {
+//		return nil, fmt.Errorf("can't get credentialsUC")
+//	}
+//
+//	return make([]entities.Credential, 0), nil
+//}
 
 func (app *TUI) Logout() error {
 	app.Creds = nil

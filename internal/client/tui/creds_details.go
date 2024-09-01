@@ -342,7 +342,7 @@ func (form *Details) EmptyFields() {
 	}
 }
 
-func (form *Details) SetHiddenCred(cred entities.Credential) *Details {
+func (form *Details) SetHiddenCred(cred *entities.Credential) *Details {
 	if form.FieldRes != nil {
 		form.FieldRes.SetText(cred.Resource)
 	}
@@ -362,7 +362,7 @@ func (form *Details) SetHiddenCred(cred entities.Credential) *Details {
 	return form
 }
 
-func (form *Details) SetCurrentCred(cred entities.Credential) *Details {
+func (form *Details) SetCurrentCred(cred *entities.Credential) *Details {
 	if form.FieldRes != nil {
 		form.FieldRes.SetText(cred.Resource)
 	}
@@ -409,7 +409,7 @@ func (form *Details) ShowSwitchPass() {
 }
 
 // FillFields alias for SetCurrentCred
-func (form *Details) FillFields(cred entities.Credential) {
+func (form *Details) FillFields(cred *entities.Credential) {
 	form.SetCurrentCred(cred)
 }
 

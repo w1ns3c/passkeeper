@@ -5,14 +5,12 @@ import (
 	"errors"
 	"passkeeper/internal/entities"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/usecase/srv/usersUC"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -62,7 +60,6 @@ func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegiste
 		Token:     token,
 		SrvSecret: secret,
 	}
-
 	h.log.Info().
 		Msgf("User \"%s\" successfully registered!", request.Login)
 
@@ -80,7 +77,7 @@ func (h *UsersHandler) LoginUser(ctx context.Context,
 		return nil, ErrWrongLogin
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
+	//ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
 
 	resp = &pb.UserLoginResponse{
 		Token:     token,
