@@ -3,9 +3,9 @@ package handlers
 import (
 	"context"
 	"errors"
+	"passkeeper/internal/entities"
 
 	"passkeeper/internal/config"
-	"passkeeper/internal/entities"
 	"passkeeper/internal/usecase/srv/usersUC"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
@@ -26,9 +26,6 @@ var (
 
 	ErrWrongLoginMsg = "can't login user, wrong login/password"
 	ErrWrongLogin    = status.Errorf(codes.PermissionDenied, ErrWrongLoginMsg)
-
-	ErrGenChallengeMsg = "can't generate challenge"
-	ErrGenChallenge    = status.Errorf(codes.Internal, ErrGenChallengeMsg)
 )
 
 type UsersHandler struct {
@@ -45,9 +42,6 @@ func NewUsersHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *Us
 	}
 }
 
-//rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
-//rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
-
 func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegisterRequest) (resp *pb.UserRegisterResponse, err error) {
 	token, secret, err := h.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
 	if err != nil {
@@ -62,11 +56,15 @@ func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegiste
 		return nil, ErrRegister
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
+	//ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
 
 	resp = &pb.UserRegisterResponse{
-		Secret: secret,
+		Token:     token,
+		SrvSecret: secret,
 	}
+
+	h.log.Info().
+		Msgf("User \"%s\" successfully registered!", request.Login)
 
 	return resp, nil
 }
@@ -85,10 +83,11 @@ func (h *UsersHandler) LoginUser(ctx context.Context,
 	ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
 
 	resp = &pb.UserLoginResponse{
-		//Token: token,
-		Secret: secret,
+		Token:     token,
+		SrvSecret: secret,
 	}
+	h.log.Info().
+		Msgf("User \"%s\" successfully logged in!", req.Login)
 
 	return resp, nil
-
 }

@@ -6,11 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"google.golang.org/grpc/metadata"
-
-	"passkeeper/internal/config"
+	"passkeeper/internal/entities/hashes"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-	"passkeeper/internal/utils/hashes"
 )
 
 var (
@@ -38,16 +35,32 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) error {
 		return err
 	}
 
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		tokens := md.Get(config.TokenHeader)
-		if len(tokens) < 1 {
-			return fmt.Errorf("no token in response")
-		}
-		c.Token = tokens[0]
+	//md, ok := metadata.FromIncomingContext(ctx)
+	//if ok {
+	//	tokens := md.Get(config.TokenHeader)
+	//	if len(tokens) < 1 {
+	//		return fmt.Errorf("no token in response")
+	//	}
+	//	c.Token = tokens[0]
+	//}
+
+	//c.Token, err = hashes.ExtractUserInfo(ctx)
+	//if err != nil {
+	//	return err
+	//}
+	//
+
+	c.Token = resp.Token
+
+	userID, err := hashes.ExtractUserID(c.Token)
+	if err != nil {
+		return err
 	}
 
-	c.SecretHash = resp.GetSecret()
+	c.Secret, err = hashes.GenerateCredsSecret(password, userID, resp.SrvSecret)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -70,10 +83,10 @@ func (c *ClientUC) Register(ctx context.Context, email, login, password, repeat 
 	}
 
 	req := &pb.UserRegisterRequest{
+		Email:      email,
 		Login:      login,
 		Password:   hash1,
 		RePassword: hash2,
-		Email:      email,
 	}
 
 	resp, err := c.userSvc.RegisterUser(ctx, req)
@@ -81,16 +94,31 @@ func (c *ClientUC) Register(ctx context.Context, email, login, password, repeat 
 		return err
 	}
 
-	md, ok := metadata.FromIncomingContext(ctx)
-	if ok {
-		tokens := md.Get(config.TokenHeader)
-		if len(tokens) < 1 {
-			return fmt.Errorf("no token in response")
-		}
-		c.Token = tokens[0]
+	//md, ok := metadata.FromIncomingContext(ctx)
+	//if ok {
+	//	tokens := md.Get(config.TokenHeader)
+	//	if len(tokens) < 1 {
+	//		return fmt.Errorf("no token in response")
+	//	}
+	//	c.Token = tokens[0]
+	//}
+
+	//c.Token, err = hashes.ExtractUserInfo(ctx)
+	//if err != nil {
+	//	return err
+	//}
+
+	c.Token = resp.Token
+
+	userID, err := hashes.ExtractUserID(c.Token)
+	if err != nil {
+		return err
 	}
 
-	c.SecretHash = resp.GetSecret()
+	c.Secret, err = hashes.GenerateCredsSecret(password, userID, resp.SrvSecret)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -101,7 +129,8 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 	username = strings.TrimSpace(username)
 	email = strings.TrimSpace(email)
 
-	// passwords should not trim space, because it can contain spaces
+	// passwords should not trim space, because it can contain spaces on the ends
+	password = strings.Trim(password, "\n\t")
 
 	if username == "" {
 		return ErrEmptyUsername
@@ -118,11 +147,6 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 		return ErrEmptyPasswordRepeat
 	}
 
-	//if _, err := mail.ParseAddress(email); err != nil {
-	//	return fmt.Errorf("email is not valid")
-	//}
-
-	// from here https://emaillistvalidation.com/blog/mastering-email-validation-in-golang-crafting-robust-regex-patterns/
 	if err := FilterEmail(email); err != nil {
 		return err
 	}
@@ -145,6 +169,8 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 }
 
 // FilterEmail check if email string is valid email
+// now this pattern tested by myself and modified from
+// original https://emaillistvalidation.com/blog/mastering-email-validation-in-golang-crafting-robust-regex-patterns/
 func FilterEmail(email string) error {
 	pattern := "^[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9-.]+[a-zA-A0-9].[a-zA-Z]{2,}$"
 	if result, _ := regexp.MatchString(pattern, email); !result {

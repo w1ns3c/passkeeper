@@ -24,9 +24,9 @@ type UserStorage interface {
 }
 
 type CredentialStorage interface {
-	AddCredential(ctx context.Context, userID string, password *entities.Credential) error
-	GetCredential(ctx context.Context, userID, passwordID string) (password *entities.Credential, err error)
-	GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.Credential, err error)
+	AddCredential(ctx context.Context, userID string, password *entities.CredBlob) error
+	GetCredential(ctx context.Context, userID, passwordID string) (password *entities.CredBlob, err error)
+	GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.CredBlob, err error)
 	DeleteCredential(ctx context.Context, userID, passwordID string) error
-	UpdateCredential(ctx context.Context, userID string, password *entities.Credential) error
+	UpdateCredential(ctx context.Context, userID string, password *entities.CredBlob) error
 }

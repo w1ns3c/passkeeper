@@ -11,7 +11,8 @@ message UserRegisterRequest {
 }
 
 message UserRegisterResponse {
-  string Secret = 1;
+  string Token = 1;
+  string SrvSecret = 2;
 }
 
 message UserLoginRequest {
@@ -20,8 +21,8 @@ message UserLoginRequest {
 }
 
 message UserLoginResponse {
-  //  string Token = 1;
-  string Secret = 1;
+  string Token = 1;
+  string SrvSecret = 2;
 }
 
 //// create challenge / response auth

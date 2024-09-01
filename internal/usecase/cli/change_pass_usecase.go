@@ -2,7 +2,7 @@ package cli
 
 import (
 	"context"
-	"passkeeper/internal/utils/hashes"
+	"passkeeper/internal/entities/hashes"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )

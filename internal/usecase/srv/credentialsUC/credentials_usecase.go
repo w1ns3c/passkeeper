@@ -15,12 +15,12 @@ var (
 )
 
 type CredUsecaseInf interface {
-	GetUserSecret(ctx context.Context, userToken string) string // return secret user string
-	GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error)
-	AddCredential(ctx context.Context, userToken string, cred *entities.Credential) error
-	UpdateCredential(ctx context.Context, userToken string, cred *entities.Credential) error
-	DeleteCredential(ctx context.Context, userToken, credID string) error
-	ListCredentials(ctx context.Context, userToken string) (creds []*entities.Credential, err error)
+	GetUserSalt(ctx context.Context, userID string) string // return secret user string
+	GetCredential(ctx context.Context, userID, credID string) (cred *entities.CredBlob, err error)
+	AddCredential(ctx context.Context, userID string, cred *entities.CredBlob) error
+	UpdateCredential(ctx context.Context, userID string, cred *entities.CredBlob) error
+	DeleteCredential(ctx context.Context, userID, credID string) error
+	ListCredentials(ctx context.Context, userID string) (creds []*entities.CredBlob, err error)
 
 	//VerifyCredDate(cred *entities.Credential) // check date/time in received credential
 

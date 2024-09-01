@@ -2,10 +2,9 @@ package interceptors
 
 import (
 	"context"
-	"passkeeper/internal/utils/hashes"
+	"passkeeper/internal/entities/hashes"
 
 	"passkeeper/internal/config"
-	"passkeeper/internal/transport/grpc/handlers"
 	"passkeeper/internal/usecase/srv/usersUC"
 
 	"google.golang.org/grpc/codes"
@@ -22,7 +21,7 @@ type AuthInterceptor struct {
 }
 
 func (in *AuthInterceptor) AuthFunc(ctx context.Context) (context.Context, error) {
-	token, err := handlers.ExtractUserInfo(ctx)
+	token, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +34,10 @@ func (in *AuthInterceptor) AuthFunc(ctx context.Context) (context.Context, error
 	metadata.AppendToOutgoingContext(ctx, config.TokenHeader, userID)
 
 	return ctx, nil
+}
+
+func NewAuthInterceptor(service usersUC.UserUsecaseInf) *AuthInterceptor {
+	return &AuthInterceptor{service: service}
 }
 
 // Will use `grpc-ecosystem/go-grpc-middleware/blob/main/interceptors/auth`

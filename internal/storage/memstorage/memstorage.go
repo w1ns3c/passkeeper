@@ -16,7 +16,7 @@ var (
 type MemStorage struct {
 	users     map[string]*entities.User
 	usersMU   *sync.RWMutex
-	passwords map[string][]*entities.Credential
+	passwords map[string][]*entities.CredBlob
 	passMU    *sync.RWMutex
 }
 
@@ -32,7 +32,7 @@ func NewEmptyMemStorage() *MemStorage {
 	return &MemStorage{
 		users:     make(map[string]*entities.User),
 		usersMU:   &sync.RWMutex{},
-		passwords: make(map[string][]*entities.Credential),
+		passwords: make(map[string][]*entities.CredBlob),
 		passMU:    &sync.RWMutex{},
 	}
 }
@@ -47,9 +47,9 @@ func WithUsers(users map[string]*entities.User) MemOptions {
 	}
 }
 
-// WithPasswords func allow init storage
-// with passwords
-func WithPasswords(passwords map[string][]*entities.Credential) MemOptions {
+// WithBlobs func allow init storage
+// with encrypted blobs
+func WithBlobs(passwords map[string][]*entities.CredBlob) MemOptions {
 	return func(s *MemStorage) {
 		s.passwords = passwords
 	}
@@ -69,7 +69,7 @@ func (m *MemStorage) Init(ctx context.Context) error {
 	}
 
 	if m.passwords == nil {
-		m.passwords = make(map[string][]*entities.Credential)
+		m.passwords = make(map[string][]*entities.CredBlob)
 	}
 
 	return nil

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"passkeeper/internal/entities/hashes"
 
 	"passkeeper/internal/usecase/srv/usersUC"
 
@@ -26,7 +27,7 @@ func NewUserChangePassHandler(logger *zerolog.Logger, service usersUC.UserUsecas
 }
 
 func (h *UserChangePassHandler) ChangePass(ctx context.Context, req *pb.UserChangePassReq) (*empty.Empty, error) {
-	userID, err := ExtractUserInfo(ctx)
+	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
 			Err(err).Send()

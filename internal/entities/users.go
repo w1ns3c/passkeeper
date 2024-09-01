@@ -1,11 +1,11 @@
 package entities
 
 type User struct {
-	ID    string
+	ID    string // generated on Hash and Salt
 	Login string // nickname
-	Hash  string
+	Hash  string // bcrypt hash of sha512 hash of password | bcrypt(sha512(password))
 
-	Salt   string // for encrypt user password
+	Salt   string // for encrypt user's password and sign user token
 	Secret string // for encrypt/decrypt saved passwords
 
 	Phone string

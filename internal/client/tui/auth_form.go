@@ -103,13 +103,14 @@ func FlexMain(tuiApp *TUI) *tview.Flex {
 			}
 			return event
 
-		case tcell.KeyUp:
-			tuiApp.Pages.SwitchToPage(PageCreds)
+			// DEBUG
+			//case tcell.KeyUp:
+			//	tuiApp.Pages.SwitchToPage(PageCreds)
+			//case tcell.KeyDown:
+			//	details := NewDetailsForm(tuiApp)
+			//	tuiApp.Pages.AddPage(TmpPage, details, true, false)
+			//	tuiApp.Pages.SwitchToPage(TmpPage)
 
-		case tcell.KeyDown:
-			details := NewDetailsForm(tuiApp)
-			tuiApp.Pages.AddPage(TmpPage, details, true, false)
-			tuiApp.Pages.SwitchToPage(TmpPage)
 		}
 		return event
 	})

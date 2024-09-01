@@ -2,7 +2,7 @@ package usersUC
 
 import (
 	"context"
-	"passkeeper/internal/utils/hashes"
+	"passkeeper/internal/entities/hashes"
 )
 
 func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error) {
@@ -17,9 +17,9 @@ func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPa
 	equal := hashes.ComparePassAndCryptoHash(oldPass, user.Hash, user.Salt)
 	if !equal {
 		u.log.Error().
-			Err(ErrWrongPassword).Send()
+			Err(ErrWrongOldPassword).Send()
 
-		return ErrWrongPassword
+		return ErrWrongOldPassword
 	}
 
 	if newPass != reNewPass {

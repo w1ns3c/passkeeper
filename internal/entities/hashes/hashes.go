@@ -6,13 +6,10 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
+	"github.com/w1ns3c/go-examples/crypto"
 	"hash"
 	"io"
-	"time"
 
-	"github.com/w1ns3c/go-examples/crypto"
-
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -86,58 +83,4 @@ func genID(secret, salt string, h hash.Hash) string {
 	}
 
 	return hex.EncodeToString(h.Sum(nil))
-}
-
-type Claims struct {
-	jwt.RegisteredClaims
-	UserID string
-}
-
-// GenerateSecret func for generate random hex string
-func GenerateSecret(secretLen int) (secret string, err error) {
-	sl, err := crypto.GenRandSlice(secretLen)
-	if err != nil {
-		return "", nil
-	}
-
-	return hex.EncodeToString(sl), nil
-}
-
-// GenerateToken func for generate JWT auth token
-func GenerateToken(userid string, secret string, lifetime time.Duration) (token string, err error) {
-	tokenLife := time.Now().Add(lifetime)
-	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(tokenLife),
-		},
-		UserID: userid,
-	})
-	token, err = jwtToken.SignedString([]byte(secret))
-	if err != nil {
-		return "", err
-	}
-
-	return token, nil
-}
-
-// CheckToken func for validate JWT auth token
-func CheckToken(tokenStr, secret string) (userID string, err error) {
-	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenStr, claims,
-		func(t *jwt.Token) (interface{}, error) {
-			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-			}
-			return []byte(secret), nil
-		})
-	if err != nil {
-		return "", err
-	}
-
-	if !token.Valid {
-		return "", ErrInvalidToken
-	}
-
-	// return user ID in readable format
-	return claims.UserID, nil
 }

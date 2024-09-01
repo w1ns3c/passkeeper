@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 	"net"
 	"passkeeper/internal/transport/grpc/handlers"
+	"passkeeper/internal/transport/grpc/interceptors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/srv/credentialsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
@@ -26,6 +27,8 @@ type TransportGRPC struct {
 	hndCreds      *handlers.CredsHandler
 	hndUsers      *handlers.UsersHandler
 	hndChangePass *handlers.UserChangePassHandler
+
+	authInterceptor *interceptors.AuthInterceptor
 
 	users usersUC.UserUsecaseInf
 	creds credentialsUC.CredUsecaseInf
@@ -62,9 +65,13 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 
 	srv.srvRPC = grpc.NewServer()
 
-	// register handlers
+	//
+	srv.authInterceptor = interceptors.NewAuthInterceptor(srv.users)
+
+	// init handlers
 	srv.hndCreds = handlers.NewCredsHandler(srv.log, srv.creds)
 	srv.hndUsers = handlers.NewUsersHandler(srv.log, srv.users)
+
 	srv.hndChangePass = handlers.NewUserChangePassHandler(srv.log, srv.users)
 
 	return
@@ -109,8 +116,9 @@ func (srv *TransportGRPC) Run() error {
 		}
 		return errHndNotRegistered
 	}
-	pb.RegisterCredSvcServer(srv.srvRPC, srv.hndCreds)
+
 	pb.RegisterUserSvcServer(srv.srvRPC, srv.hndUsers)
+	pb.RegisterCredSvcServer(srv.srvRPC, srv.hndCreds)
 	pb.RegisterUserChangePassSvcServer(srv.srvRPC, srv.hndChangePass)
 
 	l, err := net.Listen("tcp4", srv.addr.String())

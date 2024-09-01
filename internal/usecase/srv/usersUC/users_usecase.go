@@ -13,21 +13,28 @@ import (
 )
 
 var (
-	ErrGetUser       = fmt.Errorf("can't get user by ID")
-	ErrGenHash       = fmt.Errorf("can't generate hash of password")
-	ErrWrongPassword = fmt.Errorf("old password is wrong")
-	ErrRepassNotSame = fmt.Errorf("new pass and repeat not the same")
+	ErrGetUser = fmt.Errorf("can't get user by ID")
+	ErrGenHash = fmt.Errorf("can't generate hash of password")
 
-	ErrWrongAuth = fmt.Errorf("wrong user/password")
+	ErrWrongOldPassword = fmt.Errorf("old password is wrong")
+	ErrRepassNotSame    = fmt.Errorf("new pass and repeat not the same")
+
+	ErrWrongPassword = fmt.Errorf("wrong password for username")
+	ErrWrongUsername = fmt.Errorf("username not found")
+	ErrWrongAuth     = fmt.Errorf("wrong user/password")
 
 	ErrUserSecret = fmt.Errorf("can't generate user secret hash")
+
+	//ErrPassNotTheSame = fmt.Errorf("passwords not match")
+	ErrPassIsEmpty   = fmt.Errorf("password is empty")
+	ErrRePassIsEmpty = fmt.Errorf("password repeat is empty")
 )
 
 type UserUsecaseInf interface {
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token, secret string, err error)
 
 	ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error)
-	//GetTokenSalt() string
+	GetTokenSalt() string
 
 	LoginUser(ctx context.Context, login string, password string) (token, secret string, err error)
 }
@@ -39,6 +46,10 @@ type UserUsecase struct {
 	userSecretLen   int
 	userPassSaltLen int
 	log             *zerolog.Logger
+}
+
+func (u *UserUsecase) GetTokenSalt() string {
+	panic("implement me")
 }
 
 func NewUserUsecase() *UserUsecase {

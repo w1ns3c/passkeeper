@@ -2,40 +2,30 @@ package credentialsUC
 
 import (
 	"context"
-	"passkeeper/internal/utils/hashes"
+	"passkeeper/internal/entities/hashes"
 	"time"
 
 	"passkeeper/internal/entities"
 )
 
-func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID string) (cred *entities.Credential, err error) {
-	cred, err = u.storage.GetCredential(ctx, userToken, credID)
-	if err != nil {
-		return nil, err
-	}
-
-	cred.Password, err = DecryptPass(cred.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	return cred, nil
+func (u *CredUsecase) GetCredential(ctx context.Context, userToken, credID string) (cred *entities.CredBlob, err error) {
+	return u.storage.GetCredential(ctx, userToken, credID)
 }
 
 func (u *CredUsecase) AddCredential(ctx context.Context,
-	userID string, cred *entities.Credential) error {
+	userID string, cred *entities.CredBlob) error {
 
 	//cred.Password, err = EncryptPass(cred.Password)
 	//cred.ID = hashes.GeneratePassID(sec, salt)
 
 	cred.ID = hashes.GeneratePassID2()
-	VerifyCredDate(cred)
+	//VerifyCredDate(cred)
 
 	return u.storage.AddCredential(ctx, userID, cred)
 }
 
 func (u *CredUsecase) UpdateCredential(ctx context.Context,
-	userID string, cred *entities.Credential) error {
+	userID string, cred *entities.CredBlob) error {
 
 	//sec, err := usersUC.GenerateSecret(config.UserSecretLen)
 	//if err != nil {
@@ -44,7 +34,7 @@ func (u *CredUsecase) UpdateCredential(ctx context.Context,
 
 	//cred.ID = usersUC.GenerateID(sec, u.salt)
 	//cred.Password, err = EncryptPass(cred.Password)
-	VerifyCredDate(cred)
+	//VerifyCredDate(cred)
 
 	return u.storage.UpdateCredential(ctx, userID, cred)
 }
@@ -56,23 +46,9 @@ func (u *CredUsecase) DeleteCredential(ctx context.Context,
 }
 
 func (u *CredUsecase) ListCredentials(ctx context.Context,
-	userToken string) (creds []*entities.Credential, err error) {
+	userID string) (creds []*entities.CredBlob, err error) {
 
-	creds, err = u.storage.GetAllCredentials(ctx, userToken)
-	if err != nil {
-		return nil, err
-	}
-
-	for ind := 0; ind < len(creds); ind++ {
-		creds[ind].Password, err = DecryptPass(creds[ind].Password)
-		if err != nil {
-			u.log.Error().Err(err).
-				Msgf("%s with ID: %s (user: %s)", ErrNoDecrypt, creds[ind].ID, userToken)
-			creds[ind].Password = ErrNoDecrypt
-		}
-	}
-
-	return creds, nil
+	return u.storage.GetAllCredentials(ctx, userID)
 }
 
 // VerifyCredDate verify date/time in received credential
@@ -84,7 +60,7 @@ func VerifyCredDate(cred *entities.Credential) {
 	}
 }
 
-func (u *CredUsecase) GetUserSecret(ctx context.Context, userToken string) string {
+func (u *CredUsecase) GetUserSalt(ctx context.Context, userID string) string {
 	//TODO implement me
 	panic("implement me")
 }

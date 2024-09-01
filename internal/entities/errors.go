@@ -1,8 +1,18 @@
 package entities
 
-import "fmt"
+import (
+	"fmt"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
 var (
-	ErrPassNotTheSame = fmt.Errorf("passwords not match")
-	ErrUserNotFound   = fmt.Errorf("user with this login not found")
+	ErrUserNotFound = fmt.Errorf("user with this login not found")
+
+	// token
+	ErrNoTokenMsg = "no token in context"
+	ErrNoToken    = status.Error(codes.Unauthenticated, ErrNoTokenMsg)
+
+	ErrEmptyTokenMsg = "token is empty"
+	ErrEmptyToken    = status.Error(codes.Unauthenticated, ErrEmptyTokenMsg)
 )

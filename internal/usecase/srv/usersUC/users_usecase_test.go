@@ -1,7 +1,7 @@
 package usersUC
 
 import (
-	"passkeeper/internal/utils/hashes"
+	"passkeeper/internal/entities/hashes"
 	"testing"
 )
 
