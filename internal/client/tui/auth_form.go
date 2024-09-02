@@ -174,15 +174,15 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			stErr := status.FromContextError(err)
 			if strings.Contains(stErr.Message(), "connection refused") {
 				errAuthForm := NewModalWithParams(tuiApp, "Server is unavailable!", PageLogin)
-				tuiApp.Pages.AddPage(PageAuthErr, errAuthForm, true, false)
-				tuiApp.Pages.SwitchToPage(PageAuthErr)
+				tuiApp.Pages.AddPage(PageAuthError, errAuthForm, true, false)
+				tuiApp.Pages.SwitchToPage(PageAuthError)
 				return
 			}
 
 			// not authed
 			errAuthForm := NewModalWithParams(tuiApp, "Wrong username/password!", PageLogin)
-			tuiApp.Pages.AddPage(PageAuthErr, errAuthForm, true, false)
-			tuiApp.Pages.SwitchToPage(PageAuthErr)
+			tuiApp.Pages.AddPage(PageAuthError, errAuthForm, true, false)
+			tuiApp.Pages.SwitchToPage(PageAuthError)
 			return
 		}
 
@@ -209,10 +209,9 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 
 		creds, err := tuiApp.Usecase.GetCreds(tuiApp.Ctx)
 		if err != nil {
-			PageCredsErr := "credsError"
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageLogin)
-			tuiApp.Pages.AddPage(PageCredsErr, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredsErr)
+			tuiApp.Pages.AddPage(PageCredsListErr, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredsListErr)
 			return
 		}
 
@@ -354,10 +353,4 @@ func FilterResource(res string) string {
 	res = parts[0]
 
 	return res
-}
-
-// FilterEmail validate email address
-func FilterEmail(email string) bool {
-	// TODO rewrite this function
-	return true
 }

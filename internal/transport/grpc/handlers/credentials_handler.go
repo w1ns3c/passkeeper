@@ -112,7 +112,7 @@ func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*em
 		Blob:   req.Cred.Blob,
 	}
 
-	err = h.service.AddCredential(ctx, userID, cred)
+	err = h.service.UpdateCredential(ctx, userID, cred)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredUpdMsg)

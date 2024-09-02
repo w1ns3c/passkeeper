@@ -2,6 +2,8 @@ package tui
 
 import (
 	"github.com/rivo/tview"
+	"passkeeper/internal/entities/hashes"
+	"time"
 
 	"passkeeper/internal/entities"
 )
@@ -137,11 +139,28 @@ func (form *Details) Add(ind int, list CredListInf) {
 		defer form.HideButtons()
 
 		res, login, password, desc := form.GetCurrentValues()
-		tmpCreds, err := entities.Add(form.tuiApp.Creds, res, login, password, desc)
+
+		newCred := &entities.Credential{
+			ID:          hashes.GeneratePassID2(),
+			Date:        time.Now(),
+			Resource:    res,
+			Login:       login,
+			Password:    password,
+			Description: desc,
+		}
+
+		if err := form.tuiApp.Usecase.AddCred(form.tuiApp.Ctx, newCred); err != nil {
+			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
+			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			return
+		}
+
+		tmpCreds, err := entities.AddCred(form.tuiApp.Creds, newCred)
 		if err != nil {
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
-			form.tuiApp.Pages.AddPage(PageRegisterError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageRegisterError)
+			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
 			return
 		}
 		form.tuiApp.Creds = tmpCreds
@@ -187,10 +206,28 @@ func (form *Details) Edit(ind int, list CredListInf) {
 		defer form.HideButtons()
 
 		res, login, password, desc := form.GetCurrentValues()
-		if err := entities.Save(form.tuiApp.Creds, ind, res, login, password, desc); err != nil {
+
+		cred := &entities.Credential{
+			ID:          form.tuiApp.Creds[ind].ID,
+			Date:        time.Now(),
+			Resource:    res,
+			Login:       login,
+			Password:    password,
+			Description: desc,
+		}
+		// send creds to server
+		if err := form.tuiApp.Usecase.EditCred(form.tuiApp.Ctx, cred); err != nil {
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
-			form.tuiApp.Pages.AddPage(PageRegisterError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageRegisterError)
+			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			return
+		}
+
+		// save creds in local app
+		if err := entities.SaveCred(form.tuiApp.Creds, ind, cred); err != nil {
+			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
+			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
 			return
 		}
 
@@ -334,9 +371,11 @@ func (form *Details) EmptyFields() {
 	if form.FieldLogin != nil {
 		form.FieldLogin.SetText("")
 	}
+
 	if form.FieldPass != nil {
 		form.FieldPass.SetText("")
 	}
+
 	if form.FieldDesc != nil {
 		form.FieldDesc.SetText("", true)
 	}
@@ -355,6 +394,7 @@ func (form *Details) SetHiddenCred(cred *entities.Credential) *Details {
 	if form.FieldPass != nil {
 		form.PassValue = cred.Password
 		form.FieldPass.SetText(PassHidden)
+		form.HiddenPass = true
 	}
 	if form.FieldDesc != nil {
 		form.FieldDesc.SetText(cred.Description, true)

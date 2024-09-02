@@ -14,8 +14,19 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 		AddButtons([]string{btn1Name, btn2Name}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == btn1Name {
+				err := tuiApp.Usecase.DelCred(tuiApp.Ctx, tuiApp.Creds[ind].ID)
+				if err != nil {
+					tuiApp.log.Error().
+						Err(err).Msg("can't delete cred on server side")
+
+					return
+				}
+
 				newCreds, err := entities.Delete(tuiApp.Creds, ind)
 				if err != nil {
+					tuiApp.log.Error().
+						Err(err).Msg("can't delete cred on client side")
+
 					return
 				}
 

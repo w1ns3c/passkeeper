@@ -27,15 +27,6 @@ func (u *CredUsecase) AddCredential(ctx context.Context,
 func (u *CredUsecase) UpdateCredential(ctx context.Context,
 	userID string, cred *entities.CredBlob) error {
 
-	//sec, err := usersUC.GenerateSecret(config.UserSecretLen)
-	//if err != nil {
-	//	return err
-	//}
-
-	//cred.ID = usersUC.GenerateID(sec, u.salt)
-	//cred.Password, err = EncryptPass(cred.Password)
-	//VerifyCredDate(cred)
-
 	return u.storage.UpdateCredential(ctx, userID, cred)
 }
 

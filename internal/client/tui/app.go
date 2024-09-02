@@ -3,6 +3,8 @@ package tui
 import (
 	"context"
 	"fmt"
+	"github.com/rs/zerolog"
+	"passkeeper/internal/logger"
 
 	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
@@ -17,8 +19,10 @@ var (
 	PageLogin           = "Login"
 	PageRegister        = "Register"
 	PageCreds           = "Credentials"
-	PageAuthErr         = "AuthErr"
+	PageAuthError       = "AuthErr"
 	PageRegisterError   = "RegErr"
+	PageCredsListErr    = "CredsListErr"
+	PageCredUpdError    = "CredUpdErr"
 	PageRegisterSuccess = "RegSuccess"
 	PageAuthed          = "Authed"
 
@@ -58,10 +62,13 @@ type TUI struct {
 	Token string
 	User  *entities.User
 	Creds []*entities.Credential
+
+	// logger
+	log *zerolog.Logger
 }
 
 // NewTUI func is constructor for TUI
-func NewTUI(addr string) (tui *TUI, err error) {
+func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 	scr, err := tcell.NewScreen()
 	if err != nil {
 		return nil, err
@@ -86,6 +93,7 @@ func NewTUI(addr string) (tui *TUI, err error) {
 		Usecase:    usecase,
 
 		Ctx: context.Background(),
+		log: logger.Init(debugLevel),
 	}
 
 	//tuiApp.Creds = CredsList
@@ -132,6 +140,8 @@ func NewTUI(addr string) (tui *TUI, err error) {
 func (app *TUI) Logout() error {
 	app.Creds = nil
 	app.User = nil
+	app.Token = ""
+	app.Ctx = context.Background()
 
 	return nil
 }

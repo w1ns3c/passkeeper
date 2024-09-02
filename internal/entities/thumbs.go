@@ -15,6 +15,28 @@ func Save(creds []*Credential, ind int, res, login, password, desc string) error
 	return nil
 }
 
+func SaveCred(creds []*Credential, ind int, cred *Credential) error {
+	creds[ind] = cred
+	return nil
+}
+
+func AddCred(creds []*Credential, newCred *Credential) (newCreds []*Credential, err error) {
+	if len(creds) == 0 {
+
+		return append(creds, newCred), nil
+	}
+
+	creds = append(creds, &Credential{})
+
+	for i := len(creds) - 1; i > 0; i-- {
+		creds[i] = creds[i-1]
+	}
+
+	creds[0] = newCred
+
+	return creds, nil
+}
+
 func Add(creds []*Credential, res, login, password, desc string) (newCreds []*Credential, err error) {
 
 	tmpCred := &Credential{

@@ -62,7 +62,7 @@ func GeneratePassID(secret, salt string) string {
 }
 
 func GeneratePassID2() string {
-	h := sha512.New()
+	h := sha256.New()
 	n := 32
 	uid, err := crypto.GenRandStr(n)
 	if err != nil {
