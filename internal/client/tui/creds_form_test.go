@@ -3,7 +3,7 @@ package tui
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
+	"github.com/stretchr/testify/require"
 	"passkeeper/internal/entities"
 	"testing"
 	"time"
@@ -14,7 +14,7 @@ func TestSave(t *testing.T) {
 	sum2 := md5.Sum([]byte("2"))
 	sum3 := md5.Sum([]byte("3"))
 
-	creds := []entities.Credential{
+	creds := []*entities.Credential{
 		{
 			ID:          hex.EncodeToString(sum1[:]),
 			Resource:    "contoso.local",
@@ -31,7 +31,23 @@ func TestSave(t *testing.T) {
 			Date:        time.Now(),
 			Description: "Zip zip zip",
 		},
+		{
+			ID:          entities.GenHash("3"),
+			Resource:    "wiki.org",
+			Login:       "juice",
+			Password:    "secinfo",
+			Date:        time.Now(),
+			Description: "main info from site",
+		},
 	}
+
+	creds1 := make([]*entities.Credential, len(creds))
+	creds2 := make([]*entities.Credential, len(creds))
+	creds3 := make([]*entities.Credential, len(creds))
+
+	_ = copy(creds1, creds)
+	_ = copy(creds2, creds)
+	_ = copy(creds3, creds)
 
 	tmpCred := entities.Credential{
 		ID:          hex.EncodeToString(sum3[:]),
@@ -42,17 +58,17 @@ func TestSave(t *testing.T) {
 		Description: "Your favorite neighbour",
 	}
 
-	t.Log(creds)
-	t.Log("123")
-	err := entities.Save(creds, 0, tmpCred.Resource, tmpCred.Login, tmpCred.Password, tmpCred.Description)
-	if err != nil {
-		fmt.Println(err)
-	}
-	t.Log(creds)
+	//t.Log(creds)
+	//t.Log("123")
+	//err := entities.Save(creds, 0, tmpCred.Resource, tmpCred.Login, tmpCred.Password, tmpCred.Description)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//t.Log(creds)
 	//return
 
 	type args struct {
-		creds    []entities.Credential
+		creds    []*entities.Credential
 		ind      int
 		res      string
 		login    string
@@ -65,19 +81,62 @@ func TestSave(t *testing.T) {
 		wantErr bool
 	}{
 		// TODO: Add test cases.
-		{},
+		{
+			name: "Check 1: save new the first cred",
+			args: args{
+				creds:    creds1,
+				ind:      0,
+				res:      tmpCred.Resource,
+				login:    tmpCred.Login,
+				password: tmpCred.Password,
+				desc:     tmpCred.Description,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Check 2: save new middle cred",
+			args: args{
+				creds:    creds2,
+				ind:      1,
+				res:      tmpCred.Resource,
+				login:    tmpCred.Login,
+				password: tmpCred.Password,
+				desc:     tmpCred.Description,
+			},
+			wantErr: false,
+		},
+		{
+			name: "Check 3: save new the last cred",
+			args: args{
+				creds:    creds3,
+				ind:      2,
+				res:      tmpCred.Resource,
+				login:    tmpCred.Login,
+				password: tmpCred.Password,
+				desc:     tmpCred.Description,
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := entities.Save(tt.args.creds, tt.args.ind, tt.args.res, tt.args.login, tt.args.password, tt.args.desc); (err != nil) != tt.wantErr {
 				t.Errorf("Save() error = %v, wantErr %v", err, tt.wantErr)
 			}
+
+			tmp := tt.args.creds[tt.args.ind]
+			//require.Equal(t, tt.args.ind, tmp.ID)
+			require.Equal(t, tt.args.res, tmp.Resource)
+			require.Equal(t, tt.args.login, tmp.Login)
+			require.Equal(t, tt.args.password, tmp.Password)
+			require.Equal(t, tt.args.desc, tmp.Description)
+
 		})
 	}
 }
 
 func TestAdd(t *testing.T) {
-	cred1 := entities.Credential{
+	cred1 := &entities.Credential{
 		ID:          entities.GenHash("1"),
 		Resource:    "contoso.local",
 		Login:       "username",
@@ -86,7 +145,7 @@ func TestAdd(t *testing.T) {
 		Description: "Current Description",
 	}
 
-	cred2 := entities.Credential{
+	cred2 := &entities.Credential{
 		ID:          entities.GenHash("2"),
 		Resource:    "example.com",
 		Login:       "mike",
@@ -95,7 +154,7 @@ func TestAdd(t *testing.T) {
 		Description: "Zip zip zip",
 	}
 
-	cred3 := entities.Credential{
+	cred3 := &entities.Credential{
 		ID:          entities.GenHash("3"),
 		Resource:    "wiki.org",
 		Login:       "juice",
@@ -104,7 +163,7 @@ func TestAdd(t *testing.T) {
 		Description: "main info from site",
 	}
 
-	newCred := entities.Credential{
+	newCred := &entities.Credential{
 		ID:          entities.GenHash("new"),
 		Resource:    "new",
 		Login:       "new_login",
@@ -113,27 +172,26 @@ func TestAdd(t *testing.T) {
 		Description: "new_description",
 	}
 
-	creds0 := []entities.Credential{}
-	creds1 := []entities.Credential{cred1}
-	creds2 := []entities.Credential{cred1, cred2}
-	creds3 := []entities.Credential{cred1, cred2, cred3}
+	creds0 := []*entities.Credential{}
+	creds1 := []*entities.Credential{cred1}
+	creds2 := []*entities.Credential{cred1, cred2}
+	creds3 := []*entities.Credential{cred1, cred2, cred3}
 
-	newCreds0 := []entities.Credential{newCred}
-	newCreds1 := []entities.Credential{newCred, cred1}
-	newCreds2 := []entities.Credential{newCred, cred1, cred2}
-	newCreds3 := []entities.Credential{newCred, cred1, cred2, cred3}
+	newCreds0 := []*entities.Credential{newCred}
+	newCreds1 := []*entities.Credential{newCred, cred1}
+	newCreds2 := []*entities.Credential{newCred, cred1, cred2}
+	newCreds3 := []*entities.Credential{newCred, cred1, cred2, cred3}
 
 	type args struct {
-		creds []entities.Credential
-		new   entities.Credential
+		creds []*entities.Credential
+		new   *entities.Credential
 	}
 	tests := []struct {
 		name         string
 		args         args
-		wantNewCreds []entities.Credential
+		wantNewCreds []*entities.Credential
 		wantErr      bool
 	}{
-		// TODO: Add test cases.
 		{
 			name:         "No elements",
 			args:         args{creds: creds0, new: newCred},

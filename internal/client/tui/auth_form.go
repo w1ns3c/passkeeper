@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/status"
 	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"sort"
 	"strings"
 )
 
@@ -217,6 +218,8 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 
 		clearForm()
 
+		SortCredsByDate(creds)
+
 		tuiApp.Creds = creds
 		credsForm := NewCredsList(tuiApp)
 		tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
@@ -353,4 +356,13 @@ func FilterResource(res string) string {
 	res = parts[0]
 
 	return res
+}
+
+func SortCredsByDate(creds []*entities.Credential) {
+	sort.Slice(creds, func(i, j int) bool {
+		if creds[i].Date.After(creds[j].Date) {
+			return true
+		}
+		return false
+	})
 }
