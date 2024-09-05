@@ -16,7 +16,7 @@ var (
 )
 
 type ClientUsecase interface {
-	Login(ctx context.Context, login, password string) (token, secret, userID string, err error)
+	Login(ctx context.Context, login, password string) (secret, userID string, err error)
 	Register(ctx context.Context, email, login, password, repeat string) error
 	Logout()
 
@@ -24,6 +24,10 @@ type ClientUsecase interface {
 	EditCred(ctx context.Context, cred *entities.Credential) (err error)
 	AddCred(ctx context.Context, cred *entities.Credential) (err error)
 	DelCred(ctx context.Context, credID string) (err error)
+
+	// moved from tuiApp
+	GetToken() string
+	GetHeader() string
 }
 
 type ClientUC struct {
@@ -50,4 +54,12 @@ func NewClientUC(addr string) (cli *ClientUC, err error) {
 		passSvc:  pb.NewUserChangePassSvcClient(conn),
 		credsSvc: pb.NewCredSvcClient(conn),
 	}, nil
+}
+
+func (c *ClientUC) GetToken() string {
+	return c.Token
+}
+
+func (c *ClientUC) GetHeader() string {
+	return c.TokenHeader
 }

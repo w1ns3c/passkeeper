@@ -130,7 +130,6 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 func (tui *TUI) Logout() error {
 	tui.Creds = nil
 	tui.User = nil
-	tui.Token = ""
 	tui.Ctx = context.Background()
 	tui.Usecase.Logout()
 

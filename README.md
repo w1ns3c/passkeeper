@@ -1,8 +1,8 @@
-# passkeeper
+# Passkeeper
 Credential manager on Go (client/server)
 
-# TODO Features
-## Main Features
+# TODO Functionality
+## Main Functionality
 - [x] Use gRPC protocol
 - [x] Order creds by date
 - [ ] Add terminal user interface
@@ -17,7 +17,12 @@ Credential manager on Go (client/server)
 - [ ] Asynchron sync credentials
 - [ ] Change storage to DB
 - [ ] Gracefull shutdown
+- [x] Client parse args/env
+- [ ] Server parse args/env
 - [ ] Add server access check before login/register user
+- [ ] Move Creds from tuiApp to Usecase only
+- [ ] Move Token from tuiApp to Usecase only
+- [ ] Move User entity from tuiApp to Usecase only
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
 - [ ] Test cover more than 80%
@@ -26,7 +31,7 @@ Credential manager on Go (client/server)
 - [ ] Review all app code
 - [ ] Check all TODO
 
-## Optional Feature
+## Optional Functionality
 - [ ] Generate app doc
 - [ ] Swagger
 - [ ] Add email validation with sending message

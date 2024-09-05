@@ -21,7 +21,7 @@ var (
 
 // Login func is client login logic for tui app
 // to interact with server login logic
-func (c *ClientUC) Login(ctx context.Context, login, password string) (token, secret, userID string, err error) {
+func (c *ClientUC) Login(ctx context.Context, login, password string) (secret, userID string, err error) {
 
 	hash := hashes.Hash(password)
 
@@ -32,24 +32,24 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) (token, se
 
 	resp, err := c.userSvc.LoginUser(ctx, req)
 	if err != nil {
-		return "", "", "", err
+		return "", "", err
 	}
 	c.Token = resp.Token
 
 	userID, err = hashes.ExtractUserID(resp.Token)
 	if err != nil {
-		return "", "", "", err
+		return "", "", err
 	}
 	c.UserID = userID
 	cryptSecret := resp.SrvSecret
 
 	fullSecret, err := hashes.GenerateCredsSecret(password, userID, cryptSecret)
 	if err != nil {
-		return "", "", "", err
+		return "", "", err
 	}
 	c.CredsSecret = fullSecret
 
-	return c.Token, c.CredsSecret, c.UserID, nil
+	return c.CredsSecret, c.UserID, nil
 }
 
 // Register func is client register logic for tui app
