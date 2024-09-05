@@ -63,7 +63,7 @@ func main() {
 		// Passwords
 		password1 = &entities.Credential{
 			ID:          "ID1111",
-			Date:        time.Now(),
+			Date:        time.Now().Add(time.Second * -200),
 			Resource:    "localhost1111",
 			Login:       "my_favorite_username1111",
 			Password:    "my_favorite_password1111",
@@ -71,7 +71,7 @@ func main() {
 		}
 		password2 = &entities.Credential{
 			ID:          "ID2222",
-			Date:        time.Now().Add(time.Second * 500),
+			Date:        time.Now().Add(time.Second * -500),
 			Resource:    "localhost2222",
 			Login:       "admin2222",
 			Password:    "secret password2222",

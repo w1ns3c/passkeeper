@@ -59,8 +59,3 @@ func (m *MemStorage) GetUserByLogin(cxt context.Context, login string) (user *en
 
 	return u, nil
 }
-
-func (m *MemStorage) SaveChallenge(ctx context.Context, challenge string) error {
-	//TODO implement me
-	panic("implement me")
-}

@@ -169,7 +169,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		pField := itemPass.(*tview.InputField)
 		password := pField.GetText()
 
-		fullSecret, userID, err := tuiApp.Usecase.Login(tuiApp.Ctx, username, password)
+		err := tuiApp.Usecase.Login(tuiApp.Ctx, username, password)
 		if err != nil {
 			stErr := status.FromContextError(err)
 			if strings.Contains(stErr.Message(), "connection refused") {
@@ -186,12 +186,12 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			return
 		}
 
-		tuiApp.User = &entities.User{
-			ID:     userID,
-			Login:  username,
-			Hash:   password,
-			Secret: fullSecret,
-		}
+		//tuiApp.User = &entities.User{
+		//	ID:     userID,
+		//	Login:  username,
+		//	Hash:   password,
+		//	Secret: fullSecret,
+		//}
 
 		md := metadata.New(map[string]string{config.TokenHeader: tuiApp.Usecase.GetToken()})
 		tuiApp.Ctx = metadata.NewOutgoingContext(tuiApp.Ctx, md)

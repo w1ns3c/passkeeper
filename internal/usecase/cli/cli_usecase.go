@@ -16,7 +16,7 @@ var (
 )
 
 type ClientUsecase interface {
-	Login(ctx context.Context, login, password string) (secret, userID string, err error)
+	Login(ctx context.Context, login, password string) (err error)
 	Register(ctx context.Context, email, login, password, repeat string) error
 	Logout()
 
@@ -24,6 +24,7 @@ type ClientUsecase interface {
 	EditCred(ctx context.Context, cred *entities.Credential) (err error)
 	AddCred(ctx context.Context, cred *entities.Credential) (err error)
 	DelCred(ctx context.Context, credID string) (err error)
+	SyncCreds(ctx context.Context) error
 
 	// moved from tuiApp
 	GetToken() string
@@ -31,9 +32,10 @@ type ClientUsecase interface {
 }
 
 type ClientUC struct {
-	Token       string // JWT token
-	UserID      string // userID from JWT token
-	CredsSecret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
+	User  *entities.User
+	Token string // JWT token
+	//UserID      string // userID from JWT token
+	//CredsSecret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
 
 	userSvc  pb.UserSvcClient
 	passSvc  pb.UserChangePassSvcClient

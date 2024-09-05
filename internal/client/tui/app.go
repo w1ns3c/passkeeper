@@ -59,9 +59,6 @@ type TUI struct {
 	Usecase cli.ClientUsecase
 	Ctx     context.Context
 
-	// user info
-	Token string
-	User  *entities.User
 	Creds []*entities.Credential
 
 	// logger
@@ -129,7 +126,6 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 
 func (tui *TUI) Logout() error {
 	tui.Creds = nil
-	tui.User = nil
 	tui.Ctx = context.Background()
 	tui.Usecase.Logout()
 

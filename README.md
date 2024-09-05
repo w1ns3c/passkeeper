@@ -9,6 +9,7 @@ Credential manager on Go (client/server)
 - [x] User login
 - [x] User register
 - [x] User logout
+- [ ] User delete account
 - [ ] Change user password
 - [x] List credentials
 - [x] Edit credential
@@ -21,8 +22,8 @@ Credential manager on Go (client/server)
 - [ ] Server parse args/env
 - [ ] Add server access check before login/register user
 - [ ] Move Creds from tuiApp to Usecase only
-- [ ] Move Token from tuiApp to Usecase only
-- [ ] Move User entity from tuiApp to Usecase only
+- [x] Move User entity from tuiApp to Usecase only
+- [x] Move Token from tuiApp to Usecase only
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
 - [ ] Test cover more than 80%

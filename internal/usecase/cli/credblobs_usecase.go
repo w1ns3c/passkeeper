@@ -23,11 +23,11 @@ func (c *ClientUC) GetCreds(ctx context.Context) (creds []*entities.Credential, 
 	for i := 0; i < len(resp.Creds); i++ {
 		blob := &entities.CredBlob{
 			ID:     resp.Creds[i].ID,
-			UserID: c.UserID,
+			UserID: c.User.ID,
 			Blob:   resp.Creds[i].Blob,
 		}
 
-		cred, err := hashes.DecryptBlob(blob, c.CredsSecret)
+		cred, err := hashes.DecryptBlob(blob, c.User.Secret)
 		if err != nil {
 			// TODO handle ERRORS!!!
 		}
@@ -40,7 +40,7 @@ func (c *ClientUC) GetCreds(ctx context.Context) (creds []*entities.Credential, 
 
 func (c *ClientUC) EditCred(ctx context.Context, cred *entities.Credential) (err error) {
 
-	blob, err := hashes.EncryptBlob(cred, c.CredsSecret)
+	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (c *ClientUC) EditCred(ctx context.Context, cred *entities.Credential) (err
 
 func (c *ClientUC) AddCred(ctx context.Context, cred *entities.Credential) (err error) {
 
-	blob, err := hashes.EncryptBlob(cred, c.CredsSecret)
+	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {
 		return err
 	}

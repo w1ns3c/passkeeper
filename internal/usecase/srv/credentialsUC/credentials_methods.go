@@ -2,7 +2,6 @@ package credentialsUC
 
 import (
 	"context"
-	"passkeeper/internal/entities/hashes"
 	"time"
 
 	"passkeeper/internal/entities"
@@ -18,7 +17,7 @@ func (u *CredUsecase) AddCredential(ctx context.Context,
 	//cred.Password, err = EncryptPass(cred.Password)
 	//cred.ID = hashes.GeneratePassID(sec, salt)
 
-	cred.ID = hashes.GeneratePassID2()
+	//cred.ID = hashes.GeneratePassID2()
 	//VerifyCredDate(cred)
 
 	return u.storage.AddCredential(ctx, userID, cred)
