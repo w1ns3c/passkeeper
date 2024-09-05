@@ -169,7 +169,6 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		pField := itemPass.(*tview.InputField)
 		password := pField.GetText()
 
-		//authed := Login(username, password)
 		token, fullSecret, userID, err := tuiApp.Usecase.Login(tuiApp.Ctx, username, password)
 		if err != nil {
 			stErr := status.FromContextError(err)
@@ -188,15 +187,6 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		}
 
 		tuiApp.Token = token
-
-		// TODO change this auth
-		//tuiApp.User = &entities.User{
-		//	ID:     "",
-		//	Login:  username,
-		//	Hash:   password,
-		//	CredsSecret: "",
-		//	Phone:  "",
-		//}
 
 		tuiApp.User = &entities.User{
 			ID:     userID,
@@ -239,7 +229,9 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			fallthrough
 		case tcell.KeyEsc:
 			clearForm()
-			tuiApp.Pages.SwitchToPage(PageMain)
+			//tuiApp.Pages.Focus(PageMain)
+			_, page := tuiApp.Pages.SwitchToPage(PageMain).GetFrontPage()
+			tuiApp.App.SetFocus(page)
 		}
 
 		return event
@@ -249,6 +241,74 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 	loginFlex.SetDirection(tview.FlexRow).
 		AddItem(loginForm, 0, 4, true).
 		AddItem(Hint, 0, 1, false)
+
+	//loginFlex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	//	//item1 := flex.GetItem(1) // login button
+	//	//item2 := flex.GetItem(3) // register button
+	//	var (
+	//		curFocus = 0
+	//		cntItems = loginFlex.GetItemCount()
+	//	)
+	//
+	//	for i := 0; i < cntItems; i++ {
+	//		if loginFlex.GetItem(i).HasFocus() {
+	//			curFocus = i
+	//			break
+	//		}
+	//	}
+
+	//	switch event.Key() {
+	//	default:
+	//		//tuiApp.Pages.SwitchToPage(PageCreds)
+	//		return event
+	//
+	//	case tcell.KeyUp:
+	//		// first element focus
+	//		if curFocus == 0 {
+	//			loginFlex.GetItem(cntItems - 1)
+	//			tuiApp.App.SetFocus(loginFlex.GetItem(cntItems - 1))
+	//		}
+	//
+	//		// last element focus
+	//		if curFocus == cntItems-1 {
+	//			tuiApp.App.SetFocus(loginFlex.GetItem(curFocus - 1))
+	//		}
+	//	}
+	//
+	//	//case tcell.KeyRight:
+	//	//
+	//	//	if !item1.HasFocus() &&
+	//	//		!btn1Flex.HasFocus() && !btn1.HasFocus() {
+	//	//		tuiApp.App.SetFocus(btn1)
+	//	//		return event
+	//	//	}
+	//	//
+	//	//	if !item2.HasFocus() &&
+	//	//		!btn2Flex.HasFocus() && !btn2.HasFocus() {
+	//	//		tuiApp.App.SetFocus(btn2)
+	//	//		return event
+	//	//	}
+	//
+	//	//case tcell.KeyEnter:
+	//	//	if btn1.HasFocus() {
+	//	//		tuiApp.Pages.SwitchToPage(PageLogin)
+	//	//	}
+	//	//	if btn2.HasFocus() {
+	//	//		tuiApp.Pages.SwitchToPage(PageRegister)
+	//	//	}
+	//	//	return event
+	//	//
+	//	//	// DEBUG
+	//	//	//case tcell.KeyUp:
+	//	//	//	tuiApp.Pages.SwitchToPage(PageCreds)
+	//	//	//case tcell.KeyDown:
+	//	//	//	details := NewDetailsForm(tuiApp)
+	//	//	//	tuiApp.Pages.AddPage(TmpPage, details, true, false)
+	//	//	//	tuiApp.Pages.SwitchToPage(TmpPage)
+	//	//
+	//	//}
+	//	return event
+	//})
 
 	return loginFlex
 }
@@ -358,6 +418,7 @@ func FilterResource(res string) string {
 	return res
 }
 
+// SortCredsByDate sort creds, now the first cred is the latest added
 func SortCredsByDate(creds []*entities.Credential) {
 	sort.Slice(creds, func(i, j int) bool {
 		if creds[i].Date.After(creds[j].Date) {

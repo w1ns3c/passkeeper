@@ -42,7 +42,6 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) (token, se
 	}
 	c.UserID = userID
 	cryptSecret := resp.SrvSecret
-	//secret, err := hashes.DecryptSecret(cryptSecret, hash)
 
 	fullSecret, err := hashes.GenerateCredsSecret(password, userID, cryptSecret)
 	if err != nil {
@@ -142,4 +141,13 @@ func FilterEmail(email string) error {
 	}
 
 	return nil
+}
+
+// Logout func filter user input values from tui app
+func (c *ClientUC) Logout() {
+	c.UserID = ""
+	c.Token = ""
+	c.CredsSecret = ""
+
+	return
 }

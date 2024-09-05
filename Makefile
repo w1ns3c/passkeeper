@@ -1,4 +1,4 @@
-
+all: client server
 
 proto:
 	rm -f internal/transport/grpc/protofiles/*.go
@@ -21,3 +21,12 @@ proto:
 
 	mv internal/transport/grpc/protofiles/*.go internal/transport/grpc/protofiles/proto/
 
+client:
+	mkdir -p builds
+	# client
+	go build -o builds/client.elf cmd/client/client.go
+	GOOS=windows go build -o builds/client.exe cmd/client/client.go
+server:
+	mkdir -p builds
+	go build -o builds/server.elf cmd/server/server.go
+	GOOS=windows go build -o builds/server.exe cmd/server/server.go

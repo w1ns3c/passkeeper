@@ -34,5 +34,4 @@ vendor/
 
 # schemes
 schemes/
-# protoc command
-protoc_recompile
+builds/

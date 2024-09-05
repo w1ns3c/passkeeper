@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/rs/zerolog"
+	"passkeeper/internal/config/client"
 	"passkeeper/internal/logger"
 
 	"passkeeper/internal/config"
@@ -67,6 +68,11 @@ type TUI struct {
 	log *zerolog.Logger
 }
 
+// NewTUIconf is wrapper for NewTUI constructor with config parser
+func NewTUIconf(conf *client.Args) (tui *TUI, err error) {
+	return NewTUI(conf.Addr, conf.LogLevel)
+}
+
 // NewTUI func is constructor for TUI
 func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 	scr, err := tcell.NewScreen()
@@ -121,27 +127,12 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 	return tuiApp, nil
 }
 
-//func (app *TUI) GetCreds() (creds []entities.Credential, err error) {
-//	if app.User == nil {
-//		return nil, ErrNotAuthed
-//	}
-//
-//	if app.User.Login == "user" {
-//		return CredsList, nil
-//	}
-//
-//	if app.User.Login == "error" {
-//		return nil, fmt.Errorf("can't get credentialsUC")
-//	}
-//
-//	return make([]entities.Credential, 0), nil
-//}
-
-func (app *TUI) Logout() error {
-	app.Creds = nil
-	app.User = nil
-	app.Token = ""
-	app.Ctx = context.Background()
+func (tui *TUI) Logout() error {
+	tui.Creds = nil
+	tui.User = nil
+	tui.Token = ""
+	tui.Ctx = context.Background()
+	tui.Usecase.Logout()
 
 	return nil
 }

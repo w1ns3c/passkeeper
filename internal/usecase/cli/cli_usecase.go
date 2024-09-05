@@ -18,6 +18,7 @@ var (
 type ClientUsecase interface {
 	Login(ctx context.Context, login, password string) (token, secret, userID string, err error)
 	Register(ctx context.Context, email, login, password, repeat string) error
+	Logout()
 
 	GetCreds(ctx context.Context) (creds []*entities.Credential, err error)
 	EditCred(ctx context.Context, cred *entities.Credential) (err error)

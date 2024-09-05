@@ -65,19 +65,6 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 		}
 	}
 
-	//AddItem(listFlex, 0, 2, true).
-	//	AddItem(viewForm, 0, 3, true)
-
-	// Details in full height
-	//listFlex := tview.NewFlex().
-	//	SetDirection(tview.FlexRow).
-	//	AddItem(credList, 0, 5, true).
-	//	AddItem(HintCreds, 0, 1, true)
-	//
-	//fullFlex := tview.NewFlex().
-	//	AddItem(listFlex, 0, 2, true).
-	//	AddItem(viewForm, 0, 3, true)
-
 	//Hints in full length
 	listFlex := tview.NewFlex().
 		AddItem(credList, 0, 2, true).
@@ -165,6 +152,5 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 		return event
 	})
 
-	//credList.SetFocusFunc(rerenderFunc)
 	return fullFlex
 }
