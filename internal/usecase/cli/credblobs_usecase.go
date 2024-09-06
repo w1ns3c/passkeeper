@@ -37,7 +37,10 @@ func (c *ClientUC) ListCreds(ctx context.Context) error {
 	}
 
 	SortCredsByDate(creds)
+
+	c.m.Lock()
 	c.Creds = creds
+	c.m.Unlock()
 
 	return nil
 }
@@ -69,6 +72,8 @@ func (c *ClientUC) EditCred(ctx context.Context, cred *entities.Credential, ind 
 		return err
 	}
 
+	c.m.Lock()
+	defer c.m.Unlock()
 	// save creds in local app
 	if err = entities.SaveCred(c.Creds, ind, cred); err != nil {
 		return err
@@ -101,6 +106,8 @@ func (c *ClientUC) AddCred(ctx context.Context, cred *entities.Credential) (err 
 		return err
 	}
 
+	c.m.Lock()
+	defer c.m.Unlock()
 	tmpCreds, err := entities.AddCred(c.Creds, cred)
 	if err != nil {
 		// can't save creds localy
@@ -125,6 +132,8 @@ func (c *ClientUC) DelCred(ctx context.Context, ind int) (err error) {
 		return err
 	}
 
+	c.m.Lock()
+	defer c.m.Unlock()
 	newCreds, err := entities.Delete(c.Creds, ind)
 	if err != nil {
 		return err
@@ -134,10 +143,25 @@ func (c *ClientUC) DelCred(ctx context.Context, ind int) (err error) {
 	return err
 }
 
+func (c *ClientUC) GetCreds() []*entities.Credential {
+	c.m.Lock()
+
+	tmpCreds := make([]*entities.Credential, len(c.Creds))
+	copy(tmpCreds, c.Creds)
+
+	c.m.Unlock()
+
+	return tmpCreds
+}
+
 func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) {
 	if ind < 0 || ind >= len(c.Creds) {
 		return nil, fmt.Errorf("invalid index")
 	}
+
+	c.m.Lock()
+	defer c.m.Unlock()
+
 	return c.Creds[ind], nil
 }
 

@@ -9,7 +9,7 @@ func main() {
 	args := client.CliParseArgs()
 
 	tuiApp, _ := tui.NewTUIconf(args)
-	if err := tuiApp.App.Run(); err != nil {
+	if err := tuiApp.Run(); err != nil {
 		panic(err)
 	}
 }

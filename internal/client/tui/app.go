@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog"
 	"passkeeper/internal/config/client"
 	"passkeeper/internal/logger"
+	"time"
 
 	"passkeeper/internal/config"
 	"passkeeper/internal/usecase/cli"
@@ -78,7 +79,9 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 	pages := tview.NewPages()
 
 	//ctx := context.Background()
-	usecase, err := cli.NewClientUC(addr)
+	usecase, err := cli.NewClientUC(
+		cli.WithAddr(addr),
+		cli.WithSyncTime(time.Second*30))
 	if err != nil {
 		return nil, err
 	}
@@ -128,4 +131,8 @@ func (tui *TUI) Logout() error {
 	tui.Usecase.Logout()
 
 	return nil
+}
+
+func (tui *TUI) Run() error {
+	return tui.App.Run()
 }

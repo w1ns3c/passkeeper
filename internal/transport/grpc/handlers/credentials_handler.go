@@ -152,6 +152,9 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 		return nil, err
 	}
 
+	h.log.Info().
+		Msgf("User \"%s\" request creds list", userID)
+
 	creds, err := h.service.ListCredentials(ctx, userID)
 	if err != nil {
 		h.log.Error().
@@ -159,6 +162,9 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 
 		return nil, ErrCredList
 	}
+
+	h.log.Info().
+		Msgf("User \"%s\" have: %d creds", userID, len(creds))
 
 	resp = &pb.CredListResponse{
 		Creds: make([]*pb.CredBlob, len(creds)),

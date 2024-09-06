@@ -22,6 +22,7 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 				}
 
 				credsForm := NewCredsList(tuiApp)
+				tuiApp.Pages.RemovePage(PageCreds)
 				tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
 
 				pageDel := "deleted"

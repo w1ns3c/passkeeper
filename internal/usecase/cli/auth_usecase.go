@@ -56,6 +56,7 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) (err error
 		Hash:   password,
 		Secret: fullSecret,
 	}
+	c.Authed = true
 
 	return nil
 }
@@ -156,6 +157,7 @@ func (c *ClientUC) Logout() {
 	c.Token = ""
 	c.User = nil
 	c.Creds = nil
+	c.Authed = false
 
 	return
 }

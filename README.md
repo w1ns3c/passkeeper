@@ -15,7 +15,7 @@ Credential manager on Go (client/server)
 - [x] Edit credential
 - [x] Add credential
 - [x] Del credential
-- [ ] Asynchron sync credentials
+- [ ] Asynchronous sync credentials
 - [ ] Add DB storage
 - [ ] Gracefull shutdown
 - [x] Client parse args/env
@@ -24,6 +24,10 @@ Credential manager on Go (client/server)
 - [x] Move Creds from tuiApp to Usecase only
 - [x] Move User entity from tuiApp to Usecase only
 - [x] Move Token from tuiApp to Usecase only
+- [ ] reconnect to server
+- [ ] TUI form info about reconnect to server
+- [ ] Client set logger in file
+- [ ] Split client interface to multi inf
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
 - [ ] Test cover more than 80%

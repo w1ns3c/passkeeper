@@ -206,8 +206,9 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 
 		credsForm := NewCredsList(tuiApp)
 		tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
-
 		tuiApp.Pages.SwitchToPage(PageAuthed)
+
+		go tuiApp.RerenderCreds()
 
 	})
 
