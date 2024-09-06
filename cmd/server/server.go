@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/w1ns3c/go-examples/crypto"
 	"passkeeper/internal/config"
+	cnf "passkeeper/internal/config/server"
 	"passkeeper/internal/logger"
 	"passkeeper/internal/server"
 	"passkeeper/internal/usecase/srv/credentialsUC"
@@ -17,8 +18,8 @@ import (
 
 func main() {
 
-	listenAddr := "localhost:8001"
-	logLevel := "DEBUG"
+	conf := cnf.SrvParseArgs()
+
 	saltLen := config.UserPassSaltLen
 
 	var (
@@ -118,7 +119,7 @@ func main() {
 
 	ctx := context.Background()
 
-	lg := logger.Init(logLevel)
+	lg := logger.Init(conf.LogLevel)
 	lg.Info().Msg("[i] Logger init:  done")
 
 	storage := memstorage.NewMemStorage(
@@ -141,7 +142,7 @@ func main() {
 	lg.Info().Msg("[i] Usecase init: done")
 
 	srv, err := server.NewServer(
-		server.WithAddr(listenAddr),
+		server.WithAddr(conf.Addr),
 		server.WithUCcreds(credsUC),
 		server.WithUCusers(usersUC),
 		server.WithLogger(lg),

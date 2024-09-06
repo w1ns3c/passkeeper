@@ -67,11 +67,11 @@ type TUI struct {
 
 // NewTUIconf is wrapper for NewTUI constructor with config parser
 func NewTUIconf(conf *client.Args) (tui *TUI, err error) {
-	return NewTUI(conf.Addr, conf.LogLevel)
+	return NewTUI(conf.Addr, conf.LogLevel, conf.SyncTime)
 }
 
 // NewTUI func is constructor for TUI
-func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
+func NewTUI(addr string, debugLevel string, syncTime int) (tui *TUI, err error) {
 	scr, err := tcell.NewScreen()
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 	//ctx := context.Background()
 	usecase, err := cli.NewClientUC(
 		cli.WithAddr(addr),
-		cli.WithSyncTime(time.Second*30))
+		cli.WithSyncTime(time.Duration(syncTime)*time.Second))
 	if err != nil {
 		return nil, err
 	}

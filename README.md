@@ -19,16 +19,16 @@ Please, give me some comments and advices for my code in review.
 - [x] Edit credential
 - [x] Add credential
 - [x] Del credential
-- [ ] Asynchronous sync credentials
+- [ ] Asynchronous sync credentials (bugs)
 - [ ] Add DB storage
 - [ ] Gracefull shutdown
 - [x] Client parse args/env
-- [ ] Server parse args/env
+- [x] Server parse args/env
 - [ ] Add server access check before login/register user
 - [x] Move Creds from tuiApp to Usecase only
 - [x] Move User entity from tuiApp to Usecase only
 - [x] Move Token from tuiApp to Usecase only
-- [ ] reconnect to server
+- [ ] Reconnect to server
 - [ ] TUI form info about reconnect to server
 - [ ] Client set logger in file
 - [ ] Split client interface to multi inf

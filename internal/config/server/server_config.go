@@ -1,4 +1,4 @@
-package client
+package server
 
 import (
 	"flag"
@@ -6,52 +6,42 @@ import (
 	"os"
 	"passkeeper/internal/config"
 	"slices"
-	"strconv"
 )
 
 type Args struct {
 	Addr     string
 	LogLevel string
-	SyncTime int // inseconds
 }
 
-func CliParseArgs() *Args {
+func SrvParseArgs() *Args {
 	var (
 		flagAddrVal     string
 		flagLogLevelVal string
-		flagSyncTime    int
 
-		realAddr        string
-		realLogLevel    string
-		realSyncTimeVal int
+		realAddr     string
+		realLogLevel string
 
 		addrIsSet  bool
 		levelIsSet bool
-		syncIsSet  bool
 
 		defaultAddr     = config.DefaultAddr
 		defaultLogLevel = config.Level
-		defaultSyncTime = int(config.SyncDefault.Seconds())
 
-		addrFlag     = "addr"
-		levelFlag    = "level"
-		syncTimeFlag = "time"
+		addrFlag  = "addr"
+		levelFlag = "level"
 	)
 
 	inArgs := os.Args
 	addrIsSet = slices.Contains(inArgs, "-"+addrFlag)
 	levelIsSet = slices.Contains(inArgs, "-"+levelFlag)
-	syncIsSet = slices.Contains(inArgs, "-"+syncTimeFlag)
 
-	flag.StringVar(&flagAddrVal, addrFlag, defaultAddr, "client connect address")
+	flag.StringVar(&flagAddrVal, addrFlag, defaultAddr, "server listening address")
 	flag.StringVar(&flagLogLevelVal, levelFlag, defaultLogLevel, "log level")
-	flag.IntVar(&flagSyncTime, syncTimeFlag, defaultSyncTime, "time to sync credentials in seconds")
 	flag.Parse()
 
 	// Read ENV only if flags not set !!!
-	envAddr, existsAddr := os.LookupEnv("CLI_ADDR")
-	envLogLevel, existsLvl := os.LookupEnv("CLI_LOG_LEVEL")
-	envST, existST := os.LookupEnv("CLI_SYNC_TIME")
+	envAddr, existsAddr := os.LookupEnv("SRV_ADDR")
+	envLogLevel, existsLvl := os.LookupEnv("SRV_LOG_LEVEL")
 
 	// validate flag and env values
 	// validate net address
@@ -68,25 +58,16 @@ func CliParseArgs() *Args {
 		realAddr = flagAddrVal // FLAG value is good
 	}
 
-	// validate
+	// validate log level
 	if !levelIsSet && existsLvl {
 		realLogLevel = envLogLevel // FLAG value error, ENV is good
 	} else {
 		realLogLevel = flagLogLevelVal // FLAG value is good
 	}
 
-	// validate sync time
-	envSTint, err := strconv.Atoi(envST)
-	if !syncIsSet && existST && err == nil {
-		realSyncTimeVal = envSTint // FLAG value error, ENV is good
-	} else {
-		realSyncTimeVal = flagSyncTime // FLAG value is good
-	}
-
 	return &Args{
 		Addr:     realAddr,
 		LogLevel: realLogLevel,
-		SyncTime: realSyncTimeVal,
 	}
 
 }
