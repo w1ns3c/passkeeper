@@ -1,6 +1,10 @@
 # Passkeeper
 Credential manager on Go (client/server)
 
+## Check
+I know, that project is far from finish line, but...
+Please, give me some comments and advices for my code in review.
+
 # TODO Functionality
 ## Main Functionality
 - [x] Use gRPC protocol
