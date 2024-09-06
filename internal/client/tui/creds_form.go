@@ -20,8 +20,11 @@ func (list *CredList) Rerender() {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
 	}
-	if list.tuiApp.Creds != nil {
-		for ind, cred := range list.tuiApp.Creds {
+
+	// fill list fields with values
+	creds := list.tuiApp.Usecase.GetCreds()
+	if creds != nil {
+		for ind, cred := range creds {
 			res := FilterResource(cred.Resource)
 			if ind < 9 {
 				list.AddItem(res, "", rune(49+ind), nil)
@@ -57,11 +60,12 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 		SetTitle("Credentials")
 
 	var viewForm = NewDetailsForm(tuiApp)
-	if tuiApp.Creds != nil {
-		if len(tuiApp.Creds) != 0 {
+	if tuiApp.Usecase.CredsNotNil() {
+		if tuiApp.Usecase.CredsLen() != 0 {
+			cred, _ := tuiApp.Usecase.GetCredByIND(0)
 			viewForm.ShowFields()
 			viewForm.EmptyFields()
-			viewForm.SetHiddenCred(tuiApp.Creds[0])
+			viewForm.SetHiddenCred(cred)
 		}
 	}
 
@@ -78,7 +82,8 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 	credList.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
 		viewForm.ShowFields()
 		viewForm.EmptyFields()
-		viewForm.SetCurrentCred(tuiApp.Creds[ind])
+		cred, _ := tuiApp.Usecase.GetCredByIND(ind)
+		viewForm.SetCurrentCred(cred)
 		viewForm.HidePassword()
 	})
 
@@ -138,10 +143,13 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 			viewForm.HideButtons()
 			viewForm.EmptyFields()
 			viewForm.tuiApp.App.SetFocus(credList)
-			if tuiApp.Creds != nil {
-				if len(tuiApp.Creds) > 0 {
-					if len(tuiApp.Creds) > ind {
-						viewForm.SetCurrentCred(tuiApp.Creds[ind])
+			l := tuiApp.Usecase.CredsLen()
+			cred, _ := tuiApp.Usecase.GetCredByIND(ind)
+			//if tuiApp.Creds != nil {
+			if tuiApp.Usecase.CredsNotNil() {
+				if l > 0 {
+					if l > ind {
+						viewForm.SetCurrentCred(cred)
 						viewForm.Rerender()
 						return event
 					}

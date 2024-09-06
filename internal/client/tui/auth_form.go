@@ -6,8 +6,6 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"passkeeper/internal/config"
-	"passkeeper/internal/entities"
-	"sort"
 	"strings"
 )
 
@@ -196,7 +194,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		md := metadata.New(map[string]string{config.TokenHeader: tuiApp.Usecase.GetToken()})
 		tuiApp.Ctx = metadata.NewOutgoingContext(tuiApp.Ctx, md)
 
-		creds, err := tuiApp.Usecase.GetCreds(tuiApp.Ctx)
+		err = tuiApp.Usecase.ListCreds(tuiApp.Ctx)
 		if err != nil {
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageLogin)
 			tuiApp.Pages.AddPage(PageCredsListErr, errModal, true, false)
@@ -206,9 +204,6 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 
 		clearForm()
 
-		SortCredsByDate(creds)
-
-		tuiApp.Creds = creds
 		credsForm := NewCredsList(tuiApp)
 		tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
 
@@ -414,14 +409,4 @@ func FilterResource(res string) string {
 	res = parts[0]
 
 	return res
-}
-
-// SortCredsByDate sort creds, now the first cred is the latest added
-func SortCredsByDate(creds []*entities.Credential) {
-	sort.Slice(creds, func(i, j int) bool {
-		if creds[i].Date.After(creds[j].Date) {
-			return true
-		}
-		return false
-	})
 }

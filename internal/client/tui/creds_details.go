@@ -156,14 +156,14 @@ func (form *Details) Add(ind int, list CredListInf) {
 			return
 		}
 
-		tmpCreds, err := entities.AddCred(form.tuiApp.Creds, newCred)
-		if err != nil {
-			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
-			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
-			return
-		}
-		form.tuiApp.Creds = tmpCreds
+		//tmpCreds, err := entities.AddCred(form.tuiApp.Creds, newCred)
+		//if err != nil {
+		//	errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
+		//	form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+		//	form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+		//	return
+		//}
+		//form.tuiApp.Creds = tmpCreds
 
 		form.Rerender()
 		form.ShowPassword()
@@ -179,9 +179,10 @@ func (form *Details) Add(ind int, list CredListInf) {
 		defer form.cancel()
 		// rerender credsList
 		defer form.tuiApp.App.SetFocus(list)
-		if len(form.tuiApp.Creds) > 0 {
+		if form.tuiApp.Usecase.CredsLen() > 0 {
 			form.Rerender()
-			form.SetCurrentCred(form.tuiApp.Creds[ind])
+			cred, _ := form.tuiApp.Usecase.GetCredByIND(ind)
+			form.SetCurrentCred(cred)
 			return
 		}
 
@@ -193,7 +194,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 
 func (form *Details) Edit(ind int, list CredListInf) {
 	// we shouldn't edit unexisted credential
-	l := len(form.tuiApp.Creds)
+	l := form.tuiApp.Usecase.CredsLen()
 	if l <= ind || l == 0 {
 		return
 	}
@@ -208,7 +209,6 @@ func (form *Details) Edit(ind int, list CredListInf) {
 		res, login, password, desc := form.GetCurrentValues()
 
 		cred := &entities.Credential{
-			ID:          form.tuiApp.Creds[ind].ID,
 			Date:        time.Now(),
 			Resource:    res,
 			Login:       login,
@@ -216,15 +216,7 @@ func (form *Details) Edit(ind int, list CredListInf) {
 			Description: desc,
 		}
 		// send creds to server
-		if err := form.tuiApp.Usecase.EditCred(form.tuiApp.Ctx, cred); err != nil {
-			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
-			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
-			return
-		}
-
-		// save creds in local app
-		if err := entities.SaveCred(form.tuiApp.Creds, ind, cred); err != nil {
+		if err := form.tuiApp.Usecase.EditCred(form.tuiApp.Ctx, cred, ind); err != nil {
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
 			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
@@ -241,7 +233,8 @@ func (form *Details) Edit(ind int, list CredListInf) {
 	form.AddButton("Cancel", func() {
 		defer form.HideButtons() // remove buttons from form
 		form.Rerender()
-		form.SetCurrentCred(form.tuiApp.Creds[ind])
+		cred, _ := form.tuiApp.Usecase.GetCredByIND(ind)
+		form.SetCurrentCred(cred)
 		form.tuiApp.App.SetFocus(list)
 	})
 

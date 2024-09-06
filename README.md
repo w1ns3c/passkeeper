@@ -16,12 +16,12 @@ Credential manager on Go (client/server)
 - [x] Add credential
 - [x] Del credential
 - [ ] Asynchron sync credentials
-- [ ] Change storage to DB
+- [ ] Add DB storage
 - [ ] Gracefull shutdown
 - [x] Client parse args/env
 - [ ] Server parse args/env
 - [ ] Add server access check before login/register user
-- [ ] Move Creds from tuiApp to Usecase only
+- [x] Move Creds from tuiApp to Usecase only
 - [x] Move User entity from tuiApp to Usecase only
 - [x] Move Token from tuiApp to Usecase only
 - [ ] Server logger interceptor

@@ -153,10 +153,9 @@ func FilterEmail(email string) error {
 
 // Logout func filter user input values from tui app
 func (c *ClientUC) Logout() {
-	//c.UserID = ""
-	//c.CredsSecret = ""
 	c.Token = ""
 	c.User = nil
+	c.Creds = nil
 
 	return
 }

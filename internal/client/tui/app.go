@@ -8,7 +8,6 @@ import (
 	"passkeeper/internal/logger"
 
 	"passkeeper/internal/config"
-	"passkeeper/internal/entities"
 	"passkeeper/internal/usecase/cli"
 
 	"github.com/gdamore/tcell/v2"
@@ -59,7 +58,7 @@ type TUI struct {
 	Usecase cli.ClientUsecase
 	Ctx     context.Context
 
-	Creds []*entities.Credential
+	//Creds []*entities.Credential
 
 	// logger
 	log *zerolog.Logger
@@ -91,7 +90,7 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 		App: tview.NewApplication().
 			SetScreen(scr).SetRoot(pages, true).
 			EnableMouse(false),
-		Creds:      make([]*entities.Credential, 0),
+		//Creds:      make([]*entities.Credential, 0),
 		MinPassLen: config.MinPassLen,
 		Usecase:    usecase,
 
@@ -125,7 +124,6 @@ func NewTUI(addr string, debugLevel string) (tui *TUI, err error) {
 }
 
 func (tui *TUI) Logout() error {
-	tui.Creds = nil
 	tui.Ctx = context.Background()
 	tui.Usecase.Logout()
 

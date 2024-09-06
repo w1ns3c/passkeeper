@@ -2,7 +2,6 @@ package tui
 
 import (
 	"github.com/rivo/tview"
-	"passkeeper/internal/entities"
 )
 
 func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
@@ -14,7 +13,7 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 		AddButtons([]string{btn1Name, btn2Name}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == btn1Name {
-				err := tuiApp.Usecase.DelCred(tuiApp.Ctx, tuiApp.Creds[ind].ID)
+				err := tuiApp.Usecase.DelCred(tuiApp.Ctx, ind)
 				if err != nil {
 					tuiApp.log.Error().
 						Err(err).Msg("can't delete cred on server side")
@@ -22,15 +21,6 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 					return
 				}
 
-				newCreds, err := entities.Delete(tuiApp.Creds, ind)
-				if err != nil {
-					tuiApp.log.Error().
-						Err(err).Msg("can't delete cred on client side")
-
-					return
-				}
-
-				tuiApp.Creds = newCreds
 				credsForm := NewCredsList(tuiApp)
 				tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
 
