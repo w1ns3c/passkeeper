@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog"
 	"passkeeper/internal/config/client"
 	"passkeeper/internal/logger"
+	"sync"
 	"time"
 
 	"passkeeper/internal/config"
@@ -58,6 +59,7 @@ type TUI struct {
 	// Actions
 	Usecase cli.ClientUsecase
 	Ctx     context.Context
+	wg      *sync.WaitGroup
 
 	//Creds []*entities.Credential
 
@@ -96,6 +98,7 @@ func NewTUI(addr string, debugLevel string, syncTime int) (tui *TUI, err error) 
 		//Creds:      make([]*entities.Credential, 0),
 		MinPassLen: config.MinPassLen,
 		Usecase:    usecase,
+		wg:         &sync.WaitGroup{},
 
 		Ctx: context.Background(),
 		log: logger.Init(debugLevel),

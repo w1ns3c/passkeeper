@@ -127,6 +127,7 @@ func (form *Details) HideButtons() {
 	form.RemoveButton(0)
 }
 
+// Add switch tui app to cred adding form
 func (form *Details) Add(ind int, list CredListInf) {
 	//form.ShowItems()
 	form.HideFields()
@@ -135,6 +136,9 @@ func (form *Details) Add(ind int, list CredListInf) {
 	form.tuiApp.App.SetFocus(form)
 
 	form.AddButton("Save", func() {
+		//defer continue cred sync
+		defer form.tuiApp.Usecase.ContinueSync()
+
 		// defer remove buttons
 		defer form.HideButtons()
 
@@ -175,6 +179,9 @@ func (form *Details) Add(ind int, list CredListInf) {
 	})
 
 	form.AddButton("Cancel", func() {
+		//defer continue cred sync
+		defer form.tuiApp.Usecase.ContinueSync()
+
 		// defer remove buttons
 		defer form.cancel()
 		// rerender credsList
@@ -192,6 +199,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 	})
 }
 
+// Edit switch tui app to cred editing form
 func (form *Details) Edit(ind int, list CredListInf) {
 	// we shouldn't edit unexisted credential
 	l := form.tuiApp.Usecase.CredsLen()
@@ -203,6 +211,9 @@ func (form *Details) Edit(ind int, list CredListInf) {
 	form.tuiApp.App.SetFocus(form.FieldRes)
 
 	form.AddButton("Save", func() {
+		//defer continue cred sync
+		defer form.tuiApp.Usecase.ContinueSync()
+
 		// defer remove buttons
 		defer form.HideButtons()
 
@@ -231,6 +242,9 @@ func (form *Details) Edit(ind int, list CredListInf) {
 	})
 
 	form.AddButton("Cancel", func() {
+		//defer continue cred sync
+		defer form.tuiApp.Usecase.ContinueSync()
+
 		defer form.HideButtons() // remove buttons from form
 		form.Rerender()
 		cred, _ := form.tuiApp.Usecase.GetCredByIND(ind)

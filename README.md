@@ -19,7 +19,7 @@ Please, give me some comments and advices for my code in review.
 - [x] Edit credential
 - [x] Add credential
 - [x] Del credential
-- [ ] Asynchronous sync credentials (bugs)
+- [x] Asynchronous sync credentials (bugs fix)
 - [ ] Add DB storage
 - [ ] Gracefull shutdown
 - [x] Client parse args/env

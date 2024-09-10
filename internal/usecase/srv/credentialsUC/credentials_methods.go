@@ -2,8 +2,6 @@ package credentialsUC
 
 import (
 	"context"
-	"time"
-
 	"passkeeper/internal/entities"
 )
 
@@ -39,15 +37,6 @@ func (u *CredUsecase) ListCredentials(ctx context.Context,
 	userID string) (creds []*entities.CredBlob, err error) {
 
 	return u.storage.GetAllCredentials(ctx, userID)
-}
-
-// VerifyCredDate verify date/time in received credential
-// if date too old, update it
-func VerifyCredDate(cred *entities.Credential) {
-	now := time.Now()
-	if cred.Date.Sub(now) > time.Hour*24 {
-		cred.Date = now
-	}
 }
 
 func (u *CredUsecase) GetUserSalt(ctx context.Context, userID string) string {

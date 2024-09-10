@@ -30,7 +30,11 @@ type ClientUsecase interface {
 	GetCredByIND(credID int) (cred *entities.Credential, err error)
 	CredsLen() int
 	CredsNotNil() bool
+
 	SyncCreds(ctx context.Context)
+	StopSync()
+	ContinueSync()
+	CheckSync() bool
 
 	// moved from tuiApp
 	GetToken() string
@@ -48,8 +52,9 @@ type ClientUC struct {
 	//UserID      string // userID from JWT token
 	//CredsSecret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
 
-	Creds []*entities.Credential
-	m     *sync.RWMutex
+	Creds         []*entities.Credential
+	m             *sync.RWMutex
+	viewPageFocus bool
 
 	userSvc  pb.UserSvcClient
 	passSvc  pb.UserChangePassSvcClient

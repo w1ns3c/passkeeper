@@ -119,9 +119,11 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 
 		switch event.Rune() {
 		case 'a':
+			tuiApp.Usecase.StopSync()
 			tuiApp.App.SetFocus(viewForm)
 			viewForm.Add(ind, credList)
 		case 'e':
+			tuiApp.Usecase.StopSync()
 			tuiApp.App.SetFocus(viewForm)
 			viewForm.Edit(ind, credList)
 
@@ -139,6 +141,7 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 		case tcell.KeyCtrlC:
 			fallthrough
 		case tcell.KeyEscape:
+			tuiApp.Usecase.ContinueSync()
 			ind := credList.GetCurrentItem()
 			viewForm.HideButtons()
 			viewForm.EmptyFields()
