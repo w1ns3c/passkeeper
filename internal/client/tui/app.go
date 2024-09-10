@@ -4,9 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/rs/zerolog"
+	"os"
+	"os/signal"
 	"passkeeper/internal/config/client"
 	"passkeeper/internal/logger"
 	"sync"
+	"syscall"
 	"time"
 
 	"passkeeper/internal/config"
@@ -57,9 +60,10 @@ type TUI struct {
 	MinPassLen int
 
 	// Actions
-	Usecase cli.ClientUsecase
-	Ctx     context.Context
-	wg      *sync.WaitGroup
+	Usecase   cli.ClientUsecase
+	Ctx       context.Context
+	ctxCancel context.CancelFunc
+	wg        *sync.WaitGroup
 
 	//Creds []*entities.Credential
 
@@ -69,13 +73,18 @@ type TUI struct {
 
 // NewTUIconf is wrapper for NewTUI constructor with config parser
 func NewTUIconf(conf *client.Args) (tui *TUI, err error) {
-	return NewTUI(conf.Addr, conf.LogLevel, conf.SyncTime)
+	return NewTUI(conf.Addr, conf.LogLevel, conf.LogFile, conf.SyncTime)
 }
 
 // NewTUI func is constructor for TUI
-func NewTUI(addr string, debugLevel string, syncTime int) (tui *TUI, err error) {
+func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, err error) {
+	lg := logger.InitFile(debugLevel, logFile)
+
 	scr, err := tcell.NewScreen()
 	if err != nil {
+		lg.Error().Err(err).
+			Msg("failed to create tcell screen")
+
 		return nil, err
 	}
 	pages := tview.NewPages()
@@ -85,8 +94,14 @@ func NewTUI(addr string, debugLevel string, syncTime int) (tui *TUI, err error) 
 		cli.WithAddr(addr),
 		cli.WithSyncTime(time.Duration(syncTime)*time.Second))
 	if err != nil {
+		lg.Error().Err(err).
+			Msg("failed to create client usecase")
+
 		return nil, err
 	}
+
+	ctx, stop := signal.NotifyContext(context.Background(),
+		syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL, os.Interrupt)
 
 	tuiApp := &TUI{
 
@@ -100,8 +115,10 @@ func NewTUI(addr string, debugLevel string, syncTime int) (tui *TUI, err error) 
 		Usecase:    usecase,
 		wg:         &sync.WaitGroup{},
 
-		Ctx: context.Background(),
-		log: logger.Init(debugLevel),
+		Ctx:       ctx,
+		ctxCancel: stop,
+
+		log: lg,
 	}
 
 	//tuiApp.Creds = CredsList
@@ -130,12 +147,31 @@ func NewTUI(addr string, debugLevel string, syncTime int) (tui *TUI, err error) 
 }
 
 func (tui *TUI) Logout() error {
-	tui.Ctx = context.Background()
+	//tui.Ctx = context.Background()
 	tui.Usecase.Logout()
 
 	return nil
 }
 
 func (tui *TUI) Run() error {
-	return tui.App.Run()
+	tui.log.Info().
+		Msg("starting client")
+
+	err := tui.App.Run()
+	if err != nil {
+		tui.log.Error().
+			Err(err).Msg("failed to start app")
+	}
+
+	return err
+}
+
+func (tui *TUI) Stop() {
+	tui.ctxCancel()
+
+	// wait async creds update
+	tui.wg.Wait()
+
+	tui.log.Info().Msg("[i] Client stopped correctly!")
+
 }

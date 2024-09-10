@@ -154,6 +154,8 @@ func (form *Details) Add(ind int, list CredListInf) {
 		}
 
 		if err := form.tuiApp.Usecase.AddCred(form.tuiApp.Ctx, newCred); err != nil {
+			form.tuiApp.log.Error().
+				Err(err).Msg("failed to add credential on server side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
 			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
@@ -228,6 +230,8 @@ func (form *Details) Edit(ind int, list CredListInf) {
 		}
 		// send creds to server
 		if err := form.tuiApp.Usecase.EditCred(form.tuiApp.Ctx, cred, ind); err != nil {
+			form.tuiApp.log.Error().
+				Err(err).Msg("failed to edit credential on server side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
 			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
@@ -434,6 +438,7 @@ func (form *Details) HidePassword() *Details {
 		return form
 	}
 
+	form.tuiApp.log.Info().Msg("hide current cred password")
 	form.HiddenPass = true
 	form.PassValue = form.FieldPass.GetText()
 	if form.PassValue != "" {
@@ -443,6 +448,7 @@ func (form *Details) HidePassword() *Details {
 }
 
 func (form *Details) ShowPassword() {
+	form.tuiApp.log.Info().Msg("show current cred password")
 	form.HiddenPass = false
 	form.FieldPass.SetText(form.PassValue)
 }

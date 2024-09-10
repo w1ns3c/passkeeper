@@ -171,13 +171,16 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		if err != nil {
 			stErr := status.FromContextError(err)
 			if strings.Contains(stErr.Message(), "connection refused") {
+				tuiApp.log.Error().Err(err).Msg("server is unavailable")
 				errAuthForm := NewModalWithParams(tuiApp, "Server is unavailable!", PageLogin)
 				tuiApp.Pages.AddPage(PageAuthError, errAuthForm, true, false)
 				tuiApp.Pages.SwitchToPage(PageAuthError)
 				return
 			}
 
+			// TODO delete log output user/pass to log
 			// not authed
+			tuiApp.log.Error().Err(err).Msgf("wrong username or password: %s:%s", username, password)
 			errAuthForm := NewModalWithParams(tuiApp, "Wrong username/password!", PageLogin)
 			tuiApp.Pages.AddPage(PageAuthError, errAuthForm, true, false)
 			tuiApp.Pages.SwitchToPage(PageAuthError)
@@ -191,14 +194,17 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		//	Secret: fullSecret,
 		//}
 
+		tuiApp.log.Error().Err(err).Msgf("User %s successfully logged in", username)
 		md := metadata.New(map[string]string{config.TokenHeader: tuiApp.Usecase.GetToken()})
 		tuiApp.Ctx = metadata.NewOutgoingContext(tuiApp.Ctx, md)
 
 		err = tuiApp.Usecase.ListCreds(tuiApp.Ctx)
 		if err != nil {
+			tuiApp.log.Error().Err(err).Msg("failed to get creds from server")
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageLogin)
 			tuiApp.Pages.AddPage(PageCredsListErr, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageCredsListErr)
+
 			return
 		}
 
@@ -354,12 +360,14 @@ func NewRegisterForm(tuiApp *TUI) *tview.Flex {
 		if err := tuiApp.Usecase.Register(tuiApp.Ctx, email, username, password, repeat); err != nil {
 			stErr := status.FromContextError(err)
 			if strings.Contains(stErr.Message(), "connection refused") {
+				tuiApp.log.Error().Err(err).Msg("server is unavailable")
 				errAuthForm := NewModalWithParams(tuiApp, "Server is unavailable!", PageRegister)
 				tuiApp.Pages.AddPage(PageRegisterError, errAuthForm, true, false)
 				tuiApp.Pages.SwitchToPage(PageRegisterError)
 				return
 			}
 
+			tuiApp.log.Error().Err(err).Msg("failed to register")
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageRegister)
 			tuiApp.Pages.AddPage(PageRegisterError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageRegisterError)

@@ -25,6 +25,28 @@ func Init(level string) *zerolog.Logger {
 	return &logger
 }
 
+func InitFile(level, filepath string) *zerolog.Logger {
+	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMs
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+
+	lvl := SelectLevel(level)
+
+	f, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		panic(err)
+	}
+
+	logger := zerolog.New(f).With().
+		Timestamp().Logger().Level(lvl)
+
+	logger = logger.Output(zerolog.ConsoleWriter{
+		Out:        f,
+		TimeFormat: time.DateTime,
+	})
+
+	return &logger
+}
+
 func SelectLevel(level string) zerolog.Level {
 	level = strings.ToTitle(level)
 	switch level {

@@ -30,7 +30,7 @@ Please, give me some comments and advices for my code in review.
 - [x] Move Token from tuiApp to Usecase only
 - [ ] Reconnect to server
 - [ ] TUI form info about reconnect to server
-- [ ] Client set logger in file
+- [x] Client set logger in file
 - [ ] Split client interface to multi inf
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
