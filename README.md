@@ -34,6 +34,7 @@ Please, give me some comments and advices for my code in review.
 - [ ] Split client interface to multi inf
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
+- [ ] Setup TLS 
 - [ ] Test cover more than 80%
 - [ ] Doc every function
 - [ ] Refactor client TUI code

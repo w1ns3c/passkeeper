@@ -146,16 +146,28 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		user.Pass = password
 	})
 
-	clearForm := func() {
-		if loginForm.GetFormItemCount() < 2 {
-			return
-		}
-		fieldLogin := loginForm.GetFormItem(0).(*tview.InputField)
-		fieldPassword := loginForm.GetFormItem(1).(*tview.InputField)
+	//clearForm := func() {
+	//	if loginForm.GetFormItemCount() < 2 {
+	//		return
+	//	}
+	//	fieldLogin := loginForm.GetFormItem(0).(*tview.InputField)
+	//	fieldPassword := loginForm.GetFormItem(1).(*tview.InputField)
+	//
+	//	fieldLogin.SetText("")
+	//	fieldPassword.SetText("")
+	//	loginForm.SetFocus(0)
+	//}
 
-		fieldLogin.SetText("")
-		fieldPassword.SetText("")
-		loginForm.SetFocus(0)
+	clearForm := func(form *tview.Form) *tview.Form {
+		form.Clear(false)
+		form.AddInputField("Username", "", 20, nil, func(login string) {
+			user.Login = login
+		})
+		form.AddInputField("Password", "", 20, nil, func(password string) {
+			user.Pass = password
+		})
+
+		return form
 	}
 
 	loginForm.AddButton("Login", func() {
@@ -208,7 +220,8 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			return
 		}
 
-		clearForm()
+		f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
+		f = clearForm(f)
 
 		credsForm := NewCredsList(tuiApp)
 		tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
@@ -220,7 +233,8 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 	})
 
 	loginForm.AddButton("Cancel", func() {
-		clearForm()
+		f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
+		f = clearForm(f)
 		tuiApp.Pages.SwitchToPage(PageMain)
 	})
 
@@ -229,10 +243,9 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		case tcell.KeyCtrlC:
 			fallthrough
 		case tcell.KeyEsc:
-			clearForm()
-			//tuiApp.Pages.Focus(PageMain)
-			_, page := tuiApp.Pages.SwitchToPage(PageMain).GetFrontPage()
-			tuiApp.App.SetFocus(page)
+			f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
+			f = clearForm(f)
+			tuiApp.Pages.SwitchToPage(PageMain)
 		}
 
 		return event

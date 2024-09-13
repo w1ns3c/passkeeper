@@ -20,7 +20,7 @@ import (
 )
 
 var (
-	PageMain            = "Auth"
+	PageMain            = "Main"
 	PageLogin           = "Login"
 	PageRegister        = "Register"
 	PageCreds           = "Credentials"
@@ -69,6 +69,12 @@ type TUI struct {
 
 	// logger
 	log *zerolog.Logger
+
+	// save TUI primitives
+	FormMain  *tview.Flex
+	FormLogin *tview.Flex
+	FormReg   *tview.Flex
+	FormCreds *tview.Flex
 }
 
 // NewTUIconf is wrapper for NewTUI constructor with config parser
@@ -123,19 +129,17 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 
 	//tuiApp.Creds = CredsList
 
-	var (
-		// init pages
-		mainForm  = FlexMain(tuiApp)
-		loginForm = NewLoginForm(tuiApp)
-		regForm   = NewRegisterForm(tuiApp)
-		//credsForm  = NewCredsList(tuiApp)
-		authedForm = NewModalWithParams(tuiApp, "Success!", PageCreds)
-	)
+	// init pages
+	tuiApp.FormMain = FlexMain(tuiApp)
+	tuiApp.FormLogin = NewLoginForm(tuiApp)
+	tuiApp.FormReg = NewRegisterForm(tuiApp)
+	//credsForm  = NewCredsList(tuiApp)
+	authedForm := NewModalWithParams(tuiApp, "Success!", PageCreds)
 
 	// add pages
-	tuiApp.Pages.AddPage(PageMain, mainForm, true, true)
-	tuiApp.Pages.AddPage(PageLogin, loginForm, true, false)
-	tuiApp.Pages.AddPage(PageRegister, regForm, true, false)
+	tuiApp.Pages.AddPage(PageMain, tuiApp.FormMain, true, true) // login/register select form
+	tuiApp.Pages.AddPage(PageLogin, tuiApp.FormLogin, true, false)
+	tuiApp.Pages.AddPage(PageRegister, tuiApp.FormReg, true, false)
 	//tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
 	tuiApp.Pages.AddPage(PageAuthed, authedForm, true, false)
 
