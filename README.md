@@ -8,7 +8,7 @@ Please, give me some comments and advices for my code in review.
 # TODO Functionality
 ## Main Functionality
 - [x] Use gRPC protocol
-- [x] Order creds by date
+- [x] TUI Order creds by date
 - [ ] Add terminal user interface
 - [x] User login
 - [x] User register
@@ -21,7 +21,8 @@ Please, give me some comments and advices for my code in review.
 - [x] Del credential
 - [x] Asynchronous sync credentials (bugs fix)
 - [ ] Add DB storage
-- [ ] Gracefull shutdown
+- [x] Gracefull shutdown (client)
+- [ ] Gracefull shutdown (server)
 - [x] Client parse args/env
 - [x] Server parse args/env
 - [ ] Add server access check before login/register user

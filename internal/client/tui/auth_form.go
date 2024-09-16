@@ -9,117 +9,6 @@ import (
 	"strings"
 )
 
-func FlexMain(tuiApp *TUI) *tview.Flex {
-
-	btn1 := tview.NewButton("Login").
-		SetSelectedFunc(func() {
-			tuiApp.Pages.SwitchToPage(PageLogin)
-		})
-
-	btn1Flex := tview.NewFlex().
-		AddItem(nil, 0, 2, false).
-		AddItem(btn1, 5, 1, true).
-		AddItem(nil, 0, 2, false).
-		SetDirection(tview.FlexRow)
-
-	btn2 := tview.NewButton("Register").
-		SetSelectedFunc(func() {
-			tuiApp.Pages.SwitchToPage(PageRegister)
-		})
-
-	btn2Flex := tview.NewFlex().
-		AddItem(nil, 0, 2, false).
-		AddItem(btn2, 5, 1, true).
-		AddItem(nil, 0, 2, false).
-		SetDirection(tview.FlexRow)
-
-	flex := tview.NewFlex().
-		AddItem(nil, 0, 2, false).
-		AddItem(btn1Flex, 10, 1, true).
-		AddItem(nil, 0, 1, false).
-		AddItem(btn2Flex, 10, 1, true).
-		AddItem(nil, 0, 2, false)
-	flex.SetTitle("Pass Keeper").SetBorder(true)
-
-	flex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		item1 := flex.GetItem(1) // login button
-		item2 := flex.GetItem(3) // register button
-		switch event.Key() {
-		default:
-			//tuiApp.Pages.SwitchToPage(PageCreds)
-			return event
-		case tcell.KeyEsc:
-			page := "exit"
-			exitModal := ExitModal(tuiApp)
-			tuiApp.Pages.AddPage(page, exitModal, true, false)
-			tuiApp.Pages.SwitchToPage(page)
-
-		case tcell.KeyTab:
-
-			if !item1.HasFocus() &&
-				!btn1Flex.HasFocus() && !btn1.HasFocus() {
-				tuiApp.App.SetFocus(btn1)
-				return event
-			}
-
-			if !item2.HasFocus() &&
-				!btn2Flex.HasFocus() && !btn2.HasFocus() {
-				tuiApp.App.SetFocus(btn2)
-				return event
-			}
-
-		case tcell.KeyLeft:
-
-			if !item1.HasFocus() &&
-				!btn1Flex.HasFocus() && !btn1.HasFocus() {
-				tuiApp.App.SetFocus(btn1)
-				return event
-			}
-
-			if !item2.HasFocus() &&
-				!btn2Flex.HasFocus() && !btn2.HasFocus() {
-				tuiApp.App.SetFocus(btn2)
-				return event
-			}
-
-		case tcell.KeyRight:
-
-			if !item1.HasFocus() &&
-				!btn1Flex.HasFocus() && !btn1.HasFocus() {
-				tuiApp.App.SetFocus(btn1)
-				return event
-			}
-
-			if !item2.HasFocus() &&
-				!btn2Flex.HasFocus() && !btn2.HasFocus() {
-				tuiApp.App.SetFocus(btn2)
-				return event
-			}
-
-		case tcell.KeyEnter:
-			if btn1.HasFocus() {
-				tuiApp.Pages.SwitchToPage(PageLogin)
-			}
-			if btn2.HasFocus() {
-				tuiApp.Pages.SwitchToPage(PageRegister)
-			}
-			return event
-
-			// DEBUG
-			//case tcell.KeyUp:
-			//	tuiApp.Pages.SwitchToPage(PageCreds)
-			//case tcell.KeyDown:
-			//	details := NewDetailsForm(tuiApp)
-			//	tuiApp.Pages.AddPage(TmpPage, details, true, false)
-			//	tuiApp.Pages.SwitchToPage(TmpPage)
-
-		}
-		return event
-	})
-
-	return flex
-}
-
 type LoginStruct struct {
 	Login string
 	Pass  string
@@ -145,18 +34,6 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 	loginForm.AddInputField("Password", "", 20, nil, func(password string) {
 		user.Pass = password
 	})
-
-	//clearForm := func() {
-	//	if loginForm.GetFormItemCount() < 2 {
-	//		return
-	//	}
-	//	fieldLogin := loginForm.GetFormItem(0).(*tview.InputField)
-	//	fieldPassword := loginForm.GetFormItem(1).(*tview.InputField)
-	//
-	//	fieldLogin.SetText("")
-	//	fieldPassword.SetText("")
-	//	loginForm.SetFocus(0)
-	//}
 
 	clearForm := func(form *tview.Form) *tview.Form {
 		form.Clear(false)
@@ -198,13 +75,6 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			tuiApp.Pages.SwitchToPage(PageAuthError)
 			return
 		}
-
-		//tuiApp.User = &entities.User{
-		//	ID:     userID,
-		//	Login:  username,
-		//	Hash:   password,
-		//	Secret: fullSecret,
-		//}
 
 		tuiApp.log.Error().Err(err).Msgf("User %s successfully logged in", username)
 		md := metadata.New(map[string]string{config.TokenHeader: tuiApp.Usecase.GetToken()})
@@ -255,74 +125,6 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 	loginFlex.SetDirection(tview.FlexRow).
 		AddItem(loginForm, 0, 4, true).
 		AddItem(Hint, 0, 1, false)
-
-	//loginFlex.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-	//	//item1 := flex.GetItem(1) // login button
-	//	//item2 := flex.GetItem(3) // register button
-	//	var (
-	//		curFocus = 0
-	//		cntItems = loginFlex.GetItemCount()
-	//	)
-	//
-	//	for i := 0; i < cntItems; i++ {
-	//		if loginFlex.GetItem(i).HasFocus() {
-	//			curFocus = i
-	//			break
-	//		}
-	//	}
-
-	//	switch event.Key() {
-	//	default:
-	//		//tuiApp.Pages.SwitchToPage(PageCreds)
-	//		return event
-	//
-	//	case tcell.KeyUp:
-	//		// first element focus
-	//		if curFocus == 0 {
-	//			loginFlex.GetItem(cntItems - 1)
-	//			tuiApp.App.SetFocus(loginFlex.GetItem(cntItems - 1))
-	//		}
-	//
-	//		// last element focus
-	//		if curFocus == cntItems-1 {
-	//			tuiApp.App.SetFocus(loginFlex.GetItem(curFocus - 1))
-	//		}
-	//	}
-	//
-	//	//case tcell.KeyRight:
-	//	//
-	//	//	if !item1.HasFocus() &&
-	//	//		!btn1Flex.HasFocus() && !btn1.HasFocus() {
-	//	//		tuiApp.App.SetFocus(btn1)
-	//	//		return event
-	//	//	}
-	//	//
-	//	//	if !item2.HasFocus() &&
-	//	//		!btn2Flex.HasFocus() && !btn2.HasFocus() {
-	//	//		tuiApp.App.SetFocus(btn2)
-	//	//		return event
-	//	//	}
-	//
-	//	//case tcell.KeyEnter:
-	//	//	if btn1.HasFocus() {
-	//	//		tuiApp.Pages.SwitchToPage(PageLogin)
-	//	//	}
-	//	//	if btn2.HasFocus() {
-	//	//		tuiApp.Pages.SwitchToPage(PageRegister)
-	//	//	}
-	//	//	return event
-	//	//
-	//	//	// DEBUG
-	//	//	//case tcell.KeyUp:
-	//	//	//	tuiApp.Pages.SwitchToPage(PageCreds)
-	//	//	//case tcell.KeyDown:
-	//	//	//	details := NewDetailsForm(tuiApp)
-	//	//	//	tuiApp.Pages.AddPage(TmpPage, details, true, false)
-	//	//	//	tuiApp.Pages.SwitchToPage(TmpPage)
-	//	//
-	//	//}
-	//	return event
-	//})
 
 	return loginFlex
 }

@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"github.com/rs/zerolog"
 	"os"
-	"os/signal"
 	"passkeeper/internal/config/client"
 	"passkeeper/internal/logger"
 	"sync"
-	"syscall"
 	"time"
 
 	"passkeeper/internal/config"
@@ -20,18 +18,16 @@ import (
 )
 
 var (
-	PageMain            = "Main"
-	PageLogin           = "Login"
-	PageRegister        = "Register"
-	PageCreds           = "Credentials"
-	PageAuthError       = "AuthErr"
-	PageRegisterError   = "RegErr"
-	PageCredsListErr    = "CredsListErr"
+	PageMain            = "Main"         // main form, here choose login/register action
+	PageLogin           = "Login"        // form for user login
+	PageRegister        = "Register"     // form for user registration
+	PageCreds           = "Credentials"  // full form for view/edit/add user cred
+	PageAuthError       = "AuthErr"      // auth error modal
+	PageRegisterError   = "RegErr"       // register error modal
+	PageCredsListErr    = "CredsListErr" //creds list error modal
 	PageCredUpdError    = "CredUpdErr"
-	PageRegisterSuccess = "RegSuccess"
-	PageAuthed          = "Authed"
-
-	TmpPage = "tmppage"
+	PageRegisterSuccess = "RegSuccess" // register success modal
+	PageAuthed          = "Authed"     //login success modas
 
 	Hint = tview.NewTextView().
 		SetTextColor(tcell.ColorBisque).
@@ -48,8 +44,6 @@ var (
 			SetText(HintText)
 
 	PassHidden = "******"
-
-	ErrNotAuthed = fmt.Errorf("not authed")
 )
 
 // TUI struct is tui client app
@@ -106,9 +100,6 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 		return nil, err
 	}
 
-	ctx, stop := signal.NotifyContext(context.Background(),
-		syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL, os.Interrupt)
-
 	tuiApp := &TUI{
 
 		Screen: scr,
@@ -116,18 +107,13 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 		App: tview.NewApplication().
 			SetScreen(scr).SetRoot(pages, true).
 			EnableMouse(false),
-		//Creds:      make([]*entities.Credential, 0),
+
 		MinPassLen: config.MinPassLen,
 		Usecase:    usecase,
 		wg:         &sync.WaitGroup{},
 
-		Ctx:       ctx,
-		ctxCancel: stop,
-
 		log: lg,
 	}
-
-	//tuiApp.Creds = CredsList
 
 	// init pages
 	tuiApp.FormMain = FlexMain(tuiApp)
@@ -151,28 +137,65 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 }
 
 func (tui *TUI) Logout() error {
-	//tui.Ctx = context.Background()
+	tui.Ctx = context.Background()
 	tui.Usecase.Logout()
 
 	return nil
 }
 
-func (tui *TUI) Run() error {
+func (tui *TUI) Run(ctx context.Context) error {
+	tui.Ctx = ctx
+
 	tui.log.Info().
 		Msg("starting client")
 
-	err := tui.App.Run()
-	if err != nil {
-		tui.log.Error().
-			Err(err).Msg("failed to start app")
-	}
+	tui.App.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+		switch event.Key() {
+		case tcell.KeyCtrlC:
+			tui.log.Info().
+				Msg("catch \"Ctrl+C\" signal")
 
-	return err
+			p, err := os.FindProcess(os.Getpid())
+			if err != nil {
+				tui.log.Error().Err(err).
+					Msg("failed to find app process, can't notify context")
+
+				return event
+			}
+
+			if err := p.Signal(os.Interrupt); err != nil {
+				tui.log.Error().Err(err).
+					Msg("failed to send signal to app process, can't notify context")
+
+				return event
+			}
+		}
+
+		return event
+	})
+
+	go func() {
+		err := tui.App.Run()
+		if err != nil {
+			tui.log.Error().
+				Err(err).Msg("failed to start app")
+			os.Exit(1)
+		}
+	}()
+
+	// Block the rest of the code until a signal is received.
+	sig := <-ctx.Done()
+	tui.log.Info().Str("sig", fmt.Sprintf("%v", sig)).Msg("Got signal")
+	tui.log.Info().Msg("Shutting everything down gracefully")
+
+	tui.Stop()
+
+	return nil
+
+	//return err
 }
 
 func (tui *TUI) Stop() {
-	tui.ctxCancel()
-
 	// wait async creds update
 	tui.wg.Wait()
 
