@@ -152,23 +152,16 @@ func (tui *TUI) Run(ctx context.Context) error {
 	tui.App.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
 		case tcell.KeyCtrlC:
-			tui.log.Info().
-				Msg("catch \"Ctrl+C\" signal")
-
-			p, err := os.FindProcess(os.Getpid())
+			err := tui.interruptSignal()
 			if err != nil {
-				tui.log.Error().Err(err).
-					Msg("failed to find app process, can't notify context")
+				tui.log.Error().
+					Err(err).Msg("cannot send interrupt signal")
 
 				return event
 			}
 
-			if err := p.Signal(os.Interrupt); err != nil {
-				tui.log.Error().Err(err).
-					Msg("failed to send signal to app process, can't notify context")
-
-				return event
-			}
+		default:
+			return event
 		}
 
 		return event
@@ -201,4 +194,26 @@ func (tui *TUI) Stop() {
 
 	tui.log.Info().Msg("[i] Client stopped correctly!")
 
+}
+
+func (tui *TUI) interruptSignal() error {
+	tui.log.Info().
+		Msg("catch \"Ctrl+C\" signal")
+
+	p, err := os.FindProcess(os.Getpid())
+	if err != nil {
+		tui.log.Error().Err(err).
+			Msg("failed to find app process, can't notify context")
+
+		return err
+	}
+
+	if err := p.Signal(os.Interrupt); err != nil {
+		tui.log.Error().Err(err).
+			Msg("failed to send signal to app process, can't notify context")
+
+		return err
+	}
+
+	return nil
 }

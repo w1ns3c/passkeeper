@@ -48,7 +48,13 @@ func ExitModal(tuiApp *TUI) *tview.Modal {
 		AddButtons([]string{btn1Name, btn2Name}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == btn1Name {
-				tuiApp.App.Stop()
+				err := tuiApp.interruptSignal()
+				if err != nil {
+					tuiApp.log.Error().
+						Err(err).Msg("cannot send interrupt signal")
+
+					return
+				}
 			}
 			if buttonLabel == btn2Name {
 				tuiApp.Pages.SwitchToPage(PageMain)

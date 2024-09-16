@@ -106,16 +106,19 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
 		f = clearForm(f)
 		tuiApp.Pages.SwitchToPage(PageMain)
+		tuiApp.App.SetFocus(tuiApp.FormMain)
 	})
 
 	loginForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		switch event.Key() {
-		case tcell.KeyCtrlC:
-			fallthrough
 		case tcell.KeyEsc:
+			tuiApp.log.Info().
+				Msg("caught esc button")
+
 			f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
 			f = clearForm(f)
 			tuiApp.Pages.SwitchToPage(PageMain)
+			tuiApp.App.SetFocus(tuiApp.FormMain)
 		}
 
 		return event
