@@ -2,14 +2,16 @@ package main
 
 import (
 	"context"
+	"time"
+
 	"github.com/w1ns3c/go-examples/crypto"
+
 	"passkeeper/internal/config"
 	cnf "passkeeper/internal/config/server"
 	"passkeeper/internal/logger"
 	"passkeeper/internal/server"
 	"passkeeper/internal/usecase/srv/credentialsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
-	"time"
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
@@ -63,6 +65,7 @@ func main() {
 
 		// Passwords
 		password1 = &entities.Credential{
+			Type:        entities.UserCred,
 			ID:          "ID1111",
 			Date:        time.Now().Add(time.Second * -200),
 			Resource:    "localhost1111",
@@ -71,6 +74,7 @@ func main() {
 			Description: "some description1111",
 		}
 		password2 = &entities.Credential{
+			Type:        entities.UserCred,
 			ID:          "ID2222",
 			Date:        time.Now().Add(time.Second * -500),
 			Resource:    "localhost2222",
@@ -79,6 +83,7 @@ func main() {
 			Description: "some new description2222",
 		}
 		password3 = &entities.Credential{
+			Type:        entities.UserCred,
 			ID:          "superID3333",
 			Date:        time.Now(),
 			Resource:    "localhost3333",

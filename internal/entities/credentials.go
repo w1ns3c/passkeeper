@@ -4,12 +4,14 @@ import (
 	"time"
 )
 
-type Cred interface {
+type CredInf interface {
 	GetID() string
+	SetID(id string)
 }
 
 // TODO set ID to unexported field
 type Credential struct {
+	Type        BlobType  `json:"type"`
 	ID          string    `json:"-"`
 	Date        time.Time `json:"date"` // date for last changing this line
 	Resource    string    `json:"resource"`
@@ -18,8 +20,12 @@ type Credential struct {
 	Description string    `json:"desc"`
 }
 
-func (c Credential) GetID() string {
+func (c *Credential) GetID() string {
 	return c.ID
+}
+
+func (c *Credential) SetID(id string) {
+	c.ID = id
 }
 
 type CredBlob struct {
@@ -29,28 +35,46 @@ type CredBlob struct {
 }
 
 type Card struct {
-	ID          string
-	Name        string
-	Bank        string
-	Person      string
-	Number      int
-	CVC         int
-	Expiration  string
-	PIN         int
-	Description string
+	Type        BlobType `json:"type"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Bank        string   `json:"bank"`
+	Person      string   `json:"person"`
+	Number      int      `json:"number"`
+	CVC         int      `json:"cvc"`
+	Expiration  string   `json:"exp"`
+	PIN         int      `json:"pin"`
+	Description string   `json:"desc"`
 }
 
-func (c Card) GetID() string {
+func (c *Card) GetID() string {
 	return c.ID
 }
 
-type Note struct {
-	ID   string
-	Name string
-	Date time.Time `json:"date"` // date for last changing this line
-	Body string
+func (c *Card) SetID(id string) {
+	c.ID = id
 }
 
-func (n Note) GetID() string {
+type Note struct {
+	Type BlobType  `json:"type"`
+	ID   string    `json:"id"`
+	Name string    `json:"name"`
+	Date time.Time `json:"date"` // date for last changing this line
+	Body string    `json:"body"`
+}
+
+func (n *Note) GetID() string {
 	return n.ID
 }
+
+func (c *Note) SetID(id string) {
+	c.ID = id
+}
+
+type BlobType int
+
+const (
+	UserCred BlobType = iota
+	UserCard
+	UserNote
+)

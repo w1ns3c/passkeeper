@@ -35,7 +35,7 @@ func (c *ClientUC) ListCreds(ctx context.Context) error {
 			// TODO handle ERRORS!!!
 		}
 
-		creds[i] = cred
+		creds[i] = cred.(*entities.Credential)
 	}
 
 	SortCredsByDate(creds)

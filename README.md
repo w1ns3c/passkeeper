@@ -8,7 +8,6 @@ Please, give me some comments and advices for my code in review.
 # TODO Functionality
 ## Main Functionality
 - [x] Use gRPC protocol
-- [x] TUI Order creds by date
 - [ ] Add terminal user interface
 - [x] User login
 - [x] User register
@@ -49,6 +48,12 @@ Please, give me some comments and advices for my code in review.
 - [ ] Add onetime passwords
 - [ ] Change TUI to navigate with up/down arrow
 - [ ] Finall review all app code (again)
+
+## TUI 
+- [x] TUI Order creds by date
+- [ ] TUI clean fields (notes->date, cards->number,cvc,pin)
+- [ ] TUI beautify cards number fields to "0000 0000 0000 0000"
+- [ ] TUI move both login/register forms to center align 
 
 ## Fill Readme.md
 - [ ] Add gif to show functionality
