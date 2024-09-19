@@ -55,6 +55,7 @@ func NewDetailsForm(tuiApp *TUI) *Details {
 	form.FieldDate = tview.NewInputField().
 		SetLabel("Date").
 		SetFieldWidth(form.FieldWidth)
+
 	form.FieldDate.
 		SetDisabled(true)
 

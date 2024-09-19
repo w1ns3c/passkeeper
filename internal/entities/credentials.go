@@ -47,6 +47,7 @@ func (c Card) GetID() string {
 type Note struct {
 	ID   string
 	Name string
+	Date time.Time `json:"date"` // date for last changing this line
 	Body string
 }
 

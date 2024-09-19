@@ -36,10 +36,24 @@ func (tuiApp *TUI) RerenderCreds() {
 				continue
 			}
 
-			credsForm := NewCredsList(tuiApp)
-			tuiApp.Pages.RemovePage(SubPageCreds)
-			tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
-			tuiApp.Pages.SwitchToPage(SubPageCreds)
+			// reinit subpages
+			tuiApp.SubformCreds = NewCredsList(tuiApp)
+			tuiApp.SubformBank = NewBanking(tuiApp.Usecase.GetCards())
+			tuiApp.SubformNotes = NewNotes(tuiApp.Usecase.GetNotes())
+
+			tuiApp.SubPages.RemovePage(SubPageCreds)
+			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
+
+			tuiApp.SubPages.RemovePage(SubPageBank)
+			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
+
+			tuiApp.SubPages.RemovePage(SubPageNotes)
+			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
+
+			pageName, _ := tuiApp.SubPages.GetFrontPage()
+
+			tuiApp.SubPages.SwitchToPage(pageName)
+
 		case <-tuiApp.Ctx.Done():
 			tuiApp.log.Info().
 				Msg("app get signal to down, stopping sync")
