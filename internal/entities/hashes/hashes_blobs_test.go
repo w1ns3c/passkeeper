@@ -69,13 +69,15 @@ func TestEncryptDecryptBlob(t *testing.T) {
 			{
 				Type: entities.UserNote,
 			},
+			{},
 		}
 	)
 
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
+		name        string
+		args        args
+		wantErrEnc  bool
+		wantErrDecr bool
 	}{
 		// TODO: Add test cases.
 		{
@@ -84,7 +86,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				cred: cred1,
 				key:  key,
 			},
-			wantErr: false,
+			wantErrEnc: false,
 		},
 		{
 			name: "Creds: Long Description",
@@ -92,7 +94,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				cred: cred2,
 				key:  key,
 			},
-			wantErr: false,
+			wantErrEnc: false,
 		},
 		{
 			name: "Cards: Valid",
@@ -100,7 +102,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				cred: testCards[0],
 				key:  key,
 			},
-			wantErr: false,
+			wantErrEnc: false,
 		},
 		{
 			name: "Cards: Empty fields",
@@ -108,7 +110,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				cred: cred2,
 				key:  key,
 			},
-			wantErr: false,
+			wantErrEnc: false,
 		},
 		{
 			name: "Notes: Valid",
@@ -116,7 +118,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				cred: testNotes[0],
 				key:  key,
 			},
-			wantErr: false,
+			wantErrEnc: false,
 		},
 		{
 			name: "Notes: Empty fields",
@@ -124,20 +126,29 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				cred: testNotes[1],
 				key:  key,
 			},
-			wantErr: false,
+			wantErrEnc: false,
+		},
+		{
+			name: "Notes: All Empty fields",
+			args: args{
+				cred: testNotes[2],
+				key:  key,
+			},
+			wantErrEnc:  false,
+			wantErrDecr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotBlob, err := EncryptBlob(tt.args.cred, tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("EncryptBlob() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) != tt.wantErrEnc {
+				t.Errorf("EncryptBlob() error = %v, wantErr %v", err, tt.wantErrEnc)
 				return
 			}
 
 			got, err := DecryptBlob(gotBlob, tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("DecryptBlob() error = %v, wantErr %v", err, tt.wantErr)
+			if (err != nil) != tt.wantErrDecr {
+				t.Errorf("DecryptBlob() error = %v, wantErr %v", err, tt.wantErrDecr)
 				return
 			}
 

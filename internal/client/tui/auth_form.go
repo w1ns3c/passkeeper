@@ -82,7 +82,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		md := metadata.New(map[string]string{config.TokenHeader: tuiApp.Usecase.GetToken()})
 		tuiApp.Ctx = metadata.NewOutgoingContext(tuiApp.Ctx, md)
 
-		err = tuiApp.Usecase.ListCreds(tuiApp.Ctx)
+		err = tuiApp.Usecase.GetBlobs(tuiApp.Ctx)
 		if err != nil {
 			tuiApp.log.Error().Err(err).Msg("failed to get creds from server")
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageLogin)

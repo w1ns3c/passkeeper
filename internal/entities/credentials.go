@@ -74,7 +74,7 @@ func (c *Note) SetID(id string) {
 type BlobType int
 
 const (
-	UserCred BlobType = iota
+	UserCred BlobType = iota + 1
 	UserCard
 	UserNote
 )

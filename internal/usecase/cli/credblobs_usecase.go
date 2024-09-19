@@ -12,36 +12,51 @@ import (
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
 
-// ListCreds func is client logic for tui app
-// to get credential blobs from server and decrypt them to Credential entities
-func (c *ClientUC) ListCreds(ctx context.Context) error {
+// GetBlobs func is client logic for tui app
+// to get credential blobs from server and decrypt them to Credential/Card/Note entities
+func (c *ClientUC) GetBlobs(ctx context.Context) error {
 
 	resp, err := c.credsSvc.CredList(ctx, new(empty.Empty))
 	if err != nil {
 		return err
 	}
 
-	creds := make([]*entities.Credential, len(resp.Creds))
+	creds := make([]*entities.Credential, 0)
+	cards := make([]*entities.Card, 0)
+	notes := make([]*entities.Note, 0)
 
-	for i := 0; i < len(resp.Creds); i++ {
+	for i := 0; i < len(resp.Blobs); i++ {
 		blob := &entities.CredBlob{
-			ID:     resp.Creds[i].ID,
+			ID:     resp.Blobs[i].ID,
 			UserID: c.User.ID,
-			Blob:   resp.Creds[i].Blob,
+			Blob:   resp.Blobs[i].Blob,
 		}
 
-		cred, err := hashes.DecryptBlob(blob, c.User.Secret)
+		tmpCred, err := hashes.DecryptBlob(blob, c.User.Secret)
 		if err != nil {
 			// TODO handle ERRORS!!!
 		}
 
-		creds[i] = cred.(*entities.Credential)
+		switch tmpCred.(type) {
+		case *entities.Card:
+			cards = append(cards, tmpCred.(*entities.Card))
+		case *entities.Note:
+			notes = append(notes, tmpCred.(*entities.Note))
+		case *entities.Credential:
+			creds = append(creds, tmpCred.(*entities.Credential))
+		default:
+			fmt.Println("error can't decrypt cipher blob")
+		}
+
 	}
 
 	SortCredsByDate(creds)
+	SortNotesByDate(notes)
 
 	c.m.Lock()
 	c.Creds = creds
+	c.Cards = cards
+	c.Notes = notes
 	c.m.Unlock()
 
 	return nil
@@ -171,6 +186,16 @@ func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) 
 func SortCredsByDate(creds []*entities.Credential) {
 	sort.Slice(creds, func(i, j int) bool {
 		if creds[i].Date.After(creds[j].Date) {
+			return true
+		}
+		return false
+	})
+}
+
+// SortNotesByDate sort cards, now the first cred is the latest added
+func SortNotesByDate(notes []*entities.Note) {
+	sort.Slice(notes, func(i, j int) bool {
+		if notes[i].Date.After(notes[j].Date) {
 			return true
 		}
 		return false

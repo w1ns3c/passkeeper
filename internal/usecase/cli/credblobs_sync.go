@@ -2,9 +2,11 @@ package cli
 
 import (
 	"context"
-	"google.golang.org/grpc/metadata"
-	"passkeeper/internal/config"
 	"time"
+
+	"google.golang.org/grpc/metadata"
+
+	"passkeeper/internal/config"
 )
 
 func (c *ClientUC) SyncCreds(ctx context.Context) {
@@ -25,7 +27,7 @@ func (c *ClientUC) SyncCreds(ctx context.Context) {
 			md := metadata.New(map[string]string{config.TokenHeader: c.GetToken()})
 			newCtx := metadata.NewOutgoingContext(ctx, md)
 
-			err := c.ListCreds(newCtx)
+			err := c.GetBlobs(newCtx)
 			if err != nil {
 				if c.log != nil {
 					c.log.Error().

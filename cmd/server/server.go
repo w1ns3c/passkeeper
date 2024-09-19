@@ -91,6 +91,49 @@ func main() {
 			Password:    "my_favorite_password3333",
 			Description: "some description3333",
 		}
+
+		testCards = []*entities.Card{
+			{
+				Type:        entities.UserCard,
+				Name:        "test1",
+				Bank:        entities.Banks[0],
+				Person:      "string",
+				Number:      122222222222,
+				CVC:         232,
+				Expiration:  "33/44",
+				PIN:         3333,
+				Description: "test description only",
+			},
+			{
+				Type:        entities.UserCard,
+				Name:        "test333331",
+				Bank:        entities.Banks[2],
+				Person:      "Major Tom",
+				Number:      234872398472,
+				CVC:         23244444,
+				Expiration:  "11/11",
+				PIN:         11111,
+				Description: "test description2",
+			},
+		}
+
+		testNotes = []*entities.Note{
+			{
+				Type: entities.UserNote,
+				Name: "test1",
+				Body: "Hello\nWorld!",
+			},
+			{
+				Type: entities.UserNote,
+				Name: "HELLO 222222",
+				Body: "Hello\nWorld! 9234928309482390480298340923809840",
+			},
+			{
+				Type: entities.UserNote,
+				Name: "New Test Blob",
+				Body: "Hello\nWorld! Amigo",
+			},
+		}
 	)
 
 	key1, _ := hashes.GenerateCredsSecret(pass1, user1.ID, cryptSecret1)
@@ -100,22 +143,19 @@ func main() {
 		login1: user1,
 		login2: user2,
 	}
-	//passwords := map[string][]*entities.Credential{
-	//	login1: {
-	//		password1, password2,
-	//	},
-	//	login2: {
-	//		password3,
-	//	},
-	//}
 
 	blob1, _ := hashes.EncryptBlob(password1, key1)
 	blob2, _ := hashes.EncryptBlob(password2, key1)
 	blob3, _ := hashes.EncryptBlob(password3, key2)
+	blob4, _ := hashes.EncryptBlob(testCards[0], key1)
+	blob5, _ := hashes.EncryptBlob(testCards[1], key1)
+	blob6, _ := hashes.EncryptBlob(testNotes[0], key1)
+	blob7, _ := hashes.EncryptBlob(testNotes[1], key1)
+	blob8, _ := hashes.EncryptBlob(testNotes[2], key1)
 
 	blobs := map[string][]*entities.CredBlob{
 		userid1: {
-			blob1, blob2,
+			blob1, blob2, blob4, blob5, blob6, blob7, blob8,
 		},
 		userid2: {
 			blob3,
@@ -138,7 +178,7 @@ func main() {
 		credentialsUC.WithLogger(lg),
 	)
 
-	usersUC := usersUC.NewUserUsecase().
+	uc := usersUC.NewUserUsecase().
 		SetContext(ctx).
 		SetStorage(storage).
 		SetLog(lg).
@@ -149,7 +189,7 @@ func main() {
 	srv, err := server.NewServer(
 		server.WithAddr(conf.Addr),
 		server.WithUCcreds(credsUC),
-		server.WithUCusers(usersUC),
+		server.WithUCusers(uc),
 		server.WithLogger(lg),
 	)
 	if err != nil {

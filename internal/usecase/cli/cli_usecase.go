@@ -26,7 +26,7 @@ type ClientUsecase interface {
 	Logout()
 	IsAuthed() bool
 
-	ListCreds(ctx context.Context) (err error)
+	GetBlobs(ctx context.Context) (err error)
 	EditCred(ctx context.Context, cred *entities.Credential, ind int) (err error)
 	AddCred(ctx context.Context, cred *entities.Credential) (err error)
 	DelCred(ctx context.Context, ind int) (err error)

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/usecase/srv/credentialsUC"
@@ -167,10 +168,10 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 		Msgf("User \"%s\" have: %d creds", userID, len(creds))
 
 	resp = &pb.CredListResponse{
-		Creds: make([]*pb.CredBlob, len(creds)),
+		Blobs: make([]*pb.CredBlob, len(creds)),
 	}
 	for i := 0; i < len(creds); i++ {
-		resp.Creds[i] = &pb.CredBlob{
+		resp.Blobs[i] = &pb.CredBlob{
 			ID:   creds[i].ID,
 			Blob: creds[i].Blob,
 		}
