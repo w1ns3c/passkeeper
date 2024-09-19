@@ -1,11 +1,12 @@
 package tui
 
 import (
-	"github.com/rivo/tview"
-	"passkeeper/internal/entities/hashes"
 	"time"
 
+	"github.com/rivo/tview"
+
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/hashes"
 )
 
 type Details struct {
@@ -69,51 +70,10 @@ func NewDetailsForm(tuiApp *TUI) *Details {
 		SetLabel("Password").
 		SetFieldWidth(form.FieldWidth)
 
-	//form.AddTextArea("Description", tmpCred.Description, 40, 6, 10000, nil)
 	form.FieldDesc = tview.NewTextArea().
 		SetLabel("Description").
 		SetSize(form.FieldHeight, form.FieldWidth).
 		SetMaxLength(form.maxSigns)
-
-	/*form.Form.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		switch event.Key() {
-		case tcell.KeyUp:
-			form.keyUp()
-		case tcell.KeyTab:
-			fallthrough
-		case tcell.KeyDown:
-			form.keyDown()
-			//case tcell.KeyEsc:
-			//	fallthrough
-			//case tcell.KeyCtrlC:
-			//	form.HidePassword()
-			//	form.HideButtons()
-		}
-
-		switch event.Rune() {
-		case 'h':
-			form.HideItems()
-		case 's':
-			form.ShowFields()
-		case 'w':
-			form.ShowButtons()
-		case 'e':
-			form.HideButtons()
-		case 'i':
-			form.SetCurrentCred(entities.Credential{
-				ID:          "",
-				Date:        time.Now(),
-				Resource:    "mouglis",
-				Login:       "mylogin",
-				Password:    "mypass",
-				Description: "description",
-			})
-		case ' ':
-			form.ShowSwitchPass()
-		}
-		return event
-	})
-	*/
 
 	return form
 }
@@ -156,20 +116,11 @@ func (form *Details) Add(ind int, list CredListInf) {
 		if err := form.tuiApp.Usecase.AddCred(form.tuiApp.Ctx, newCred); err != nil {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to add credential on server side")
-			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
+			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
 			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
 			return
 		}
-
-		//tmpCreds, err := entities.AddCred(form.tuiApp.Creds, newCred)
-		//if err != nil {
-		//	errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
-		//	form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-		//	form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
-		//	return
-		//}
-		//form.tuiApp.Creds = tmpCreds
 
 		form.Rerender()
 		form.ShowPassword()
@@ -232,7 +183,7 @@ func (form *Details) Edit(ind int, list CredListInf) {
 		if err := form.tuiApp.Usecase.EditCred(form.tuiApp.Ctx, cred, ind); err != nil {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to edit credential on server side")
-			errModal := NewModalWithParams(form.tuiApp, err.Error(), PageCreds)
+			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
 			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
 			return
@@ -333,19 +284,6 @@ func (form *Details) keyDown() {
 	}
 
 	if form.CurrentField == maxInd {
-		// switch to Button
-		//if form.GetButtonCount() == 2 {
-		//	if !form.GetButton(0).HasFocus() {
-		//		form.SetFocus(5)
-		//
-		//		return
-		//	} else {
-		//		form.SetFocus(6)
-		//
-		//		return
-		//	}
-		//}
-
 		// switch to the first item
 		form.CurrentField = 0
 		form.SetFocus(form.CurrentField)

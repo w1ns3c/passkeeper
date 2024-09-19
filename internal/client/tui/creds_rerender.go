@@ -30,10 +30,16 @@ func (tuiApp *TUI) RerenderCreds() {
 			tuiApp.log.Info().
 				Msg("get new list of creds, time to rerender all")
 
+			// check that is focused
+			if !tuiApp.SubformCreds.HasFocus() {
+
+				continue
+			}
+
 			credsForm := NewCredsList(tuiApp)
-			tuiApp.Pages.RemovePage(PageCreds)
-			tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
-			tuiApp.Pages.SwitchToPage(PageCreds)
+			tuiApp.Pages.RemovePage(SubPageCreds)
+			tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
+			tuiApp.Pages.SwitchToPage(SubPageCreds)
 		case <-tuiApp.Ctx.Done():
 			tuiApp.log.Info().
 				Msg("app get signal to down, stopping sync")

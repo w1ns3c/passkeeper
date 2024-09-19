@@ -3,9 +3,10 @@ package cli
 import (
 	"context"
 	"fmt"
-	"passkeeper/internal/entities"
 	"regexp"
 	"strings"
+
+	"passkeeper/internal/entities"
 
 	"passkeeper/internal/entities/hashes"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
@@ -160,4 +161,8 @@ func (c *ClientUC) Logout() {
 	c.Authed = false
 
 	return
+}
+
+func (c *ClientUC) IsAuthed() bool {
+	return c.User != nil
 }

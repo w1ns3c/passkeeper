@@ -1,12 +1,14 @@
 package tui
 
 import (
+	"strings"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+
 	"passkeeper/internal/config"
-	"strings"
 )
 
 type LoginStruct struct {
@@ -93,12 +95,16 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
 		f = clearForm(f)
 
-		credsForm := NewCredsList(tuiApp)
-		tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
+		tuiApp.SubformCreds = NewCredsList(tuiApp)
 		tuiApp.Pages.SwitchToPage(PageAuthed)
+		tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
+		tuiApp.SubPages.SwitchToPage(SubPageCreds)
 
 		tuiApp.wg.Add(1)
-		go tuiApp.RerenderCreds()
+		go func() {
+			tuiApp.RerenderCreds()
+			tuiApp.wg.Done()
+		}()
 
 	})
 
@@ -106,7 +112,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
 		f = clearForm(f)
 		tuiApp.Pages.SwitchToPage(PageMain)
-		tuiApp.App.SetFocus(tuiApp.FormMain)
+		tuiApp.App.SetFocus(tuiApp.FormAuth)
 	})
 
 	loginForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
@@ -118,7 +124,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 			f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
 			f = clearForm(f)
 			tuiApp.Pages.SwitchToPage(PageMain)
-			tuiApp.App.SetFocus(tuiApp.FormMain)
+			tuiApp.App.SetFocus(tuiApp.FormAuth)
 		}
 
 		return event

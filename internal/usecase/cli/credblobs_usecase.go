@@ -3,11 +3,13 @@ package cli
 import (
 	"context"
 	"fmt"
+	"sort"
+
 	"github.com/golang/protobuf/ptypes/empty"
+
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-	"sort"
 )
 
 // ListCreds func is client logic for tui app
@@ -173,4 +175,12 @@ func SortCredsByDate(creds []*entities.Credential) {
 		}
 		return false
 	})
+}
+
+func (c *ClientUC) GetCards() []*entities.Card {
+	return c.Cards
+}
+
+func (c *ClientUC) GetNotes() []*entities.Note {
+	return c.Notes
 }

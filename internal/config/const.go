@@ -17,5 +17,7 @@ const (
 
 	SyncMax     = time.Second * 1000
 	SyncMin     = time.Second * 1
-	SyncDefault = time.Second * 5
+	SyncDefault = time.Second * 10
+
+	MaxNameLen = 10
 )

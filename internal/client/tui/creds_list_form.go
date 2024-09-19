@@ -76,8 +76,9 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 
 	fullFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(listFlex, 0, 5, true).
-		AddItem(HintCreds, 0, 1, true)
+		//AddItem(NewHeader(1), 0, 1, false).
+		AddItem(listFlex, 0, 10, true).
+		AddItem(HintCreds, 0, 2, false)
 
 	credList.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
 		viewForm.ShowFields()

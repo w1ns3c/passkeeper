@@ -49,3 +49,6 @@ Please, give me some comments and advices for my code in review.
 - [ ] Add onetime passwords
 - [ ] Change TUI to navigate with up/down arrow
 - [ ] Finall review all app code (again)
+
+## Fill Readme.md
+- [ ] Add gif to show functionality

@@ -3,13 +3,15 @@ package cli
 import (
 	"context"
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
 	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
-	"sync"
-	"time"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
@@ -22,6 +24,7 @@ type ClientUsecase interface {
 	Login(ctx context.Context, login, password string) (err error)
 	Register(ctx context.Context, email, login, password, repeat string) error
 	Logout()
+	IsAuthed() bool
 
 	ListCreds(ctx context.Context) (err error)
 	EditCred(ctx context.Context, cred *entities.Credential, ind int) (err error)
@@ -40,6 +43,8 @@ type ClientUsecase interface {
 	GetToken() string
 	GetHeader() string
 	GetCreds() []*entities.Credential
+	GetCards() []*entities.Card
+	GetNotes() []*entities.Note
 	GetSyncTime() time.Duration
 }
 
@@ -53,6 +58,8 @@ type ClientUC struct {
 	//CredsSecret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
 
 	Creds         []*entities.Credential
+	Cards         []*entities.Card
+	Notes         []*entities.Note
 	m             *sync.RWMutex
 	viewPageFocus bool
 

@@ -22,16 +22,16 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 				}
 
 				credsForm := NewCredsList(tuiApp)
-				tuiApp.Pages.RemovePage(PageCreds)
-				tuiApp.Pages.AddPage(PageCreds, credsForm, true, false)
+				tuiApp.Pages.RemovePage(SubPageCreds)
+				tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
 
 				pageDel := "deleted"
-				deletedPage := NewModalWithParams(tuiApp, "Credential successful deleted!", PageCreds)
+				deletedPage := NewModalWithParams(tuiApp, "Credential successful deleted!", SubPageCreds)
 				tuiApp.Pages.AddPage(pageDel, deletedPage, true, false)
 				tuiApp.Pages.SwitchToPage(pageDel)
 			}
 			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(PageCreds)
+				tuiApp.Pages.SwitchToPage(SubPageCreds)
 			}
 		}).
 		SetFocus(1)
@@ -77,9 +77,10 @@ func LogoutModal(tuiApp *TUI) *tview.Modal {
 			if buttonLabel == btn1Name {
 				tuiApp.Logout()
 				tuiApp.Pages.SwitchToPage(PageMain)
+				tuiApp.App.SetFocus(tuiApp.FormAuth)
 			}
 			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(PageCreds)
+				tuiApp.Pages.SwitchToPage(SubPageCreds)
 			}
 		}).
 		SetFocus(1)

@@ -5,8 +5,8 @@ import (
 	"github.com/rivo/tview"
 )
 
-// FlexMain generate TUI of app main menu (login/register choice)
-func FlexMain(tuiApp *TUI) *tview.Flex {
+// FlexAuth generate TUI of app main menu (login/register choice)
+func FlexAuth(tuiApp *TUI) *tview.Flex {
 
 	btn1 := tview.NewButton("Login").
 		SetSelectedFunc(func() {
@@ -43,7 +43,7 @@ func FlexMain(tuiApp *TUI) *tview.Flex {
 		item2 := flex.GetItem(3) // register button
 		switch event.Key() {
 		default:
-			//tuiApp.Pages.SwitchToPage(PageCreds)
+			//tuiApp.Pages.SwitchToPage(SubPageCreds)
 			return event
 		case tcell.KeyEsc:
 			page := "exit"
