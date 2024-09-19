@@ -31,7 +31,7 @@ func (m *MemStorage) SaveUser(ctx context.Context, u *entities.User) error {
 	defer m.usersMU.Unlock()
 
 	m.users[u.Login] = u
-	m.passwords[u.ID] = make([]*entities.CredBlob, 0)
+	m.passwords[u.ID] = make([]*entities.CryptoBlob, 0)
 
 	return nil
 }

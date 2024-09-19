@@ -13,7 +13,7 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 		AddButtons([]string{btn1Name, btn2Name}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == btn1Name {
-				err := tuiApp.Usecase.DelCred(tuiApp.Ctx, ind)
+				err := tuiApp.Usecase.DelBlob(tuiApp.Ctx, ind)
 				if err != nil {
 					tuiApp.log.Error().
 						Err(err).Msg("can't delete cred on server side")
@@ -80,7 +80,7 @@ func LogoutModal(tuiApp *TUI) *tview.Modal {
 				tuiApp.App.SetFocus(tuiApp.FormAuth)
 			}
 			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(SubPageCreds)
+				tuiApp.Pages.SwitchToPage(PageCredsMenu)
 			}
 		}).
 		SetFocus(1)

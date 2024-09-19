@@ -6,12 +6,12 @@ import (
 	"passkeeper/internal/entities"
 )
 
-func (m *MemStorage) AddCredential(ctx context.Context, userID string, password *entities.CredBlob) error {
+func (m *MemStorage) AddCredential(ctx context.Context, userID string, password *entities.CryptoBlob) error {
 	m.passMU.Lock()
 	defer m.passMU.Unlock()
 
 	if m.passwords[userID] == nil {
-		m.passwords[userID] = make([]*entities.CredBlob, 1)
+		m.passwords[userID] = make([]*entities.CryptoBlob, 1)
 		m.passwords[userID][0] = password
 		return nil
 	}
@@ -20,7 +20,7 @@ func (m *MemStorage) AddCredential(ctx context.Context, userID string, password 
 	return nil
 }
 
-func (m *MemStorage) GetCredential(ctx context.Context, userID, passwordID string) (password *entities.CredBlob, err error) {
+func (m *MemStorage) GetCredential(ctx context.Context, userID, passwordID string) (password *entities.CryptoBlob, err error) {
 	m.passMU.RLock()
 	defer m.passMU.RUnlock()
 
@@ -36,7 +36,7 @@ func (m *MemStorage) GetCredential(ctx context.Context, userID, passwordID strin
 	return nil, ErrPassNotFound
 }
 
-func (m *MemStorage) GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.CredBlob, err error) {
+func (m *MemStorage) GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.CryptoBlob, err error) {
 	m.passMU.RLock()
 	defer m.passMU.RUnlock()
 
@@ -67,7 +67,7 @@ func (m *MemStorage) DeleteCredential(ctx context.Context, userID, passwordID st
 	return ErrPassNotFound
 }
 
-func (m *MemStorage) UpdateCredential(ctx context.Context, userID string, password *entities.CredBlob) error {
+func (m *MemStorage) UpdateCredential(ctx context.Context, userID string, password *entities.CryptoBlob) error {
 	m.passMU.Lock()
 	defer m.passMU.Unlock()
 

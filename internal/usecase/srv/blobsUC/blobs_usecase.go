@@ -1,7 +1,8 @@
-package credentialsUC
+package blobsUC
 
 import (
 	"context"
+
 	"passkeeper/internal/storage/memstorage"
 
 	"github.com/rs/zerolog"
@@ -14,13 +15,13 @@ var (
 	ErrNoDecrypt = "can't decrypt password"
 )
 
-type CredUsecaseInf interface {
-	GetUserSalt(ctx context.Context, userID string) string // return secret user string
-	GetCredential(ctx context.Context, userID, credID string) (cred *entities.CredBlob, err error)
-	AddCredential(ctx context.Context, userID string, cred *entities.CredBlob) error
-	UpdateCredential(ctx context.Context, userID string, cred *entities.CredBlob) error
-	DeleteCredential(ctx context.Context, userID, credID string) error
-	ListCredentials(ctx context.Context, userID string) (creds []*entities.CredBlob, err error)
+type BlobUsecaseInf interface {
+	GetUserSalt(ctx context.Context, blobID string) string // return secret user string
+	GetBlob(ctx context.Context, userID, blobID string) (cred *entities.CryptoBlob, err error)
+	AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
+	UpdBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
+	DelBlob(ctx context.Context, userID, blobID string) error
+	ListBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)
 
 	//VerifyCredDate(cred *entities.Credential) // check date/time in received credential
 
@@ -28,23 +29,23 @@ type CredUsecaseInf interface {
 	//DecryptPass(ctx context.Context, encPwd string) (password string, err error)
 }
 
-type CredUsecase struct {
+type BlobUsecase struct {
 	ctx     context.Context
 	storage storage.CredentialStorage
 	//salt    string
 	log *zerolog.Logger
 }
 
-type CredOption func(usecase *CredUsecase)
+type CredOption func(usecase *BlobUsecase)
 
-func newCredUsecase() *CredUsecase {
-	return &CredUsecase{
+func newBlobUC() *BlobUsecase {
+	return &BlobUsecase{
 		storage: memstorage.NewMemStorage(),
 	}
 }
 
-func NewCredUCWithOpts(opts ...CredOption) *CredUsecase {
-	credsUC := newCredUsecase()
+func NewBlobUCWithOpts(opts ...CredOption) *BlobUsecase {
+	credsUC := newBlobUC()
 	for _, opt := range opts {
 		opt(credsUC)
 	}
@@ -53,19 +54,19 @@ func NewCredUCWithOpts(opts ...CredOption) *CredUsecase {
 }
 
 func WithStorage(db storage.Storage) CredOption {
-	return func(usecase *CredUsecase) {
+	return func(usecase *BlobUsecase) {
 		usecase.storage = db
 	}
 }
 
 func WithContext(ctx context.Context) CredOption {
-	return func(usecase *CredUsecase) {
+	return func(usecase *BlobUsecase) {
 		usecase.ctx = ctx
 	}
 }
 
 func WithLogger(logger *zerolog.Logger) CredOption {
-	return func(usecase *CredUsecase) {
+	return func(usecase *BlobUsecase) {
 		usecase.log = logger
 	}
 }

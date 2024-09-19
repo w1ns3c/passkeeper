@@ -29,7 +29,7 @@ Please, give me some comments and advices for my code in review.
 - [x] Move User entity from tuiApp to Usecase only
 - [x] Move Token from tuiApp to Usecase only
 - [ ] Reconnect to server
-- [ ] TUI form info about reconnect to server
+- [ ] TUI viewForm info about reconnect to server
 - [x] Client set logger in file
 - [ ] Split client interface to multi inf
 - [ ] Server logger interceptor

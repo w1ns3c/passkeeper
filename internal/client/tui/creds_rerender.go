@@ -10,7 +10,7 @@ func (tuiApp *TUI) RerenderCreds() {
 
 	tuiApp.wg.Add(1)
 	go func() {
-		tuiApp.Usecase.SyncCreds(tuiApp.Ctx)
+		tuiApp.Usecase.SyncBlobs(tuiApp.Ctx)
 		tuiApp.wg.Done()
 	}()
 
@@ -38,7 +38,7 @@ func (tuiApp *TUI) RerenderCreds() {
 
 			// reinit subpages
 			tuiApp.SubformCreds = NewCredsList(tuiApp)
-			tuiApp.SubformBank = NewBanking(tuiApp.Usecase.GetCards())
+			tuiApp.SubformBank = tuiApp.NewBanking(tuiApp.Usecase.GetCards())
 			tuiApp.SubformNotes = NewNotes(tuiApp.Usecase.GetNotes())
 
 			tuiApp.SubPages.RemovePage(SubPageCreds)

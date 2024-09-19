@@ -69,4 +69,5 @@ func NewNoteDetails(note *entities.Note) *NoteDetails {
 func (form *NoteDetails) Rerender(note *entities.Note) {
 	form.FieldName.SetText(note.Name)
 	form.FieldBody.SetText(note.Body, true)
+	form.CurrentNote = note
 }

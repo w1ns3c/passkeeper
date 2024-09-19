@@ -20,6 +20,16 @@ func SaveCred(creds []*Credential, ind int, cred *Credential) error {
 	return nil
 }
 
+func SaveCard(cards []*Card, ind int, card *Card) error {
+	cards[ind] = card
+	return nil
+}
+
+func SaveNote(notes []*Note, ind int, note *Note) error {
+	notes[ind] = note
+	return nil
+}
+
 func AddCred(creds []*Credential, newCred *Credential) (newCreds []*Credential, err error) {
 	if len(creds) == 0 {
 
@@ -35,6 +45,40 @@ func AddCred(creds []*Credential, newCred *Credential) (newCreds []*Credential, 
 	creds[0] = newCred
 
 	return creds, nil
+}
+
+func AddCard(cards []*Card, newCard *Card) (newCards []*Card, err error) {
+	if len(cards) == 0 {
+
+		return append(cards, newCard), nil
+	}
+
+	cards = append(cards, &Card{})
+
+	for i := len(cards) - 1; i > 0; i-- {
+		cards[i] = cards[i-1]
+	}
+
+	cards[0] = newCard
+
+	return cards, nil
+}
+
+func AddNote(notes []*Note, newNote *Note) (newNotes []*Note, err error) {
+	if len(notes) == 0 {
+
+		return append(notes, newNote), nil
+	}
+
+	notes = append(notes, &Note{})
+
+	for i := len(notes) - 1; i > 0; i-- {
+		notes[i] = notes[i-1]
+	}
+
+	notes[0] = newNote
+
+	return notes, nil
 }
 
 func Add(creds []*Credential, res, login, password, desc string) (newCreds []*Credential, err error) {

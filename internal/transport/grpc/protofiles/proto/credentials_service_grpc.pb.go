@@ -20,253 +20,253 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CredSvc_CredAdd_FullMethodName  = "/CredSvc/CredAdd"
-	CredSvc_CredGet_FullMethodName  = "/CredSvc/CredGet"
-	CredSvc_CredUpd_FullMethodName  = "/CredSvc/CredUpd"
-	CredSvc_CredDel_FullMethodName  = "/CredSvc/CredDel"
-	CredSvc_CredList_FullMethodName = "/CredSvc/CredList"
+	BlobSvc_BlobAdd_FullMethodName  = "/BlobSvc/BlobAdd"
+	BlobSvc_BlobGet_FullMethodName  = "/BlobSvc/BlobGet"
+	BlobSvc_BlobUpd_FullMethodName  = "/BlobSvc/BlobUpd"
+	BlobSvc_BlobDel_FullMethodName  = "/BlobSvc/BlobDel"
+	BlobSvc_BlobList_FullMethodName = "/BlobSvc/BlobList"
 )
 
-// CredSvcClient is the client API for CredSvc service.
+// BlobSvcClient is the client API for BlobSvc service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type CredSvcClient interface {
-	CredAdd(ctx context.Context, in *CredAddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	CredGet(ctx context.Context, in *CredGetRequest, opts ...grpc.CallOption) (*CredGetResponse, error)
-	CredUpd(ctx context.Context, in *CredUpdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	CredDel(ctx context.Context, in *CredDelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	CredList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CredListResponse, error)
+type BlobSvcClient interface {
+	BlobAdd(ctx context.Context, in *BlobAddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	BlobGet(ctx context.Context, in *BlobGetRequest, opts ...grpc.CallOption) (*BlobGetResponse, error)
+	BlobUpd(ctx context.Context, in *BlobUpdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	BlobDel(ctx context.Context, in *BlobDelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	BlobList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BlobListResponse, error)
 }
 
-type credSvcClient struct {
+type blobSvcClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewCredSvcClient(cc grpc.ClientConnInterface) CredSvcClient {
-	return &credSvcClient{cc}
+func NewBlobSvcClient(cc grpc.ClientConnInterface) BlobSvcClient {
+	return &blobSvcClient{cc}
 }
 
-func (c *credSvcClient) CredAdd(ctx context.Context, in *CredAddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *blobSvcClient) BlobAdd(ctx context.Context, in *BlobAddRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, CredSvc_CredAdd_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BlobSvc_BlobAdd_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *credSvcClient) CredGet(ctx context.Context, in *CredGetRequest, opts ...grpc.CallOption) (*CredGetResponse, error) {
+func (c *blobSvcClient) BlobGet(ctx context.Context, in *BlobGetRequest, opts ...grpc.CallOption) (*BlobGetResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CredGetResponse)
-	err := c.cc.Invoke(ctx, CredSvc_CredGet_FullMethodName, in, out, cOpts...)
+	out := new(BlobGetResponse)
+	err := c.cc.Invoke(ctx, BlobSvc_BlobGet_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *credSvcClient) CredUpd(ctx context.Context, in *CredUpdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, CredSvc_CredUpd_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *credSvcClient) CredDel(ctx context.Context, in *CredDelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *blobSvcClient) BlobUpd(ctx context.Context, in *BlobUpdRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, CredSvc_CredDel_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, BlobSvc_BlobUpd_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *credSvcClient) CredList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*CredListResponse, error) {
+func (c *blobSvcClient) BlobDel(ctx context.Context, in *BlobDelRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CredListResponse)
-	err := c.cc.Invoke(ctx, CredSvc_CredList_FullMethodName, in, out, cOpts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, BlobSvc_BlobDel_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// CredSvcServer is the server API for CredSvc service.
-// All implementations must embed UnimplementedCredSvcServer
+func (c *blobSvcClient) BlobList(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BlobListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(BlobListResponse)
+	err := c.cc.Invoke(ctx, BlobSvc_BlobList_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// BlobSvcServer is the server API for BlobSvc service.
+// All implementations must embed UnimplementedBlobSvcServer
 // for forward compatibility.
-type CredSvcServer interface {
-	CredAdd(context.Context, *CredAddRequest) (*emptypb.Empty, error)
-	CredGet(context.Context, *CredGetRequest) (*CredGetResponse, error)
-	CredUpd(context.Context, *CredUpdRequest) (*emptypb.Empty, error)
-	CredDel(context.Context, *CredDelRequest) (*emptypb.Empty, error)
-	CredList(context.Context, *emptypb.Empty) (*CredListResponse, error)
-	mustEmbedUnimplementedCredSvcServer()
+type BlobSvcServer interface {
+	BlobAdd(context.Context, *BlobAddRequest) (*emptypb.Empty, error)
+	BlobGet(context.Context, *BlobGetRequest) (*BlobGetResponse, error)
+	BlobUpd(context.Context, *BlobUpdRequest) (*emptypb.Empty, error)
+	BlobDel(context.Context, *BlobDelRequest) (*emptypb.Empty, error)
+	BlobList(context.Context, *emptypb.Empty) (*BlobListResponse, error)
+	mustEmbedUnimplementedBlobSvcServer()
 }
 
-// UnimplementedCredSvcServer must be embedded to have
+// UnimplementedBlobSvcServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedCredSvcServer struct{}
+type UnimplementedBlobSvcServer struct{}
 
-func (UnimplementedCredSvcServer) CredAdd(context.Context, *CredAddRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CredAdd not implemented")
+func (UnimplementedBlobSvcServer) BlobAdd(context.Context, *BlobAddRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlobAdd not implemented")
 }
-func (UnimplementedCredSvcServer) CredGet(context.Context, *CredGetRequest) (*CredGetResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CredGet not implemented")
+func (UnimplementedBlobSvcServer) BlobGet(context.Context, *BlobGetRequest) (*BlobGetResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlobGet not implemented")
 }
-func (UnimplementedCredSvcServer) CredUpd(context.Context, *CredUpdRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CredUpd not implemented")
+func (UnimplementedBlobSvcServer) BlobUpd(context.Context, *BlobUpdRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlobUpd not implemented")
 }
-func (UnimplementedCredSvcServer) CredDel(context.Context, *CredDelRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CredDel not implemented")
+func (UnimplementedBlobSvcServer) BlobDel(context.Context, *BlobDelRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlobDel not implemented")
 }
-func (UnimplementedCredSvcServer) CredList(context.Context, *emptypb.Empty) (*CredListResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CredList not implemented")
+func (UnimplementedBlobSvcServer) BlobList(context.Context, *emptypb.Empty) (*BlobListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlobList not implemented")
 }
-func (UnimplementedCredSvcServer) mustEmbedUnimplementedCredSvcServer() {}
-func (UnimplementedCredSvcServer) testEmbeddedByValue()                 {}
+func (UnimplementedBlobSvcServer) mustEmbedUnimplementedBlobSvcServer() {}
+func (UnimplementedBlobSvcServer) testEmbeddedByValue()                 {}
 
-// UnsafeCredSvcServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to CredSvcServer will
+// UnsafeBlobSvcServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BlobSvcServer will
 // result in compilation errors.
-type UnsafeCredSvcServer interface {
-	mustEmbedUnimplementedCredSvcServer()
+type UnsafeBlobSvcServer interface {
+	mustEmbedUnimplementedBlobSvcServer()
 }
 
-func RegisterCredSvcServer(s grpc.ServiceRegistrar, srv CredSvcServer) {
-	// If the following call pancis, it indicates UnimplementedCredSvcServer was
+func RegisterBlobSvcServer(s grpc.ServiceRegistrar, srv BlobSvcServer) {
+	// If the following call pancis, it indicates UnimplementedBlobSvcServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&CredSvc_ServiceDesc, srv)
+	s.RegisterService(&BlobSvc_ServiceDesc, srv)
 }
 
-func _CredSvc_CredAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CredAddRequest)
+func _BlobSvc_BlobAdd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlobAddRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredSvcServer).CredAdd(ctx, in)
+		return srv.(BlobSvcServer).BlobAdd(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CredSvc_CredAdd_FullMethodName,
+		FullMethod: BlobSvc_BlobAdd_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredSvcServer).CredAdd(ctx, req.(*CredAddRequest))
+		return srv.(BlobSvcServer).BlobAdd(ctx, req.(*BlobAddRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredSvc_CredGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CredGetRequest)
+func _BlobSvc_BlobGet_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlobGetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredSvcServer).CredGet(ctx, in)
+		return srv.(BlobSvcServer).BlobGet(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CredSvc_CredGet_FullMethodName,
+		FullMethod: BlobSvc_BlobGet_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredSvcServer).CredGet(ctx, req.(*CredGetRequest))
+		return srv.(BlobSvcServer).BlobGet(ctx, req.(*BlobGetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredSvc_CredUpd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CredUpdRequest)
+func _BlobSvc_BlobUpd_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlobUpdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredSvcServer).CredUpd(ctx, in)
+		return srv.(BlobSvcServer).BlobUpd(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CredSvc_CredUpd_FullMethodName,
+		FullMethod: BlobSvc_BlobUpd_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredSvcServer).CredUpd(ctx, req.(*CredUpdRequest))
+		return srv.(BlobSvcServer).BlobUpd(ctx, req.(*BlobUpdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredSvc_CredDel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CredDelRequest)
+func _BlobSvc_BlobDel_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BlobDelRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredSvcServer).CredDel(ctx, in)
+		return srv.(BlobSvcServer).BlobDel(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CredSvc_CredDel_FullMethodName,
+		FullMethod: BlobSvc_BlobDel_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredSvcServer).CredDel(ctx, req.(*CredDelRequest))
+		return srv.(BlobSvcServer).BlobDel(ctx, req.(*BlobDelRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CredSvc_CredList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _BlobSvc_BlobList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CredSvcServer).CredList(ctx, in)
+		return srv.(BlobSvcServer).BlobList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CredSvc_CredList_FullMethodName,
+		FullMethod: BlobSvc_BlobList_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CredSvcServer).CredList(ctx, req.(*emptypb.Empty))
+		return srv.(BlobSvcServer).BlobList(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// CredSvc_ServiceDesc is the grpc.ServiceDesc for CredSvc service.
+// BlobSvc_ServiceDesc is the grpc.ServiceDesc for BlobSvc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var CredSvc_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "CredSvc",
-	HandlerType: (*CredSvcServer)(nil),
+var BlobSvc_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "BlobSvc",
+	HandlerType: (*BlobSvcServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CredAdd",
-			Handler:    _CredSvc_CredAdd_Handler,
+			MethodName: "BlobAdd",
+			Handler:    _BlobSvc_BlobAdd_Handler,
 		},
 		{
-			MethodName: "CredGet",
-			Handler:    _CredSvc_CredGet_Handler,
+			MethodName: "BlobGet",
+			Handler:    _BlobSvc_BlobGet_Handler,
 		},
 		{
-			MethodName: "CredUpd",
-			Handler:    _CredSvc_CredUpd_Handler,
+			MethodName: "BlobUpd",
+			Handler:    _BlobSvc_BlobUpd_Handler,
 		},
 		{
-			MethodName: "CredDel",
-			Handler:    _CredSvc_CredDel_Handler,
+			MethodName: "BlobDel",
+			Handler:    _BlobSvc_BlobDel_Handler,
 		},
 		{
-			MethodName: "CredList",
-			Handler:    _CredSvc_CredList_Handler,
+			MethodName: "BlobList",
+			Handler:    _BlobSvc_BlobList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

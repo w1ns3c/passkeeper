@@ -106,6 +106,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 		res, login, password, desc := form.GetCurrentValues()
 
 		newCred := &entities.Credential{
+			Type:        entities.UserCred,
 			ID:          hashes.GeneratePassID2(),
 			Date:        time.Now(),
 			Resource:    res,
@@ -114,7 +115,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 			Description: desc,
 		}
 
-		if err := form.tuiApp.Usecase.AddCred(form.tuiApp.Ctx, newCred); err != nil {
+		if err := form.tuiApp.Usecase.AddBlob(form.tuiApp.Ctx, newCred); err != nil {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to add credential on server side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
@@ -147,7 +148,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 			return
 		}
 
-		// clear fields if there isn't any credentialsUC
+		// clear fields if there isn't any blobsUC
 		form.EmptyFields()
 		form.HideFields()
 	})
@@ -181,7 +182,7 @@ func (form *Details) Edit(ind int, list CredListInf) {
 			Description: desc,
 		}
 		// send creds to server
-		if err := form.tuiApp.Usecase.EditCred(form.tuiApp.Ctx, cred, ind); err != nil {
+		if err := form.tuiApp.Usecase.EditBlob(form.tuiApp.Ctx, cred, ind); err != nil {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to edit credential on server side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)

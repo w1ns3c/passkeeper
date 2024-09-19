@@ -27,14 +27,18 @@ type ClientUsecase interface {
 	IsAuthed() bool
 
 	GetBlobs(ctx context.Context) (err error)
-	EditCred(ctx context.Context, cred *entities.Credential, ind int) (err error)
-	AddCred(ctx context.Context, cred *entities.Credential) (err error)
-	DelCred(ctx context.Context, ind int) (err error)
-	GetCredByIND(credID int) (cred *entities.Credential, err error)
+	EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error)
+	AddBlob(ctx context.Context, cred entities.CredInf) (err error)
+	DelBlob(ctx context.Context, ind int) (err error)
+
+	GetCredByIND(credIND int) (cred *entities.Credential, err error)
+	GetCardByIND(cardIND int) (cred *entities.Card, err error)
+	GetNoteByIND(noteIND int) (cred *entities.Note, err error)
+
 	CredsLen() int
 	CredsNotNil() bool
 
-	SyncCreds(ctx context.Context)
+	SyncBlobs(ctx context.Context)
 	StopSync()
 	ContinueSync()
 	CheckSync() bool
@@ -65,7 +69,7 @@ type ClientUC struct {
 
 	userSvc  pb.UserSvcClient
 	passSvc  pb.UserChangePassSvcClient
-	credsSvc pb.CredSvcClient
+	credsSvc pb.BlobSvcClient
 
 	TokenHeader string
 	SyncTime    time.Duration
@@ -97,7 +101,7 @@ func NewClientUC(opts ...ClientUCoptions) (cli *ClientUC, err error) {
 
 	cli.userSvc = pb.NewUserSvcClient(conn)
 	cli.passSvc = pb.NewUserChangePassSvcClient(conn)
-	cli.credsSvc = pb.NewCredSvcClient(conn)
+	cli.credsSvc = pb.NewBlobSvcClient(conn)
 	cli.m = &sync.RWMutex{}
 
 	return cli, nil

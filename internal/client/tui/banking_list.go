@@ -11,9 +11,9 @@ import (
 	"passkeeper/internal/entities"
 )
 
-func NewBanking(cards []*entities.Card) *tview.Flex {
+func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 	var (
-		form *CardDetails
+		viewForm *CardDetails
 	)
 
 	list := NewCardList(cards)
@@ -21,9 +21,9 @@ func NewBanking(cards []*entities.Card) *tview.Flex {
 
 	ind := list.GetCurrentItem()
 	if cards != nil && len(cards) > ind {
-		form = NewCardDetails(cards[ind])
+		viewForm = NewCardDetails(cards[ind])
 	} else {
-		form = NewCardDetails(nil)
+		viewForm = NewCardDetails(nil)
 	}
 
 	list.SetBorder(true).
@@ -35,7 +35,7 @@ func NewBanking(cards []*entities.Card) *tview.Flex {
 
 	subFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(form, 0, 2, false).
+		AddItem(viewForm, 0, 2, false).
 		AddItem(helpCards, 0, 1, false)
 
 	flex := tview.NewFlex().
@@ -55,16 +55,16 @@ func NewBanking(cards []*entities.Card) *tview.Flex {
 			//tuiApp.Pages.SwitchToPage(pageConfirm)
 		}
 
-		// inputs for credList
+		// inputs for bank cards
 		switch event.Key() {
 		case tcell.KeyEsc:
 			fallthrough
 		case tcell.KeyCtrlL:
 
-			//pageName := "Logout"
-			//logoutModal := LogoutModal(tuiApp)
-			//tuiApp.Pages.AddPage(pageName, logoutModal, true, false)
-			//tuiApp.Pages.SwitchToPage(pageName)
+			pageName := "Logout"
+			logoutModal := LogoutModal(tuiApp)
+			tuiApp.Pages.AddPage(pageName, logoutModal, true, false)
+			tuiApp.Pages.SwitchToPage(pageName)
 
 		case tcell.KeyDelete:
 			delFunc()
@@ -72,9 +72,9 @@ func NewBanking(cards []*entities.Card) *tview.Flex {
 
 		switch event.Rune() {
 		case 'a':
-			//tuiApp.Usecase.StopSync()
-			//tuiApp.App.SetFocus(viewForm)
-			//viewForm.Add(ind, credList)
+			tuiApp.Usecase.StopSync()
+			tuiApp.App.SetFocus(viewForm)
+			viewForm.Add(tuiApp, ind, list)
 		case 'e':
 			//tuiApp.Usecase.StopSync()
 			//tuiApp.App.SetFocus(viewForm)
@@ -92,20 +92,20 @@ func NewBanking(cards []*entities.Card) *tview.Flex {
 
 	list.SetChangedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
 		curID := list.GetCurrentItem()
-		form.Rerender(cards[curID])
+		viewForm.Rerender(cards[curID])
 	})
 
-	form.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-
-		form.BtnSave = tview.NewButton("Save")
-		form.BtnCancel = tview.NewButton("Cancel")
-
-		form.BtnSave.SetSelectedFunc(func() {
-
-		})
-
-		return event
-	})
+	//viewForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
+	//
+	//	viewForm.BtnSave = tview.NewButton("Save")
+	//	viewForm.BtnCancel = tview.NewButton("Cancel")
+	//
+	//	viewForm.BtnSave.SetSelectedFunc(func() {
+	//
+	//	})
+	//
+	//	return event
+	//})
 
 	return flex
 }

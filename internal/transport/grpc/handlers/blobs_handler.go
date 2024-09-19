@@ -5,7 +5,7 @@ import (
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
-	"passkeeper/internal/usecase/srv/credentialsUC"
+	"passkeeper/internal/usecase/srv/blobsUC"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 
@@ -32,21 +32,21 @@ var (
 	ErrCredList    = status.Error(codes.Internal, ErrCredListMsg)
 )
 
-type CredsHandler struct {
-	pb.UnimplementedCredSvcServer
-	service credentialsUC.CredUsecaseInf
+type BlobsHandler struct {
+	pb.UnimplementedBlobSvcServer
+	service blobsUC.BlobUsecaseInf
 	log     *zerolog.Logger
 }
 
-func NewCredsHandler(logger *zerolog.Logger, service credentialsUC.CredUsecaseInf) *CredsHandler {
-	return &CredsHandler{
-		UnimplementedCredSvcServer: pb.UnimplementedCredSvcServer{},
+func NewBlobsHandler(logger *zerolog.Logger, service blobsUC.BlobUsecaseInf) *BlobsHandler {
+	return &BlobsHandler{
+		UnimplementedBlobSvcServer: pb.UnimplementedBlobSvcServer{},
 		service:                    service,
 		log:                        logger,
 	}
 }
 
-func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*empty.Empty, error) {
+func (h *BlobsHandler) BlobAdd(ctx context.Context, req *pb.BlobAddRequest) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
@@ -55,13 +55,13 @@ func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*em
 		return nil, err
 	}
 
-	cred := &entities.CredBlob{
+	cred := &entities.CryptoBlob{
 		ID:     req.Cred.ID,
 		UserID: userID,
 		Blob:   req.Cred.Blob,
 	}
 
-	err = h.service.AddCredential(ctx, userID, cred)
+	err = h.service.AddBlob(ctx, userID, cred)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredAddMsg)
@@ -72,7 +72,7 @@ func (h *CredsHandler) CredAdd(ctx context.Context, req *pb.CredAddRequest) (*em
 	return new(empty.Empty), nil
 }
 
-func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (resp *pb.CredGetResponse, err error) {
+func (h *BlobsHandler) BlobGet(ctx context.Context, req *pb.BlobGetRequest) (resp *pb.BlobGetResponse, err error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
@@ -81,7 +81,7 @@ func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (res
 		return nil, err
 	}
 
-	cr, err := h.service.GetCredential(ctx, userID, req.CredID)
+	cr, err := h.service.GetBlob(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredGetMsg)
@@ -89,8 +89,8 @@ func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (res
 		return nil, ErrCredGet
 	}
 
-	resp = &pb.CredGetResponse{
-		Cred: &pb.CredBlob{
+	resp = &pb.BlobGetResponse{
+		Cred: &pb.CryptoBlob{
 			ID:   cr.ID,
 			Blob: cr.Blob,
 		},
@@ -98,7 +98,7 @@ func (h *CredsHandler) CredGet(ctx context.Context, req *pb.CredGetRequest) (res
 	return resp, nil
 }
 
-func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*empty.Empty, error) {
+func (h *BlobsHandler) BlobUpd(ctx context.Context, req *pb.BlobUpdRequest) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
@@ -107,13 +107,13 @@ func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*em
 		return nil, err
 	}
 
-	cred := &entities.CredBlob{
-		ID:     req.Cred.ID,
+	cred := &entities.CryptoBlob{
+		ID:     req.Blob.ID,
 		UserID: userID,
-		Blob:   req.Cred.Blob,
+		Blob:   req.Blob.Blob,
 	}
 
-	err = h.service.UpdateCredential(ctx, userID, cred)
+	err = h.service.UpdBlob(ctx, userID, cred)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredUpdMsg)
@@ -124,7 +124,7 @@ func (h *CredsHandler) CredUpd(ctx context.Context, req *pb.CredUpdRequest) (*em
 	return new(empty.Empty), nil
 }
 
-func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*empty.Empty, error) {
+func (h *BlobsHandler) BlobDel(ctx context.Context, req *pb.BlobDelRequest) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
@@ -133,7 +133,7 @@ func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*em
 		return nil, err
 	}
 
-	err = h.service.DeleteCredential(ctx, userID, req.CredID)
+	err = h.service.DelBlob(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredDelMsg)
@@ -144,7 +144,7 @@ func (h *CredsHandler) CredDel(ctx context.Context, req *pb.CredDelRequest) (*em
 	return new(empty.Empty), nil
 }
 
-func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb.CredListResponse, err error) {
+func (h *BlobsHandler) BlobList(ctx context.Context, req *empty.Empty) (resp *pb.BlobListResponse, err error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
 		h.log.Error().
@@ -156,7 +156,7 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 	h.log.Info().
 		Msgf("User \"%s\" request creds list", userID)
 
-	creds, err := h.service.ListCredentials(ctx, userID)
+	creds, err := h.service.ListBlobs(ctx, userID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredListMsg)
@@ -167,11 +167,11 @@ func (h *CredsHandler) CredList(ctx context.Context, req *empty.Empty) (resp *pb
 	h.log.Info().
 		Msgf("User \"%s\" have: %d creds", userID, len(creds))
 
-	resp = &pb.CredListResponse{
-		Blobs: make([]*pb.CredBlob, len(creds)),
+	resp = &pb.BlobListResponse{
+		Blobs: make([]*pb.CryptoBlob, len(creds)),
 	}
 	for i := 0; i < len(creds); i++ {
-		resp.Blobs[i] = &pb.CredBlob{
+		resp.Blobs[i] = &pb.CryptoBlob{
 			ID:   creds[i].ID,
 			Blob: creds[i].Blob,
 		}

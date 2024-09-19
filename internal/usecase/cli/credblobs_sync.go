@@ -9,7 +9,7 @@ import (
 	"passkeeper/internal/config"
 )
 
-func (c *ClientUC) SyncCreds(ctx context.Context) {
+func (c *ClientUC) SyncBlobs(ctx context.Context) {
 
 	ticker := time.NewTicker(c.SyncTime)
 	for {

@@ -2,13 +2,15 @@ package grpc
 
 import (
 	"fmt"
+	"net"
+
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
-	"net"
+
 	"passkeeper/internal/transport/grpc/handlers"
 	"passkeeper/internal/transport/grpc/interceptors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-	"passkeeper/internal/usecase/srv/credentialsUC"
+	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
@@ -24,14 +26,14 @@ type TransportGRPC struct {
 	addr   *net.TCPAddr
 	srvRPC *grpc.Server
 
-	hndCreds      *handlers.CredsHandler
+	hndCreds      *handlers.BlobsHandler
 	hndUsers      *handlers.UsersHandler
 	hndChangePass *handlers.UserChangePassHandler
 
 	authInterceptor *interceptors.AuthInterceptor
 
 	users usersUC.UserUsecaseInf
-	creds credentialsUC.CredUsecaseInf
+	creds blobsUC.BlobUsecaseInf
 
 	log *zerolog.Logger
 }
@@ -67,7 +69,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	srv.authInterceptor = interceptors.NewAuthInterceptor(srv.users)
 
 	// init handlers
-	srv.hndCreds = handlers.NewCredsHandler(srv.log, srv.creds)
+	srv.hndCreds = handlers.NewBlobsHandler(srv.log, srv.creds)
 	srv.hndUsers = handlers.NewUsersHandler(srv.log, srv.users)
 
 	srv.hndChangePass = handlers.NewUserChangePassHandler(srv.log, srv.users)
@@ -91,7 +93,7 @@ func WithUCusers(users usersUC.UserUsecaseInf) TransportOption {
 	}
 }
 
-func WithUCcreds(creds credentialsUC.CredUsecaseInf) TransportOption {
+func WithUCcreds(creds blobsUC.BlobUsecaseInf) TransportOption {
 	return func(srv *TransportGRPC) {
 		srv.creds = creds
 	}
@@ -120,7 +122,7 @@ func (srv *TransportGRPC) Run() error {
 	}
 
 	pb.RegisterUserSvcServer(srv.srvRPC, srv.hndUsers)
-	pb.RegisterCredSvcServer(srv.srvRPC, srv.hndCreds)
+	pb.RegisterBlobSvcServer(srv.srvRPC, srv.hndCreds)
 	pb.RegisterUserChangePassSvcServer(srv.srvRPC, srv.hndChangePass)
 
 	l, err := net.Listen("tcp4", srv.addr.String())

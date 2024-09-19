@@ -10,7 +10,7 @@ import (
 	cnf "passkeeper/internal/config/server"
 	"passkeeper/internal/logger"
 	"passkeeper/internal/server"
-	"passkeeper/internal/usecase/srv/credentialsUC"
+	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
 
 	"passkeeper/internal/entities"
@@ -153,7 +153,7 @@ func main() {
 	blob7, _ := hashes.EncryptBlob(testNotes[1], key1)
 	blob8, _ := hashes.EncryptBlob(testNotes[2], key1)
 
-	blobs := map[string][]*entities.CredBlob{
+	blobs := map[string][]*entities.CryptoBlob{
 		userid1: {
 			blob1, blob2, blob4, blob5, blob6, blob7, blob8,
 		},
@@ -172,10 +172,10 @@ func main() {
 		memstorage.WithBlobs(blobs))
 	lg.Info().Msg("[i] Storage init: done")
 
-	credsUC := credentialsUC.NewCredUCWithOpts(
-		credentialsUC.WithContext(ctx),
-		credentialsUC.WithStorage(storage),
-		credentialsUC.WithLogger(lg),
+	credsUC := blobsUC.NewBlobUCWithOpts(
+		blobsUC.WithContext(ctx),
+		blobsUC.WithStorage(storage),
+		blobsUC.WithLogger(lg),
 	)
 
 	uc := usersUC.NewUserUsecase().

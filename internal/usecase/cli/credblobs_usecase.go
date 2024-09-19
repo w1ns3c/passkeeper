@@ -16,7 +16,7 @@ import (
 // to get credential blobs from server and decrypt them to Credential/Card/Note entities
 func (c *ClientUC) GetBlobs(ctx context.Context) error {
 
-	resp, err := c.credsSvc.CredList(ctx, new(empty.Empty))
+	resp, err := c.credsSvc.BlobList(ctx, new(empty.Empty))
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	notes := make([]*entities.Note, 0)
 
 	for i := 0; i < len(resp.Blobs); i++ {
-		blob := &entities.CredBlob{
+		blob := &entities.CryptoBlob{
 			ID:     resp.Blobs[i].ID,
 			UserID: c.User.ID,
 			Blob:   resp.Blobs[i].Blob,
@@ -62,11 +62,11 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	return nil
 }
 
-func (c *ClientUC) EditCred(ctx context.Context, cred *entities.Credential, ind int) (err error) {
+func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error) {
 
 	//ID:          form.tuiApp.Creds[ind].ID,
 	// update credID
-	cred.ID = c.Creds[ind].ID
+	cred.SetID(c.Creds[ind].ID)
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {
@@ -77,14 +77,14 @@ func (c *ClientUC) EditCred(ctx context.Context, cred *entities.Credential, ind 
 		return fmt.Errorf("something go wrong, blob is nil")
 	}
 
-	req := &pb.CredUpdRequest{
-		Cred: &pb.CredBlob{
+	req := &pb.BlobUpdRequest{
+		Blob: &pb.CryptoBlob{
 			ID:   blob.ID,
 			Blob: blob.Blob,
 		},
 	}
 
-	_, err = c.credsSvc.CredUpd(ctx, req)
+	_, err = c.credsSvc.BlobUpd(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -92,14 +92,30 @@ func (c *ClientUC) EditCred(ctx context.Context, cred *entities.Credential, ind 
 	c.m.Lock()
 	defer c.m.Unlock()
 	// save creds in local app
-	if err = entities.SaveCred(c.Creds, ind, cred); err != nil {
-		return err
+	switch cred.(type) {
+	case *entities.Credential:
+		if err = entities.SaveCred(c.Creds, ind, cred.(*entities.Credential)); err != nil {
+			return err
+		}
+
+	case *entities.Card:
+		if err = entities.SaveCard(c.Cards, ind, cred.(*entities.Card)); err != nil {
+			return err
+		}
+
+	case *entities.Note:
+		if err = entities.SaveNote(c.Notes, ind, cred.(*entities.Note)); err != nil {
+			return err
+		}
+
+	default:
+		return fmt.Errorf("unknown credential type")
 	}
 
 	return err
 }
 
-func (c *ClientUC) AddCred(ctx context.Context, cred *entities.Credential) (err error) {
+func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err error) {
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {
@@ -110,40 +126,72 @@ func (c *ClientUC) AddCred(ctx context.Context, cred *entities.Credential) (err 
 		return fmt.Errorf("something go wrong, blob is nil")
 	}
 
-	req := &pb.CredAddRequest{
-		Cred: &pb.CredBlob{
+	req := &pb.BlobAddRequest{
+		Cred: &pb.CryptoBlob{
 			ID:   blob.ID,
 			Blob: blob.Blob,
 		},
 	}
 
-	_, err = c.credsSvc.CredAdd(ctx, req)
+	_, err = c.credsSvc.BlobAdd(ctx, req)
 	if err != nil {
 		// can't save creds on server
+		// can't save creds localy
+		c.log.Error().
+			Err(err).Msg("can't save new cred remotely")
 		return err
 	}
 
 	c.m.Lock()
 	defer c.m.Unlock()
-	tmpCreds, err := entities.AddCred(c.Creds, cred)
-	if err != nil {
-		// can't save creds localy
-		return err
+
+	switch cred.(type) {
+	case *entities.Credential:
+		tmpCreds, err := entities.AddCred(c.Creds, cred.(*entities.Credential))
+		if err != nil {
+			// can't save creds localy
+			c.log.Error().
+				Err(err).Msg("can't save new cred locally")
+			return err
+		}
+		c.Creds = tmpCreds
+
+	case *entities.Card:
+		tmpCards, err := entities.AddCard(c.Cards, cred.(*entities.Card))
+		if err != nil {
+			// can't save creds localy
+			c.log.Error().
+				Err(err).Msg("can't save new cred locally")
+			return err
+		}
+		c.Cards = tmpCards
+
+	case *entities.Note:
+		tmpNotes, err := entities.AddNote(c.Notes, cred.(*entities.Note))
+		if err != nil {
+			// can't save creds localy
+			c.log.Error().
+				Err(err).Msg("can't save new cred locally")
+			return err
+		}
+		c.Notes = tmpNotes
+
+	default:
+		return fmt.Errorf("unknown credential type")
 	}
-	c.Creds = tmpCreds
 
 	return nil
 }
 
-func (c *ClientUC) DelCred(ctx context.Context, ind int) (err error) {
+func (c *ClientUC) DelBlob(ctx context.Context, ind int) (err error) {
 	if ind < 0 && ind >= len(c.Creds) {
 		return fmt.Errorf("invalid index")
 	}
 
 	credID := c.Creds[ind].ID
 
-	req := &pb.CredDelRequest{CredID: credID}
-	_, err = c.credsSvc.CredDel(ctx, req)
+	req := &pb.BlobDelRequest{CredID: credID}
+	_, err = c.credsSvc.BlobDel(ctx, req)
 	if err != nil {
 
 		return err
@@ -180,6 +228,28 @@ func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) 
 	defer c.m.Unlock()
 
 	return c.Creds[ind], nil
+}
+
+func (c *ClientUC) GetCardByIND(ind int) (card *entities.Card, err error) {
+	if ind < 0 || ind >= len(c.Cards) {
+		return nil, fmt.Errorf("invalid index")
+	}
+
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	return c.Cards[ind], nil
+}
+
+func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
+	if ind < 0 || ind >= len(c.Notes) {
+		return nil, fmt.Errorf("invalid index")
+	}
+
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	return c.Notes[ind], nil
 }
 
 // SortCredsByDate sort creds, now the first cred is the latest added

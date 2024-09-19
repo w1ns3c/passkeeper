@@ -10,8 +10,8 @@ import (
 	"github.com/w1ns3c/go-examples/crypto"
 )
 
-// EncryptBlob func just encrypt Credential to CredBlob with key
-func EncryptBlob(cred entities.CredInf, key string) (blob *entities.CredBlob, err error) {
+// EncryptBlob func just encrypt Credential to CryptoBlob with key
+func EncryptBlob(cred entities.CredInf, key string) (blob *entities.CryptoBlob, err error) {
 	jsonCred, err := json.Marshal(cred)
 	if err != nil {
 		return nil, fmt.Errorf("can't marshal cred: %v", err)
@@ -25,14 +25,14 @@ func EncryptBlob(cred entities.CredInf, key string) (blob *entities.CredBlob, er
 
 	cryptoStr := hex.EncodeToString(cryptoCred)
 
-	return &entities.CredBlob{
+	return &entities.CryptoBlob{
 		ID:   cred.GetID(),
 		Blob: cryptoStr,
 	}, nil
 }
 
-// DecryptBlob func just decrypt CredBlob back to Credential with key
-func DecryptBlob(blob *entities.CredBlob, key string) (cred entities.CredInf, err error) {
+// DecryptBlob func just decrypt CryptoBlob back to Credential with key
+func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, err error) {
 	cryptoCred, err := hex.DecodeString(blob.Blob)
 	if err != nil {
 		return nil, fmt.Errorf("can't decode from hex: %v", err)

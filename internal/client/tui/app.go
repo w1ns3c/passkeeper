@@ -167,6 +167,11 @@ func (tuiApp *TUI) Logout() error {
 	tuiApp.Ctx = context.Background()
 	tuiApp.Usecase.Logout()
 
+	// delete pages
+	tuiApp.SubPages.RemovePage(SubPageCreds)
+	tuiApp.SubPages.RemovePage(SubPageBank)
+	tuiApp.SubPages.RemovePage(SubPageNotes)
+
 	return nil
 }
 
@@ -198,7 +203,7 @@ func (tuiApp *TUI) Run(ctx context.Context) error {
 
 		case tcell.KeyF3:
 			if tuiApp.Usecase.IsAuthed() {
-				tuiApp.SubformBank = NewBanking(tuiApp.Usecase.GetCards())
+				tuiApp.SubformBank = tuiApp.NewBanking(tuiApp.Usecase.GetCards())
 				item := tuiApp.FormCredsMenu.GetItem(0).(*Header)
 				item.ChangePage(2)
 				tuiApp.SubPages.AddPage(SubPageBank, tuiApp.SubformBank, true, false)

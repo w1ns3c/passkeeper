@@ -28,7 +28,7 @@ func (c *Credential) SetID(id string) {
 	c.ID = id
 }
 
-type CredBlob struct {
+type CryptoBlob struct {
 	ID     string // blob ID
 	UserID string // user's ID who owns credential
 	Blob   string // encrypted saved resource (credentials)
@@ -71,6 +71,7 @@ func (c *Note) SetID(id string) {
 	c.ID = id
 }
 
+// BlobType using for identify CryptoBlob type
 type BlobType int
 
 const (

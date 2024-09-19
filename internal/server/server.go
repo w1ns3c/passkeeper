@@ -2,18 +2,20 @@ package server
 
 import (
 	"fmt"
+
 	"github.com/rs/zerolog"
+
 	"passkeeper/internal/config"
 	"passkeeper/internal/logger"
 	mygrpc "passkeeper/internal/transport/grpc"
-	"passkeeper/internal/usecase/srv/credentialsUC"
+	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
 type Server struct {
 	addr  string // ex: localhost:8000
 	users usersUC.UserUsecaseInf
-	creds credentialsUC.CredUsecaseInf
+	creds blobsUC.BlobUsecaseInf
 
 	transport *mygrpc.TransportGRPC
 
@@ -84,7 +86,7 @@ func WithUCusers(uc usersUC.UserUsecaseInf) SrvOption {
 	}
 }
 
-func WithUCcreds(uc credentialsUC.CredUsecaseInf) SrvOption {
+func WithUCcreds(uc blobsUC.BlobUsecaseInf) SrvOption {
 	return func(srv *Server) {
 		srv.creds = uc
 	}
