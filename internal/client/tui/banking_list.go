@@ -44,17 +44,6 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 
 	list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 		//ind := list.GetCurrentItem()
-		delFunc := func() {
-			if list.GetItemCount() == 0 {
-				return
-			}
-
-			//delConfirm := DeleteModal(tuiApp, ind)
-			//pageConfirm := "confirmation"
-			//tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
-			//tuiApp.Pages.SwitchToPage(pageConfirm)
-		}
-
 		// inputs for bank cards
 		switch event.Key() {
 		case tcell.KeyEsc:
@@ -67,7 +56,7 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 			tuiApp.Pages.SwitchToPage(pageName)
 
 		case tcell.KeyDelete:
-			delFunc()
+			list.Delete(tuiApp, ind)
 		}
 
 		switch event.Rune() {
@@ -81,7 +70,7 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 			viewForm.Edit(tuiApp, ind, list)
 
 		case 'd':
-			delFunc()
+			list.Delete(tuiApp, ind)
 		case ' ':
 			//showFunc(false)
 			//viewForm.ShowSwitchPass()
@@ -91,8 +80,12 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 	})
 
 	list.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
-
-		card, _ := tuiApp.Usecase.GetCardByIND(ind)
+		card, err := tuiApp.Usecase.GetCardByIND(ind)
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("wrong ind")
+			return
+		}
 		viewForm.Rerender(card)
 	})
 
@@ -163,4 +156,15 @@ func GenCardShortName(card *entities.Card) string {
 	}
 
 	return res
+}
+
+func (list *CardList) Delete(tuiApp *TUI, ind int) {
+	if list.GetItemCount() == 0 {
+		return
+	}
+
+	delConfirm := DeleteModal(tuiApp, ind, entities.UserCard)
+	pageConfirm := "confirmation"
+	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
+	tuiApp.Pages.SwitchToPage(pageConfirm)
 }

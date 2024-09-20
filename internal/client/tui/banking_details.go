@@ -89,10 +89,30 @@ func (form *CardDetails) Rerender(card *entities.Card) {
 	form.FieldName.SetText(card.Name)
 	form.FieldBank.SetTextOptions("", "", "", "", card.Bank)
 	form.FieldPerson.SetText(card.Person)
-	form.FieldNumber.SetText(strconv.Itoa(card.Number))
+
+	num := strconv.Itoa(card.Number)
+	if num == "0" {
+		form.FieldNumber.SetText("")
+	} else {
+		form.FieldNumber.SetText(num)
+	}
+
 	form.FieldExpiration.SetText(card.Expiration.Format(bankingExpirationFormat))
-	form.FieldCVC.SetText(strconv.Itoa(card.CVC))
-	form.FieldPIN.SetText(strconv.Itoa(card.PIN))
+
+	cvc := strconv.Itoa(card.CVC)
+	if cvc == "0" {
+		form.FieldCVC.SetText("")
+	} else {
+		form.FieldCVC.SetText(cvc)
+	}
+
+	pin := strconv.Itoa(card.PIN)
+	if pin == "0" {
+		form.FieldPIN.SetText("")
+	} else {
+		form.FieldPIN.SetText(pin)
+	}
+
 	form.FieldDesc.SetText(card.Description, true)
 	form.CurrentCard = card
 }

@@ -54,6 +54,8 @@ Please, give me some comments and advices for my code in review.
 - [ ] TUI clean fields (notes->date, cards->number,cvc,pin)
 - [ ] TUI beautify cards number fields to "0000 0000 0000 0000"
 - [ ] TUI move both login/register forms to center align 
+- [ ] TUI subpage: bank cards not auto update after delete card
+- [ ] TUI subpage: notes not auto update after delete note
 
 ## Fill Readme.md
 - [ ] Add gif to show functionality

@@ -2,9 +2,11 @@ package tui
 
 import (
 	"github.com/rivo/tview"
+
+	"passkeeper/internal/entities"
 )
 
-func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
+func DeleteModal(tuiApp *TUI, ind int, blobType entities.BlobType) *tview.Modal {
 	btn1Name := "Yes"
 	btn2Name := "No"
 
@@ -13,7 +15,7 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 		AddButtons([]string{btn1Name, btn2Name}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == btn1Name {
-				err := tuiApp.Usecase.DelBlob(tuiApp.Ctx, ind)
+				err := tuiApp.Usecase.DelBlob(tuiApp.Ctx, ind, blobType)
 				if err != nil {
 					tuiApp.log.Error().
 						Err(err).Msg("can't delete cred on server side")
@@ -26,12 +28,15 @@ func DeleteModal(tuiApp *TUI, ind int) *tview.Modal {
 				tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
 
 				pageDel := "deleted"
-				deletedPage := NewModalWithParams(tuiApp, "Credential successful deleted!", SubPageCreds)
+				deletedPage := NewModalWithParams(tuiApp, "Credential successful deleted!", PageCredsMenu)
 				tuiApp.Pages.AddPage(pageDel, deletedPage, true, false)
 				tuiApp.Pages.SwitchToPage(pageDel)
+
+				tuiApp.Rerender()
 			}
+
 			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(SubPageCreds)
+				tuiApp.Pages.SwitchToPage(PageCredsMenu)
 			}
 		}).
 		SetFocus(1)

@@ -285,3 +285,29 @@ func genHelp(page string) string {
 		prefix+"(Ctrl+L)      - to logout\n", page, page, page, page)
 
 }
+
+func (tuiApp *TUI) Rerender() {
+	page, _ := tuiApp.SubPages.GetFrontPage()
+	var ind int
+
+	switch page {
+	case SubPageCreds:
+		ind = 1
+	case SubPageBank:
+		ind = 2
+	case SubPageNotes:
+		ind = 3
+	}
+
+	tuiApp.SubformCreds = NewCredsList(tuiApp)
+	tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
+	tuiApp.SubformBank = tuiApp.NewBanking(tuiApp.Usecase.GetCards())
+	tuiApp.SubPages.AddPage(SubPageBank, tuiApp.SubformBank, true, false)
+	tuiApp.SubformNotes = NewNotes(tuiApp.Usecase.GetNotes())
+	tuiApp.SubPages.AddPage(SubPageNotes, tuiApp.SubformNotes, true, false)
+
+	item := tuiApp.FormCredsMenu.GetItem(0).(*Header)
+	item.ChangePage(ind)
+
+	tuiApp.SubPages.SwitchToPage(page)
+}

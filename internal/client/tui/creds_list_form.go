@@ -3,6 +3,8 @@ package tui
 import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
+
+	"passkeeper/internal/entities"
 )
 
 type CredListInf interface {
@@ -83,7 +85,13 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 	credList.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
 		viewForm.ShowFields()
 		viewForm.EmptyFields()
-		cred, _ := tuiApp.Usecase.GetCredByIND(ind)
+		cred, err := tuiApp.Usecase.GetCredByIND(ind)
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("wrong ind")
+			return
+		}
+
 		viewForm.SetCurrentCred(cred)
 		viewForm.HidePassword()
 	})
@@ -95,7 +103,7 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 				return
 			}
 
-			delConfirm := DeleteModal(tuiApp, ind)
+			delConfirm := DeleteModal(tuiApp, ind, entities.UserCred)
 			pageConfirm := "confirmation"
 			tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 			tuiApp.Pages.SwitchToPage(pageConfirm)

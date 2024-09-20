@@ -29,7 +29,7 @@ type ClientUsecase interface {
 	GetBlobs(ctx context.Context) (err error)
 	EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error)
 	AddBlob(ctx context.Context, cred entities.CredInf) (err error)
-	DelBlob(ctx context.Context, ind int) (err error)
+	DelBlob(ctx context.Context, ind int, blobType entities.BlobType) (err error)
 
 	GetCredByIND(credIND int) (cred *entities.Credential, err error)
 	GetCardByIND(cardIND int) (cred *entities.Card, err error)

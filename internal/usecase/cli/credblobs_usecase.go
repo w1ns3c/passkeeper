@@ -63,10 +63,23 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 }
 
 func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error) {
-
-	//ID:          form.tuiApp.Creds[ind].ID,
-	// update credID
-	//cred.SetID(c.Creds[ind].ID)
+	// check that blob with ind exist
+	switch cred.(type) {
+	case *entities.Credential:
+		if ind < 0 && ind >= len(c.Creds) {
+			return fmt.Errorf("invalid index of creds")
+		}
+	case *entities.Card:
+		if ind < 0 && ind >= len(c.Cards) {
+			return fmt.Errorf("invalid index of cards")
+		}
+	case *entities.Note:
+		if ind < 0 && ind >= len(c.Notes) {
+			return fmt.Errorf("invalid index of notes")
+		}
+	default:
+		return fmt.Errorf("unknown type of blob")
+	}
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {
@@ -183,14 +196,37 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 	return nil
 }
 
-func (c *ClientUC) DelBlob(ctx context.Context, ind int) (err error) {
-	if ind < 0 && ind >= len(c.Creds) {
-		return fmt.Errorf("invalid index")
+func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobType) (err error) {
+	var delID string
+
+	// check that blob with ind exist
+	switch blobType {
+	case entities.UserCred:
+		tmp, err := c.GetCredByIND(ind)
+		if err != nil {
+			return fmt.Errorf("invalid index of creds")
+		}
+		delID = tmp.ID
+
+	case entities.UserCard:
+		tmp, err := c.GetCardByIND(ind)
+		if err != nil {
+			return fmt.Errorf("invalid index of creds")
+		}
+		delID = tmp.ID
+
+	case entities.UserNote:
+		tmp, err := c.GetNoteByIND(ind)
+		if err != nil {
+			return fmt.Errorf("invalid index of notes")
+		}
+		delID = tmp.ID
+
+	default:
+		return fmt.Errorf("unknown type of blob")
 	}
 
-	credID := c.Creds[ind].ID
-
-	req := &pb.BlobDelRequest{CredID: credID}
+	req := &pb.BlobDelRequest{CredID: delID}
 	_, err = c.credsSvc.BlobDel(ctx, req)
 	if err != nil {
 
@@ -199,55 +235,63 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int) (err error) {
 
 	c.m.Lock()
 	defer c.m.Unlock()
-	newCreds, err := entities.Delete(c.Creds, ind)
-	if err != nil {
-		return err
+
+	// update blobs values
+	switch blobType {
+	case entities.UserCred:
+		newCreds, err := entities.DeleteCred(c.Creds, ind)
+		if err != nil {
+			return err
+		}
+		c.Creds = newCreds
+
+	case entities.UserCard:
+		newCards, err := entities.DeleteCard(c.Cards, ind)
+		if err != nil {
+			return err
+		}
+		c.Cards = newCards
+
+	case entities.UserNote:
+		newNotes, err := entities.DeleteNote(c.Notes, ind)
+		if err != nil {
+			return err
+		}
+		c.Notes = newNotes
+
+	default:
+		return fmt.Errorf("unknown type of blob")
 	}
-	c.Creds = newCreds
 
 	return err
 }
 
-func (c *ClientUC) GetCreds() []*entities.Credential {
-	c.m.Lock()
-
-	tmpCreds := make([]*entities.Credential, len(c.Creds))
-	copy(tmpCreds, c.Creds)
-
-	c.m.Unlock()
-
-	return tmpCreds
-}
-
 func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) {
+	c.m.Lock()
+	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Creds) {
 		return nil, fmt.Errorf("invalid index")
 	}
-
-	c.m.Lock()
-	defer c.m.Unlock()
 
 	return c.Creds[ind], nil
 }
 
 func (c *ClientUC) GetCardByIND(ind int) (card *entities.Card, err error) {
+	c.m.Lock()
+	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Cards) {
 		return nil, fmt.Errorf("invalid index")
 	}
-
-	c.m.Lock()
-	defer c.m.Unlock()
 
 	return c.Cards[ind], nil
 }
 
 func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
+	c.m.Lock()
+	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Notes) {
 		return nil, fmt.Errorf("invalid index")
 	}
-
-	c.m.Lock()
-	defer c.m.Unlock()
 
 	return c.Notes[ind], nil
 }
@@ -270,6 +314,17 @@ func SortNotesByDate(notes []*entities.Note) {
 		}
 		return false
 	})
+}
+
+func (c *ClientUC) GetCreds() []*entities.Credential {
+	c.m.Lock()
+
+	tmpCreds := make([]*entities.Credential, len(c.Creds))
+	copy(tmpCreds, c.Creds)
+
+	c.m.Unlock()
+
+	return tmpCreds
 }
 
 func (c *ClientUC) GetCards() []*entities.Card {

@@ -107,12 +107,28 @@ func Add(creds []*Credential, res, login, password, desc string) (newCreds []*Cr
 	return creds, nil
 }
 
-func Delete(creds []*Credential, ind int) (newCreds []*Credential, err error) {
+func DeleteCred(creds []*Credential, ind int) (newCreds []*Credential, err error) {
 	for i := ind; i < len(creds)-1; i++ {
 		creds[i] = creds[i+1]
 	}
 	creds = creds[:len(creds)-1]
 	return creds, nil
+}
+
+func DeleteCard(cards []*Card, ind int) (newCards []*Card, err error) {
+	for i := ind; i < len(cards)-1; i++ {
+		cards[i] = cards[i+1]
+	}
+	cards = cards[:len(cards)-1]
+	return cards, nil
+}
+
+func DeleteNote(notes []*Note, ind int) (newCreds []*Note, err error) {
+	for i := ind; i < len(notes)-1; i++ {
+		notes[i] = notes[i+1]
+	}
+	notes = notes[:len(notes)-1]
+	return notes, nil
 }
 
 func GenHash(s string) string {
