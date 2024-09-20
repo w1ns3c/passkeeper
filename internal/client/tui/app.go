@@ -213,7 +213,7 @@ func (tuiApp *TUI) Run(ctx context.Context) error {
 			}
 		case tcell.KeyF4:
 			if tuiApp.Usecase.IsAuthed() {
-				tuiApp.SubformNotes = NewNotes(tuiApp.Usecase.GetNotes())
+				tuiApp.SubformNotes = tuiApp.NewNotes(tuiApp.Usecase.GetNotes())
 				item := tuiApp.FormCredsMenu.GetItem(0).(*Header)
 				item.ChangePage(3)
 				tuiApp.SubPages.AddPage(SubPageNotes, tuiApp.SubformNotes, true, false)
@@ -305,7 +305,7 @@ func (tuiApp *TUI) Rerender() {
 	tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
 	tuiApp.SubformBank = tuiApp.NewBanking(tuiApp.Usecase.GetCards())
 	tuiApp.SubPages.AddPage(SubPageBank, tuiApp.SubformBank, true, false)
-	tuiApp.SubformNotes = NewNotes(tuiApp.Usecase.GetNotes())
+	tuiApp.SubformNotes = tuiApp.NewNotes(tuiApp.Usecase.GetNotes())
 	tuiApp.SubPages.AddPage(SubPageNotes, tuiApp.SubformNotes, true, false)
 
 	item := tuiApp.FormCredsMenu.GetItem(0).(*Header)

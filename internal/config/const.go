@@ -19,5 +19,6 @@ const (
 	SyncMin     = time.Second * 1
 	SyncDefault = time.Second * 10
 
-	MaxNameLen = 10
+	MaxNameLen     = 10
+	MaxTextAreaLen = 200
 )

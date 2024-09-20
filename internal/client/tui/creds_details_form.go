@@ -5,6 +5,7 @@ import (
 
 	"github.com/rivo/tview"
 
+	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
 )
@@ -47,6 +48,7 @@ func NewDetailsForm(tuiApp *TUI) *Details {
 		CancelLabel: "Cancel",
 		FieldWidth:  40,
 		FieldHeight: 6,
+		maxSigns:    config.MaxTextAreaLen,
 	}
 	form.
 		SetBorder(true).

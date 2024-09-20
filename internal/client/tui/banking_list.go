@@ -43,7 +43,7 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 		AddItem(subFlex, 0, 3, false)
 
 	list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		//ind := list.GetCurrentItem()
+
 		// inputs for bank cards
 		switch event.Key() {
 		case tcell.KeyEsc:
@@ -71,9 +71,6 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 
 		case 'd':
 			list.Delete(tuiApp, ind)
-		case ' ':
-			//showFunc(false)
-			//viewForm.ShowSwitchPass()
 		}
 
 		return event

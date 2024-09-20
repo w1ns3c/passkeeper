@@ -39,7 +39,7 @@ func (tuiApp *TUI) RerenderCreds() {
 			// reinit subpages
 			tuiApp.SubformCreds = NewCredsList(tuiApp)
 			tuiApp.SubformBank = tuiApp.NewBanking(tuiApp.Usecase.GetCards())
-			tuiApp.SubformNotes = NewNotes(tuiApp.Usecase.GetNotes())
+			tuiApp.SubformNotes = tuiApp.NewNotes(tuiApp.Usecase.GetNotes())
 
 			tuiApp.SubPages.RemovePage(SubPageCreds)
 			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)

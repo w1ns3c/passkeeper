@@ -14,7 +14,7 @@ var (
 	HintTextNotes = "note"
 )
 
-func NewNotes(notes []*entities.Note) *tview.Flex {
+func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
 	var form *NoteDetails
 
 	list := NewNotesList(notes)
@@ -45,17 +45,6 @@ func NewNotes(notes []*entities.Note) *tview.Flex {
 		AddItem(subFlex, 0, 3, false)
 
 	list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-		//ind := list.GetCurrentItem()
-		delFunc := func() {
-			if list.GetItemCount() == 0 {
-				return
-			}
-
-			//delConfirm := DeleteModal(tuiApp, ind)
-			//pageConfirm := "confirmation"
-			//tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
-			//tuiApp.Pages.SwitchToPage(pageConfirm)
-		}
 
 		// inputs for credList
 		switch event.Key() {
@@ -63,13 +52,13 @@ func NewNotes(notes []*entities.Note) *tview.Flex {
 			fallthrough
 		case tcell.KeyCtrlL:
 
-			//pageName := "Logout"
-			//logoutModal := LogoutModal(tuiApp)
-			//tuiApp.Pages.AddPage(pageName, logoutModal, true, false)
-			//tuiApp.Pages.SwitchToPage(pageName)
+			pageName := "Logout"
+			logoutModal := LogoutModal(tuiApp)
+			tuiApp.Pages.AddPage(pageName, logoutModal, true, false)
+			tuiApp.Pages.SwitchToPage(pageName)
 
 		case tcell.KeyDelete:
-			delFunc()
+			list.Delete(tuiApp, ind)
 		}
 
 		switch event.Rune() {
@@ -83,10 +72,7 @@ func NewNotes(notes []*entities.Note) *tview.Flex {
 			//viewForm.Edit(ind, credList)
 
 		case 'd':
-			delFunc()
-		case ' ':
-			//showFunc(false)
-			//viewForm.ShowSwitchPass()
+			list.Delete(tuiApp, ind)
 		}
 
 		return event
@@ -146,6 +132,7 @@ func (list *NotesList) Rerender(notes []*entities.Note) {
 		}
 	}
 }
+
 func GenNoteShortName(note *entities.Note) string {
 	if note == nil {
 		return ""
@@ -171,4 +158,15 @@ func GenNoteShortName(note *entities.Note) string {
 	}
 
 	return res
+}
+
+func (list *NotesList) Delete(tuiApp *TUI, ind int) {
+	if list.GetItemCount() == 0 {
+		return
+	}
+
+	delConfirm := DeleteModal(tuiApp, ind, entities.UserNote)
+	pageConfirm := "confirmation"
+	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
+	tuiApp.Pages.SwitchToPage(pageConfirm)
 }

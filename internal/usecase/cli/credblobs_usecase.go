@@ -34,7 +34,6 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 
 		tmpCred, err := hashes.DecryptBlob(blob, c.User.Secret)
 		if err != nil {
-			// TODO handle ERRORS!!!
 			c.log.Error().
 				Err(err).Msg("can't decrypt cipher blob")
 
@@ -59,10 +58,18 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	SortNotesByDate(notes)
 
 	c.m.Lock()
+	defer c.m.Unlock()
+
 	c.Creds = creds
 	c.Cards = cards
 	c.Notes = notes
-	c.m.Unlock()
+
+	c.log.Info().Msgf("sync sum blobs:  %d", len(resp.Blobs))
+	c.log.Info().Msgf("decrypted blobs: %d", len(c.Creds)+len(c.Cards)+len(c.Notes))
+	c.log.Info().
+		Int("creds", len(c.Creds)).
+		Int("cards", len(c.Cards)).
+		Int("notes", len(c.Notes)).Msgf("blobs by type:")
 
 	return nil
 }
@@ -109,26 +116,35 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 
 	c.m.Lock()
 	defer c.m.Unlock()
+
+	var blobT string
+
 	// save creds in local app
 	switch cred.(type) {
 	case *entities.Credential:
 		if err = entities.SaveCred(c.Creds, ind, cred.(*entities.Credential)); err != nil {
 			return err
 		}
+		blobT = "credential"
 
 	case *entities.Card:
 		if err = entities.SaveCard(c.Cards, ind, cred.(*entities.Card)); err != nil {
 			return err
 		}
+		blobT = "card"
 
 	case *entities.Note:
 		if err = entities.SaveNote(c.Notes, ind, cred.(*entities.Note)); err != nil {
 			return err
 		}
+		blobT = "note"
 
 	default:
 		return fmt.Errorf("unknown credential type")
 	}
+
+	c.log.Info().
+		Str("id", cred.GetID()).Msgf("blob (%s) deleted", blobT)
 
 	return err
 }
@@ -163,6 +179,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 	c.m.Lock()
 	defer c.m.Unlock()
 
+	var blobT string
 	switch cred.(type) {
 	case *entities.Credential:
 		tmpCreds, err := entities.AddCred(c.Creds, cred.(*entities.Credential))
@@ -173,6 +190,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 			return err
 		}
 		c.Creds = tmpCreds
+		blobT = "credential"
 
 	case *entities.Card:
 		tmpCards, err := entities.AddCard(c.Cards, cred.(*entities.Card))
@@ -183,6 +201,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 			return err
 		}
 		c.Cards = tmpCards
+		blobT = "card"
 
 	case *entities.Note:
 		tmpNotes, err := entities.AddNote(c.Notes, cred.(*entities.Note))
@@ -193,10 +212,14 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 			return err
 		}
 		c.Notes = tmpNotes
+		blobT = "note"
 
 	default:
 		return fmt.Errorf("unknown credential type")
 	}
+
+	c.log.Info().
+		Str("id", cred.GetID()).Msgf("blob (%s) added", blobT)
 
 	return nil
 }
@@ -241,6 +264,8 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 	c.m.Lock()
 	defer c.m.Unlock()
 
+	var blobT string
+
 	// update blobs values
 	switch blobType {
 	case entities.UserCred:
@@ -249,6 +274,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 			return err
 		}
 		c.Creds = newCreds
+		blobT = "credential"
 
 	case entities.UserCard:
 		newCards, err := entities.DeleteCard(c.Cards, ind)
@@ -256,6 +282,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 			return err
 		}
 		c.Cards = newCards
+		blobT = "card"
 
 	case entities.UserNote:
 		newNotes, err := entities.DeleteNote(c.Notes, ind)
@@ -263,10 +290,14 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 			return err
 		}
 		c.Notes = newNotes
+		blobT = "note"
 
 	default:
 		return fmt.Errorf("unknown type of blob")
 	}
+
+	c.log.Info().
+		Str("id", delID).Msgf("blob (%s) deleted", blobT)
 
 	return err
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/rivo/tview"
 
+	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
 )
@@ -68,6 +69,10 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 		FieldPIN:    tview.NewInputField().SetLabel("PIN").SetText(strconv.Itoa(card.PIN)),
 		FieldDesc:   tview.NewTextArea().SetLabel("Description:").SetText(card.Description, true),
 		CurrentCard: card,
+
+		FieldWidth:  40,
+		FieldHeight: 6,
+		maxSigns:    config.MaxTextAreaLen,
 	}
 
 	form.Form.SetBorder(true).
@@ -80,7 +85,7 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 	form.Form.AddFormItem(form.FieldExpiration)
 	form.Form.AddFormItem(form.FieldCVC)
 	form.Form.AddFormItem(form.FieldPIN)
-	form.Form.AddFormItem(form.FieldDesc)
+	form.Form.AddFormItem(form.FieldDesc.SetMaxLength(form.maxSigns))
 
 	return form
 }
@@ -94,6 +99,7 @@ func (form *CardDetails) Rerender(card *entities.Card) {
 	if num == "0" {
 		form.FieldNumber.SetText("")
 	} else {
+		num = BeautifyCard(num)
 		form.FieldNumber.SetText(num)
 	}
 
@@ -154,8 +160,6 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 		//defer continue cred sync
 		tuiApp.Usecase.ContinueSync()
 
-		tuiApp.log.Info().
-			Str("id", newCard.ID).Msg("cred added")
 	})
 
 	form.AddButton("Cancel", func() {
@@ -357,4 +361,17 @@ func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) 
 	newCard.PIN = pin
 
 	return newCard, nil
+}
+
+func BeautifyCard(number string) string {
+	var newNum string
+	for ind, s := range number {
+		newNum += string(s)
+
+		if ind+1%4 == 0 {
+			newNum += " "
+		}
+	}
+
+	return strings.TrimSpace(newNum)
 }
