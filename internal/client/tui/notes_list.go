@@ -66,9 +66,9 @@ func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
 			tuiApp.App.SetFocus(viewForm)
 			viewForm.Add(tuiApp, ind, list)
 		case 'e':
-			//tuiApp.Usecase.StopSync()
-			//tuiApp.App.SetFocus(viewForm)
-			//viewForm.Edit(ind, credList)
+			tuiApp.Usecase.StopSync()
+			tuiApp.App.SetFocus(viewForm)
+			viewForm.Edit(tuiApp, ind, list)
 
 		case 'd':
 			list.Delete(tuiApp, ind)

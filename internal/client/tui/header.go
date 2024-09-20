@@ -18,7 +18,7 @@ func NewHeader(ind int) *Header {
 	pgView := tview.NewFlex().
 		AddItem(tview.NewTextView(), 0, 1, false).
 		AddItem(tview.NewTextView().SetText("F2 - Resources"), 0, 3, false).
-		AddItem(tview.NewTextView().SetText("F3 - Bank cards"), 0, 3, false).
+		AddItem(tview.NewTextView().SetText("F3 - Bank Cards"), 0, 3, false).
 		AddItem(tview.NewTextView().SetText("F4 - User Notes"), 0, 3, false).
 		AddItem(tview.NewTextView().SetText("F5 - Files"), 0, 3, false).
 		AddItem(tview.NewTextView(), 0, 1, false)

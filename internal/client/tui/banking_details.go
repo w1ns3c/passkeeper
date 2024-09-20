@@ -30,12 +30,6 @@ type CardDetails struct {
 	FieldPIN        *tview.InputField
 	FieldDesc       *tview.TextArea
 
-	BtnSave   *tview.Button
-	BtnCancel *tview.Button
-
-	SaveLabel   string
-	CancelLabel string
-
 	CurrentCard *entities.Card
 
 	// fields sizes
@@ -56,17 +50,16 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 	bank.SetTextOptions("", "", "", "", card.Bank)
 
 	form := &CardDetails{
-		Form:        tview.NewForm(),
-		FieldName:   tview.NewInputField().SetLabel("Name:").SetText(card.Name),
-		FieldBank:   bank,
-		FieldPerson: tview.NewInputField().SetLabel("Person:").SetText(card.Person),
-		FieldNumber: tview.NewInputField().SetLabel("Number:").SetText(strconv.Itoa(card.Number)),
-		FieldExpiration: tview.NewInputField().SetLabel("Expiration").
-			SetText(card.Expiration.Format(bankingExpirationFormat)),
-		FieldCVC:    tview.NewInputField().SetLabel("CVC").SetText(strconv.Itoa(card.CVC)),
-		FieldPIN:    tview.NewInputField().SetLabel("PIN").SetText(strconv.Itoa(card.PIN)),
-		FieldDesc:   tview.NewTextArea().SetLabel("Description:").SetText(card.Description, true),
-		CurrentCard: card,
+		Form:            tview.NewForm(),
+		FieldName:       tview.NewInputField().SetLabel("Name:").SetText(card.Name),
+		FieldBank:       bank,
+		FieldPerson:     tview.NewInputField().SetLabel("Person:").SetText(card.Person),
+		FieldNumber:     tview.NewInputField().SetLabel("Number:").SetText(BeautifyCard(strconv.Itoa(card.Number))),
+		FieldExpiration: tview.NewInputField().SetLabel("Expiration").SetText(card.Expiration.Format(bankingExpirationFormat)),
+		FieldCVC:        tview.NewInputField().SetLabel("CVC").SetText(strconv.Itoa(card.CVC)),
+		FieldPIN:        tview.NewInputField().SetLabel("PIN").SetText(strconv.Itoa(card.PIN)),
+		FieldDesc:       tview.NewTextArea().SetLabel("Description:").SetText(card.Description, true),
+		CurrentCard:     card,
 
 		FieldWidth:  40,
 		FieldHeight: 6,
@@ -121,6 +114,7 @@ func (form *CardDetails) Rerender(card *entities.Card) {
 	form.CurrentCard = card
 }
 
+// Add responsible for TUI of adding new entities.Card
 func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 	form.EmptyFields()
 
@@ -190,6 +184,7 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 
 }
 
+// Edit responsible for TUI of editing current selected entities.Card
 func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 	tmp := tuiApp.Usecase.GetCards()
 	if tmp == nil || len(tmp) <= ind || len(tmp) == 0 {
@@ -211,7 +206,7 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 		editedCard, err := form.GetCurrentValues()
 		if err != nil {
 			tuiApp.log.Error().
-				Err(err).Msg("failed to edit new card on client side")
+				Err(err).Msg("failed to edit card on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
 			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageCredUpdError)
@@ -223,7 +218,7 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 
 		if err := tuiApp.Usecase.EditBlob(tuiApp.Ctx, editedCard, ind); err != nil {
 			tuiApp.log.Error().
-				Err(err).Msg("failed to edit new card on server side")
+				Err(err).Msg("failed to edit card on server side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
 			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageCredUpdError)
@@ -242,8 +237,6 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 		//defer continue cred sync
 		tuiApp.Usecase.ContinueSync()
 
-		tuiApp.log.Info().
-			Str("id", editedCard.ID).Msg("cred updated")
 	})
 
 	form.AddButton("Cancel", func() {
@@ -255,13 +248,19 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 		// rerender credsList
 		defer tuiApp.App.SetFocus(list)
 		if tuiApp.Usecase.CredsLen() > 0 {
-			card, _ := tuiApp.Usecase.GetCardByIND(ind)
+			card, err := tuiApp.Usecase.GetCardByIND(ind)
+			if err != nil {
+				tuiApp.log.Error().
+					Err(err).Msg("can't get current card")
+
+				return
+			}
 			form.Rerender(card)
+
 			return
 		}
 
 		// clear fields if there isn't any blobsUC
-		//form.EmptyFields()
 		form.HideFields()
 	})
 
@@ -364,10 +363,10 @@ func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) 
 // BeautifyCard try to beauty card number to "0000 0000 0000 0000"
 func BeautifyCard(number string) string {
 	var newNum string
-	for ind, s := range number {
-		newNum += string(s)
+	for ind := 0; ind < len(number); ind++ {
+		newNum += string(number[ind])
 
-		if ind+1%4 == 0 {
+		if (ind+1)%4 == 0 {
 			newNum += " "
 		}
 	}

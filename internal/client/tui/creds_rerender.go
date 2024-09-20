@@ -22,13 +22,13 @@ func (tuiApp *TUI) RerenderCreds() {
 			// don't rerender forms if user edit/add new cred in tui
 			if tuiApp.Usecase.CheckSync() {
 				tuiApp.log.Info().
-					Msg("not time to sync creds: user changing them")
+					Msg("not time to sync blobs: user changing them")
 
 				continue
 			}
 
 			tuiApp.log.Info().
-				Msg("get new list of creds, time to rerender all")
+				Msg("get new list of blobs, time to rerender all")
 
 			// check that is focused
 			if !tuiApp.SubformCreds.HasFocus() {

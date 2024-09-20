@@ -18,12 +18,6 @@ type NoteDetails struct {
 	FieldDate *tview.InputField
 	FieldBody *tview.TextArea
 
-	BtnSave   *tview.Button
-	BtnCancel *tview.Button
-
-	SaveLabel   string
-	CancelLabel string
-
 	CurrentNote *entities.Note
 
 	// fields sizes
@@ -38,15 +32,10 @@ func NewNoteDetails(note *entities.Note) *NoteDetails {
 	}
 
 	form := &NoteDetails{
-		Form:      tview.NewForm(),
-		FieldName: tview.NewInputField().SetLabel("Name:").SetText(note.Name),
-		FieldDate: tview.NewInputField().SetLabel("Date").
-			SetText(note.Date.Format(time.DateTime)),
+		Form:        tview.NewForm(),
+		FieldName:   tview.NewInputField().SetLabel("Name:").SetText(note.Name),
+		FieldDate:   tview.NewInputField().SetLabel("Date").SetText(note.Date.Format(time.DateTime)),
 		FieldBody:   tview.NewTextArea().SetLabel("Note:").SetText(note.Body, true),
-		BtnSave:     nil,
-		BtnCancel:   nil,
-		SaveLabel:   "",
-		CancelLabel: "",
 		CurrentNote: note,
 		FieldWidth:  40,
 		FieldHeight: 6,
@@ -68,10 +57,12 @@ func NewNoteDetails(note *entities.Note) *NoteDetails {
 
 func (form *NoteDetails) Rerender(note *entities.Note) {
 	form.FieldName.SetText(note.Name)
+	form.FieldDate.SetText(note.Date.Format(time.DateTime))
 	form.FieldBody.SetText(note.Body, true)
 	form.CurrentNote = note
 }
 
+// Add responsible for TUI of adding new entities.Note
 func (form *NoteDetails) Add(tuiApp *TUI, ind int, list *NotesList) {
 	form.EmptyFields()
 	form.AddButton("Save", func() {
@@ -136,6 +127,88 @@ func (form *NoteDetails) Add(tuiApp *TUI, ind int, list *NotesList) {
 		}
 
 		form.Rerender(curNote)
+	})
+}
+
+// Edit responsible for TUI of editing current selected entities.Note
+func (form *NoteDetails) Edit(tuiApp *TUI, ind int, list *NotesList) {
+	tmp := tuiApp.Usecase.GetNotes()
+	if tmp == nil || len(tmp) <= ind || len(tmp) == 0 {
+		return
+	}
+
+	form.AddButton("Save", func() {
+		cur, err := tuiApp.Usecase.GetNoteByIND(ind)
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("failed to edit note on client side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
+			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+
+			return
+		}
+
+		editedNote, err := form.GetCurrentValues()
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("failed to edit note on client side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
+			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+
+			return
+		}
+
+		editedNote.SetID(cur.GetID())
+
+		if err := tuiApp.Usecase.EditBlob(tuiApp.Ctx, editedNote, ind); err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("failed to edit note on server side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
+			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+
+			return
+		}
+
+		// rerender credsList
+		list.Rerender(tuiApp.Usecase.GetNotes())
+		form.Rerender(editedNote)
+		tuiApp.App.SetFocus(list)
+
+		// hide buttons
+		form.HideButtons()
+
+		//defer continue cred sync
+		tuiApp.Usecase.ContinueSync()
+
+	})
+
+	form.AddButton("Cancel", func() {
+		//defer continue cred sync
+		defer tuiApp.Usecase.ContinueSync()
+
+		// defer remove buttons
+		defer form.HideButtons()
+		// rerender credsList
+		defer tuiApp.App.SetFocus(list)
+		if tuiApp.Usecase.CredsLen() > 0 {
+			note, err := tuiApp.Usecase.GetNoteByIND(ind)
+			if err != nil {
+				tuiApp.log.Error().
+					Err(err).Msg("can't get current note")
+
+				return
+			}
+			form.Rerender(note)
+
+			return
+		}
+
+		// clear fields if there isn't any blobsUC
+		//form.EmptyFields()
+		form.HideFields()
 	})
 }
 

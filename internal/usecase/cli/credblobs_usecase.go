@@ -144,7 +144,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 	}
 
 	c.log.Info().
-		Str("id", cred.GetID()).Msgf("blob (%s) deleted", blobT)
+		Str("id", cred.GetID()).Msgf("blob (%s) updated", blobT)
 
 	return err
 }

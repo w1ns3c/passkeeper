@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"errors"
+
 	"passkeeper/internal/entities"
 
 	"passkeeper/internal/usecase/srv/usersUC"
@@ -54,8 +55,6 @@ func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegiste
 		return nil, ErrRegister
 	}
 
-	//ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
-
 	resp = &pb.UserRegisterResponse{
 		Token:     token,
 		SrvSecret: secret,
@@ -76,8 +75,6 @@ func (h *UsersHandler) LoginUser(ctx context.Context,
 
 		return nil, ErrWrongLogin
 	}
-
-	//ctx = metadata.AppendToOutgoingContext(ctx, config.TokenHeader, token)
 
 	resp = &pb.UserLoginResponse{
 		Token:     token,
