@@ -9,15 +9,15 @@ import (
 )
 
 var (
-	ErrPassNotFound = fmt.Errorf("password not exist")
+	ErrBlobNotFound = fmt.Errorf("blob not exist")
 	ErrUserNotFound = fmt.Errorf("user not exist")
 )
 
 type MemStorage struct {
-	users     map[string]*entities.User
-	usersMU   *sync.RWMutex
-	passwords map[string][]*entities.CryptoBlob
-	passMU    *sync.RWMutex
+	users   map[string]*entities.User
+	usersMU *sync.RWMutex
+	blobs   map[string][]*entities.CryptoBlob
+	blobMU  *sync.RWMutex
 }
 
 func NewMemStorage(options ...MemOptions) *MemStorage {
@@ -30,10 +30,10 @@ func NewMemStorage(options ...MemOptions) *MemStorage {
 
 func NewEmptyMemStorage() *MemStorage {
 	return &MemStorage{
-		users:     make(map[string]*entities.User),
-		usersMU:   &sync.RWMutex{},
-		passwords: make(map[string][]*entities.CryptoBlob),
-		passMU:    &sync.RWMutex{},
+		users:   make(map[string]*entities.User),
+		usersMU: &sync.RWMutex{},
+		blobs:   make(map[string][]*entities.CryptoBlob),
+		blobMU:  &sync.RWMutex{},
 	}
 }
 
@@ -51,7 +51,7 @@ func WithUsers(users map[string]*entities.User) MemOptions {
 // with encrypted blobs
 func WithBlobs(passwords map[string][]*entities.CryptoBlob) MemOptions {
 	return func(s *MemStorage) {
-		s.passwords = passwords
+		s.blobs = passwords
 	}
 }
 
@@ -60,16 +60,16 @@ func (m *MemStorage) Init(ctx context.Context) error {
 		m.usersMU = &sync.RWMutex{}
 	}
 
-	if m.passMU == nil {
-		m.passMU = &sync.RWMutex{}
+	if m.blobMU == nil {
+		m.blobMU = &sync.RWMutex{}
 	}
 
 	if m.users == nil {
 		m.users = make(map[string]*entities.User)
 	}
 
-	if m.passwords == nil {
-		m.passwords = make(map[string][]*entities.CryptoBlob)
+	if m.blobs == nil {
+		m.blobs = make(map[string][]*entities.CryptoBlob)
 	}
 
 	return nil

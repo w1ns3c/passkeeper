@@ -154,6 +154,8 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 		//defer continue cred sync
 		tuiApp.Usecase.ContinueSync()
 
+		tuiApp.log.Info().
+			Str("id", newCard.ID).Msg("cred added")
 	})
 
 	form.AddButton("Cancel", func() {
@@ -173,6 +175,15 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 		// clear fields if there isn't any blobsUC
 		//form.EmptyFields()
 		form.HideFields()
+
+		curCard, err := tuiApp.Usecase.GetCardByIND(list.GetCurrentItem())
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("can't get current card")
+
+		}
+
+		form.Rerender(curCard)
 	})
 
 }
@@ -206,14 +217,7 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 			return
 		}
 
-		cur.Name = editedCard.Name
-		cur.Bank = editedCard.Bank
-		cur.Person = editedCard.Person
-		cur.Number = editedCard.Number
-		cur.Expiration = editedCard.Expiration
-		cur.CVC = editedCard.CVC
-		cur.PIN = editedCard.PIN
-		cur.Description = editedCard.Description
+		editedCard.SetID(cur.GetID())
 
 		if err := tuiApp.Usecase.EditBlob(tuiApp.Ctx, editedCard, ind); err != nil {
 			tuiApp.log.Error().
@@ -236,6 +240,8 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 		//defer continue cred sync
 		tuiApp.Usecase.ContinueSync()
 
+		tuiApp.log.Info().
+			Str("id", editedCard.ID).Msg("cred updated")
 	})
 
 	form.AddButton("Cancel", func() {
@@ -314,6 +320,7 @@ func (form *CardDetails) EmptyFields() {
 // GetCurrentValues get values from user input and format it to Card entity
 func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) {
 	newCard = new(entities.Card)
+	newCard.Type = entities.UserCard
 
 	newCard.Name = form.FieldName.GetText()
 	_, newCard.Bank = form.FieldBank.GetCurrentOption()

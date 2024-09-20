@@ -18,7 +18,7 @@ func (c *ClientUC) SyncBlobs(ctx context.Context) {
 			// skip if user not authed
 			// or edit/add new cred
 			c.m.RLock()
-			if (c.User == nil && c.Creds == nil) || !c.Authed {
+			if (c.User == nil && c.Creds == nil) || !c.Authed || c.viewPageFocus {
 				c.m.RUnlock()
 				continue
 			}

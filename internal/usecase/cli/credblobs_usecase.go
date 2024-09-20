@@ -35,6 +35,10 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 		tmpCred, err := hashes.DecryptBlob(blob, c.User.Secret)
 		if err != nil {
 			// TODO handle ERRORS!!!
+			c.log.Error().
+				Err(err).Msg("can't decrypt cipher blob")
+
+			continue
 		}
 
 		switch tmpCred.(type) {
@@ -45,7 +49,8 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 		case *entities.Credential:
 			creds = append(creds, tmpCred.(*entities.Credential))
 		default:
-			fmt.Println("error can't decrypt cipher blob")
+			c.log.Error().
+				Err(fmt.Errorf("unknown type of blob")).Send()
 		}
 
 	}

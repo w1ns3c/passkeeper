@@ -119,22 +119,37 @@ func main() {
 				PIN:         11111,
 				Description: "test description2",
 			},
+			{
+				ID:          "ID_CARD_33",
+				Type:        entities.UserCard,
+				Name:        "super secret card",
+				Bank:        entities.Banks[4],
+				Person:      "Major Jerry",
+				Number:      2348723984721111,
+				CVC:         232444443333,
+				Expiration:  time2.Add(time.Second * 500),
+				PIN:         2323,
+				Description: "test myself",
+			},
 		}
 
 		testNotes = []*entities.Note{
 			{
+				ID:   "ID_NOTE_1",
 				Type: entities.UserNote,
 				Name: "test1",
 				Date: time.Now().Add(time.Second * -300000),
 				Body: "Hello\nWorld!",
 			},
 			{
+				ID:   "ID_NOTE_2",
 				Type: entities.UserNote,
 				Name: "HELLO 222222",
 				Date: time.Now().Add(time.Second * -3000010),
 				Body: "Hello\nWorld! 9234928309482390480298340923809840",
 			},
 			{
+				ID:   "ID_NOTE_3",
 				Type: entities.UserNote,
 				Name: "New Test Blob",
 				Date: time.Now().Add(time.Second * -500000),

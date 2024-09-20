@@ -105,7 +105,9 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 
 	usecase, err := cli.NewClientUC(
 		cli.WithAddr(addr),
-		cli.WithSyncTime(time.Duration(syncTime)*time.Second))
+		cli.WithSyncTime(time.Duration(syncTime)*time.Second),
+		cli.WithLogger(lg))
+
 	if err != nil {
 		lg.Error().Err(err).
 			Msg("failed to create client usecase")
