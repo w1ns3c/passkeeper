@@ -80,7 +80,7 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 		card, err := tuiApp.Usecase.GetCardByIND(ind)
 		if err != nil {
 			tuiApp.log.Error().
-				Err(err).Msg("wrong ind")
+				Err(err).Msg("wrong card ind")
 			return
 		}
 		viewForm.Rerender(card)

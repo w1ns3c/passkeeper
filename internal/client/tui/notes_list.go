@@ -15,17 +15,16 @@ var (
 )
 
 func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
-	var form *NoteDetails
+	var viewForm *NoteDetails
 
 	list := NewNotesList(notes)
 	list.Rerender(notes)
 
 	ind := list.GetCurrentItem()
-
 	if notes != nil && len(notes) > ind {
-		form = NewNoteDetails(notes[ind])
+		viewForm = NewNoteDetails(notes[ind])
 	} else {
-		form = NewNoteDetails(nil)
+		viewForm = NewNoteDetails(nil)
 	}
 
 	list.SetBorder(true).
@@ -37,7 +36,7 @@ func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
 
 	subFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(form, 0, 2, false).
+		AddItem(viewForm, 0, 2, false).
 		AddItem(helpNotes, 0, 1, false)
 
 	flex := tview.NewFlex().
@@ -63,9 +62,9 @@ func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
 
 		switch event.Rune() {
 		case 'a':
-			//tuiApp.Usecase.StopSync()
-			//tuiApp.App.SetFocus(viewForm)
-			//viewForm.Add(ind, credList)
+			tuiApp.Usecase.StopSync()
+			tuiApp.App.SetFocus(viewForm)
+			viewForm.Add(tuiApp, ind, list)
 		case 'e':
 			//tuiApp.Usecase.StopSync()
 			//tuiApp.App.SetFocus(viewForm)
@@ -78,21 +77,15 @@ func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
 		return event
 	})
 
-	list.SetChangedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
-		curID := list.GetCurrentItem()
-		form.Rerender(notes[curID])
-	})
+	list.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
+		note, err := tuiApp.Usecase.GetNoteByIND(ind)
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("wrong note ind")
 
-	form.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-
-		form.BtnSave = tview.NewButton("Save")
-		form.BtnCancel = tview.NewButton("Cancel")
-
-		form.BtnSave.SetSelectedFunc(func() {
-
-		})
-
-		return event
+			return
+		}
+		viewForm.Rerender(note)
 	})
 
 	return flex

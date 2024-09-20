@@ -21,8 +21,6 @@ var (
 type CardDetails struct {
 	*tview.Form
 
-	//tuiApp *TUI
-
 	FieldName       *tview.InputField
 	FieldBank       *tview.DropDown
 	FieldPerson     *tview.InputField
@@ -55,7 +53,7 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 		SetLabel("Bank:").
 		SetOptions(entities.Banks, nil)
 	bank.SetTitle(card.Bank)
-	bank.SetTextOptions(card.Bank, "", "", "", card.Bank)
+	bank.SetTextOptions("", "", "", "", card.Bank)
 
 	form := &CardDetails{
 		Form:        tview.NewForm(),
@@ -137,7 +135,6 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 			return
 		}
 
-		newCard.Type = entities.UserCard
 		newCard.ID = hashes.GeneratePassID2()
 
 		if err := tuiApp.Usecase.AddBlob(tuiApp.Ctx, newCard); err != nil {
@@ -173,11 +170,11 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 		if tuiApp.Usecase.CredsLen() > 0 {
 			card, _ := tuiApp.Usecase.GetCardByIND(ind)
 			form.Rerender(card)
+
 			return
 		}
 
 		// clear fields if there isn't any blobsUC
-		//form.EmptyFields()
 		form.HideFields()
 
 		curCard, err := tuiApp.Usecase.GetCardByIND(list.GetCurrentItem())
@@ -185,6 +182,7 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 			tuiApp.log.Error().
 				Err(err).Msg("can't get current card")
 
+			return
 		}
 
 		form.Rerender(curCard)
@@ -363,6 +361,7 @@ func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) 
 	return newCard, nil
 }
 
+// BeautifyCard try to beauty card number to "0000 0000 0000 0000"
 func BeautifyCard(number string) string {
 	var newNum string
 	for ind, s := range number {
