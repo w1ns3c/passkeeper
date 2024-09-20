@@ -95,7 +95,6 @@ func NewModalWithParams(tuiApp *TUI, text string, page string) *tview.Modal {
 		AddButtons([]string{"OK"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "OK" {
-				//tuiApp.Pages.Draw(tuiApp.Screen)
 				tuiApp.Pages.SwitchToPage(page)
 				return
 			}
@@ -104,20 +103,16 @@ func NewModalWithParams(tuiApp *TUI, text string, page string) *tview.Modal {
 	return errModal
 }
 
-func NewModalWithParams2Btns(tuiApp TUI, text, pageOK, pageNotOK string) *tview.Modal {
-	btn1Name := "OK"
-	btn2Name := "Cancel"
-
+func NewErrorEditModal(tuiApp *TUI, text string, returnPage tview.Primitive) *tview.Modal {
+	text = CapitalizeFirst(text)
 	errModal := tview.NewModal().
 		SetText(text).
 		AddButtons([]string{"OK"}).
-		AddButtons([]string{"Cancel"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
-			if buttonLabel == btn1Name {
-				tuiApp.Pages.SwitchToPage(pageOK)
-			}
-			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(pageNotOK)
+			if buttonLabel == "OK" {
+				tuiApp.Pages.SwitchToPage(PageCredsMenu)
+				tuiApp.App.SetFocus(returnPage)
+				return
 			}
 		})
 

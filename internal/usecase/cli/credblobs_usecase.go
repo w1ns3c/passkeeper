@@ -66,7 +66,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 
 	//ID:          form.tuiApp.Creds[ind].ID,
 	// update credID
-	cred.SetID(c.Creds[ind].ID)
+	//cred.SetID(c.Creds[ind].ID)
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {

@@ -92,26 +92,30 @@ func main() {
 			Description: "some description3333",
 		}
 
+		time1, _  = time.Parse("01/06", "33/44")
+		time2, _  = time.Parse("01/06", "1/11")
 		testCards = []*entities.Card{
 			{
+				ID:          "ID_CARD_1111",
 				Type:        entities.UserCard,
 				Name:        "test1",
 				Bank:        entities.Banks[0],
 				Person:      "string",
 				Number:      122222222222,
 				CVC:         232,
-				Expiration:  "33/44",
+				Expiration:  time1,
 				PIN:         3333,
 				Description: "test description only",
 			},
 			{
+				ID:          "ID_CARD_22222",
 				Type:        entities.UserCard,
 				Name:        "test333331",
 				Bank:        entities.Banks[2],
 				Person:      "Major Tom",
 				Number:      234872398472,
 				CVC:         23244444,
-				Expiration:  "11/11",
+				Expiration:  time2,
 				PIN:         11111,
 				Description: "test description2",
 			},
@@ -121,16 +125,19 @@ func main() {
 			{
 				Type: entities.UserNote,
 				Name: "test1",
+				Date: time.Now().Add(time.Second * -300000),
 				Body: "Hello\nWorld!",
 			},
 			{
 				Type: entities.UserNote,
 				Name: "HELLO 222222",
+				Date: time.Now().Add(time.Second * -3000010),
 				Body: "Hello\nWorld! 9234928309482390480298340923809840",
 			},
 			{
 				Type: entities.UserNote,
 				Name: "New Test Blob",
+				Date: time.Now().Add(time.Second * -500000),
 				Body: "Hello\nWorld! Amigo",
 			},
 		}

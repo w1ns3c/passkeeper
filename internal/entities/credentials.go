@@ -35,16 +35,16 @@ type CryptoBlob struct {
 }
 
 type Card struct {
-	Type        BlobType `json:"type"`
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Bank        string   `json:"bank"`
-	Person      string   `json:"person"`
-	Number      int      `json:"number"`
-	CVC         int      `json:"cvc"`
-	Expiration  string   `json:"exp"`
-	PIN         int      `json:"pin"`
-	Description string   `json:"desc"`
+	Type        BlobType  `json:"type"`
+	ID          string    `json:"id"`
+	Name        string    `json:"name"`
+	Bank        string    `json:"bank"`
+	Person      string    `json:"person"`
+	Number      int       `json:"number"`
+	CVC         int       `json:"cvc"`
+	Expiration  time.Time `json:"exp"`
+	PIN         int       `json:"pin"`
+	Description string    `json:"desc"`
 }
 
 func (c *Card) GetID() string {
@@ -71,7 +71,7 @@ func (c *Note) SetID(id string) {
 	c.ID = id
 }
 
-// BlobType using for identify CryptoBlob type
+// BlobType using for identify CryptoBlob
 type BlobType int
 
 const (

@@ -1,8 +1,10 @@
 package tui
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/rivo/tview"
 
@@ -11,7 +13,8 @@ import (
 )
 
 var (
-	HintTextCards = genHelp("card")
+	HintTextCards           = genHelp("card")
+	bankingExpirationFormat = "01/06"
 )
 
 type CardDetails struct {
@@ -54,16 +57,17 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 	bank.SetTextOptions(card.Bank, "", "", "", card.Bank)
 
 	form := &CardDetails{
-		Form:            tview.NewForm(),
-		FieldName:       tview.NewInputField().SetLabel("Name:").SetText(card.Name),
-		FieldBank:       bank,
-		FieldPerson:     tview.NewInputField().SetLabel("Person:").SetText(card.Person),
-		FieldNumber:     tview.NewInputField().SetLabel("Number:").SetText(strconv.Itoa(card.Number)),
-		FieldExpiration: tview.NewInputField().SetLabel("Expiration").SetText(card.Expiration),
-		FieldCVC:        tview.NewInputField().SetLabel("CVC").SetText(strconv.Itoa(card.CVC)),
-		FieldPIN:        tview.NewInputField().SetLabel("PIN").SetText(strconv.Itoa(card.PIN)),
-		FieldDesc:       tview.NewTextArea().SetLabel("Description:").SetText(card.Description, true),
-		CurrentCard:     card,
+		Form:        tview.NewForm(),
+		FieldName:   tview.NewInputField().SetLabel("Name:").SetText(card.Name),
+		FieldBank:   bank,
+		FieldPerson: tview.NewInputField().SetLabel("Person:").SetText(card.Person),
+		FieldNumber: tview.NewInputField().SetLabel("Number:").SetText(strconv.Itoa(card.Number)),
+		FieldExpiration: tview.NewInputField().SetLabel("Expiration").
+			SetText(card.Expiration.Format(bankingExpirationFormat)),
+		FieldCVC:    tview.NewInputField().SetLabel("CVC").SetText(strconv.Itoa(card.CVC)),
+		FieldPIN:    tview.NewInputField().SetLabel("PIN").SetText(strconv.Itoa(card.PIN)),
+		FieldDesc:   tview.NewTextArea().SetLabel("Description:").SetText(card.Description, true),
+		CurrentCard: card,
 	}
 
 	form.Form.SetBorder(true).
@@ -83,10 +87,10 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 
 func (form *CardDetails) Rerender(card *entities.Card) {
 	form.FieldName.SetText(card.Name)
-	form.FieldBank.SetTextOptions(card.Bank, "", "", "", card.Bank)
+	form.FieldBank.SetTextOptions("", "", "", "", card.Bank)
 	form.FieldPerson.SetText(card.Person)
 	form.FieldNumber.SetText(strconv.Itoa(card.Number))
-	form.FieldExpiration.SetText(card.Expiration)
+	form.FieldExpiration.SetText(card.Expiration.Format(bankingExpirationFormat))
 	form.FieldCVC.SetText(strconv.Itoa(card.CVC))
 	form.FieldPIN.SetText(strconv.Itoa(card.PIN))
 	form.FieldDesc.SetText(card.Description, true)
@@ -97,17 +101,11 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 	form.EmptyFields()
 
 	form.AddButton("Save", func() {
-		//defer continue cred sync
-		defer tuiApp.Usecase.ContinueSync()
-
-		// defer remove buttons
-		defer form.HideButtons()
-
 		newCard, err := form.GetCurrentValues()
 		if err != nil {
 			tuiApp.log.Error().
-				Err(err).Msg("failed to add credential on server side")
-			errModal := NewModalWithParams(tuiApp, err.Error(), PageCredsMenu)
+				Err(err).Msg("failed to add new card on client side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
 			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageCredUpdError)
 			return
@@ -118,17 +116,23 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 
 		if err := tuiApp.Usecase.AddBlob(tuiApp.Ctx, newCard); err != nil {
 			tuiApp.log.Error().
-				Err(err).Msg("failed to add credential on server side")
-			errModal := NewModalWithParams(tuiApp, err.Error(), PageCredsMenu)
+				Err(err).Msg("failed to add new card on server side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
 			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
 			tuiApp.Pages.SwitchToPage(PageCredUpdError)
 			return
 		}
 
-		form.Rerender(newCard)
-
 		// rerender credsList
+		list.Rerender(tuiApp.Usecase.GetCards())
+		form.Rerender(newCard)
 		tuiApp.App.SetFocus(list)
+
+		// hide buttons
+		form.HideButtons()
+
+		//defer continue cred sync
+		tuiApp.Usecase.ContinueSync()
 
 	})
 
@@ -153,6 +157,89 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 
 }
 
+func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
+	tmp := tuiApp.Usecase.GetCards()
+	if tmp == nil || len(tmp) <= ind || len(tmp) == 0 {
+		return
+	}
+
+	form.AddButton("Save", func() {
+		cur, err := tuiApp.Usecase.GetCardByIND(ind)
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("failed to edit new card on client side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
+			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+
+			return
+		}
+
+		editedCard, err := form.GetCurrentValues()
+		if err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("failed to edit new card on client side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
+			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+
+			return
+		}
+
+		cur.Name = editedCard.Name
+		cur.Bank = editedCard.Bank
+		cur.Person = editedCard.Person
+		cur.Number = editedCard.Number
+		cur.Expiration = editedCard.Expiration
+		cur.CVC = editedCard.CVC
+		cur.PIN = editedCard.PIN
+		cur.Description = editedCard.Description
+
+		if err := tuiApp.Usecase.EditBlob(tuiApp.Ctx, editedCard, ind); err != nil {
+			tuiApp.log.Error().
+				Err(err).Msg("failed to edit new card on server side")
+			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
+			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+
+			return
+		}
+
+		// rerender credsList
+		list.Rerender(tuiApp.Usecase.GetCards())
+		form.Rerender(editedCard)
+		tuiApp.App.SetFocus(list)
+
+		// hide buttons
+		form.HideButtons()
+
+		//defer continue cred sync
+		tuiApp.Usecase.ContinueSync()
+
+	})
+
+	form.AddButton("Cancel", func() {
+		//defer continue cred sync
+		defer tuiApp.Usecase.ContinueSync()
+
+		// defer remove buttons
+		defer form.HideButtons()
+		// rerender credsList
+		defer tuiApp.App.SetFocus(list)
+		if tuiApp.Usecase.CredsLen() > 0 {
+			card, _ := tuiApp.Usecase.GetCardByIND(ind)
+			form.Rerender(card)
+			return
+		}
+
+		// clear fields if there isn't any blobsUC
+		//form.EmptyFields()
+		form.HideFields()
+	})
+
+}
+
+// HideButtons hide Save/Cancel buttons
 func (form *CardDetails) HideButtons() {
 	if form.GetButtonCount() <= 0 {
 		return
@@ -162,12 +249,14 @@ func (form *CardDetails) HideButtons() {
 	form.RemoveButton(0)
 }
 
+// HideFields remove all items from form
 func (form *CardDetails) HideFields() {
 	for ind := form.Form.GetFormItemCount() - 1; ind >= 0; ind-- {
 		form.Form.RemoveFormItem(ind)
 	}
 }
 
+// EmptyFields reset fields' values
 func (form *CardDetails) EmptyFields() {
 	if form.FieldName != nil {
 		form.FieldName.SetText("")
@@ -201,6 +290,8 @@ func (form *CardDetails) EmptyFields() {
 		form.FieldDesc.SetText("", true)
 	}
 }
+
+// GetCurrentValues get values from user input and format it to Card entity
 func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) {
 	newCard = new(entities.Card)
 
@@ -213,21 +304,28 @@ func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) 
 	numberStr = strings.ReplaceAll(numberStr, " ", "")
 	number, err := strconv.Atoi(numberStr)
 	if err != nil {
-		return nil, err
+
+		return nil, fmt.Errorf("can't parse card number")
 	}
 	newCard.Number = number
 
-	newCard.Expiration = form.FieldExpiration.GetText()
+	exp := form.FieldExpiration.GetText()
+	newCard.Expiration, err = time.Parse(bankingExpirationFormat, exp)
+	if err != nil {
+		return nil, fmt.Errorf("can't parse card expiration")
+	}
 
 	cvc, err := strconv.Atoi(form.FieldCVC.GetText())
 	if err != nil {
-		return nil, err
+
+		return nil, fmt.Errorf("can't parse card CVV")
 	}
 	newCard.CVC = cvc
 
 	pin, err := strconv.Atoi(form.FieldPIN.GetText())
 	if err != nil {
-		return nil, err
+
+		return nil, fmt.Errorf("can't parse card CVV")
 	}
 	newCard.PIN = pin
 

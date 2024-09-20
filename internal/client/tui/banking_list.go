@@ -76,9 +76,9 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 			tuiApp.App.SetFocus(viewForm)
 			viewForm.Add(tuiApp, ind, list)
 		case 'e':
-			//tuiApp.Usecase.StopSync()
-			//tuiApp.App.SetFocus(viewForm)
-			//viewForm.Edit(ind, credList)
+			tuiApp.Usecase.StopSync()
+			tuiApp.App.SetFocus(viewForm)
+			viewForm.Edit(tuiApp, ind, list)
 
 		case 'd':
 			delFunc()
@@ -90,22 +90,11 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 		return event
 	})
 
-	list.SetChangedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
-		curID := list.GetCurrentItem()
-		viewForm.Rerender(cards[curID])
-	})
+	list.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
 
-	//viewForm.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
-	//
-	//	viewForm.BtnSave = tview.NewButton("Save")
-	//	viewForm.BtnCancel = tview.NewButton("Cancel")
-	//
-	//	viewForm.BtnSave.SetSelectedFunc(func() {
-	//
-	//	})
-	//
-	//	return event
-	//})
+		card, _ := tuiApp.Usecase.GetCardByIND(ind)
+		viewForm.Rerender(card)
+	})
 
 	return flex
 }
@@ -146,6 +135,7 @@ func (list *CardList) Rerender(cards []*entities.Card) {
 	}
 }
 
+// GenCardShortName beautify card name to show it in the list
 func GenCardShortName(card *entities.Card) string {
 	if card == nil {
 		return ""

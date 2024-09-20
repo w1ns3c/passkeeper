@@ -174,13 +174,22 @@ func (form *Details) Edit(ind int, list CredListInf) {
 
 		res, login, password, desc := form.GetCurrentValues()
 
-		cred := &entities.Credential{
-			Date:        time.Now(),
-			Resource:    res,
-			Login:       login,
-			Password:    password,
-			Description: desc,
+		cred, err := form.tuiApp.Usecase.GetCredByIND(ind)
+		if err != nil {
+			form.tuiApp.log.Error().
+				Err(err).Msg("failed to edit credential on client side")
+			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
+			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			return
 		}
+
+		cred.Date = time.Now()
+		cred.Resource = res
+		cred.Login = login
+		cred.Password = password
+		cred.Description = desc
+
 		// send creds to server
 		if err := form.tuiApp.Usecase.EditBlob(form.tuiApp.Ctx, cred, ind); err != nil {
 			form.tuiApp.log.Error().
