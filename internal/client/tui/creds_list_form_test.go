@@ -3,10 +3,11 @@ package tui
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/stretchr/testify/require"
 	"passkeeper/internal/entities"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestSave(t *testing.T) {

@@ -12,9 +12,8 @@ import (
 
 	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
-	"passkeeper/internal/usecase/cli/filesUC"
-
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
+	"passkeeper/internal/usecase/cli/filesUC"
 )
 
 var (

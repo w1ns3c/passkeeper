@@ -3,13 +3,13 @@ package usersUC
 import (
 	"context"
 	"fmt"
-	"passkeeper/internal/config"
 	"time"
 
+	"github.com/rs/zerolog"
+
+	"passkeeper/internal/config"
 	"passkeeper/internal/storage"
 	"passkeeper/internal/storage/memstorage"
-
-	"github.com/rs/zerolog"
 )
 
 var (

@@ -4,15 +4,13 @@ import (
 	"context"
 	"errors"
 
-	"passkeeper/internal/entities"
-
-	"passkeeper/internal/usecase/srv/usersUC"
-
-	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"passkeeper/internal/entities"
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
+	"passkeeper/internal/usecase/srv/usersUC"
 )
 
 // response errors

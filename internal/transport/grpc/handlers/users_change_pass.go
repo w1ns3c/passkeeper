@@ -2,14 +2,13 @@ package handlers
 
 import (
 	"context"
-	"passkeeper/internal/entities/hashes"
-
-	"passkeeper/internal/usecase/srv/usersUC"
-
-	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
+
+	"passkeeper/internal/entities/hashes"
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
+	"passkeeper/internal/usecase/srv/usersUC"
 )
 
 type UserChangePassHandler struct {

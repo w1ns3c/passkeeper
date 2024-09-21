@@ -3,12 +3,11 @@ package blobsUC
 import (
 	"context"
 
-	"passkeeper/internal/storage/memstorage"
-
 	"github.com/rs/zerolog"
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/storage"
+	"passkeeper/internal/storage/memstorage"
 )
 
 var (

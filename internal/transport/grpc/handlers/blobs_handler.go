@@ -3,16 +3,15 @@ package handlers
 import (
 	"context"
 
-	"passkeeper/internal/entities"
-	"passkeeper/internal/entities/hashes"
-	"passkeeper/internal/usecase/srv/blobsUC"
-
-	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/hashes"
+	pb "passkeeper/internal/transport/grpc/protofiles/proto"
+	"passkeeper/internal/usecase/srv/blobsUC"
 )
 
 var (

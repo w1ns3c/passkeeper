@@ -1,8 +1,9 @@
 package usersUC
 
 import (
-	"passkeeper/internal/entities/hashes"
 	"testing"
+
+	"passkeeper/internal/entities/hashes"
 )
 
 func TestGenerateCryptoHash(t *testing.T) {

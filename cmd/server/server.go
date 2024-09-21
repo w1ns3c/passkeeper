@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"time"
-
-	"github.com/w1ns3c/go-examples/crypto"
 
 	"passkeeper/internal/config"
 	cnf "passkeeper/internal/config/server"
@@ -13,8 +10,6 @@ import (
 	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
 
-	"passkeeper/internal/entities"
-	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/storage/memstorage"
 )
 
@@ -24,170 +19,12 @@ func main() {
 
 	saltLen := config.UserPassSaltLen
 
-	var (
-		login1  = "user1"
-		pass1   = "123"
-		userid1 = login1 + "_ID"
-
-		login2  = "user2"
-		pass2   = "password"
-		userid2 = login2 + "_ID"
-
-		hash1 = hashes.Hash(pass1)
-		hash2 = hashes.Hash(pass2)
-
-		userSalt1, _ = crypto.GenRandStr(config.UserPassSaltLen)
-		userSalt2, _ = crypto.GenRandStr(config.UserPassSaltLen)
-
-		cryptHash1, _ = hashes.GenerateCryptoHash(hash1, userSalt1)
-		cryptHash2, _ = hashes.GenerateCryptoHash(hash2, userSalt2)
-
-		secret1, _      = hashes.GenerateSecret(config.UserPassSaltLen)
-		secret2, _      = hashes.GenerateSecret(config.UserPassSaltLen)
-		cryptSecret1, _ = hashes.EncryptSecret(secret1, hash1)
-		cryptSecret2, _ = hashes.EncryptSecret(secret2, hash2)
-
-		user1 = &entities.User{
-			ID:     userid1,
-			Login:  login1,
-			Hash:   cryptHash1,
-			Salt:   userSalt1,
-			Secret: cryptSecret1,
-		}
-
-		user2 = &entities.User{
-			ID:     userid2,
-			Login:  login2,
-			Hash:   cryptHash2,
-			Salt:   userSalt2,
-			Secret: cryptSecret2,
-		}
-
-		// Passwords
-		password1 = &entities.Credential{
-			Type:        entities.UserCred,
-			ID:          "ID1111",
-			Date:        time.Now().Add(time.Second * -200),
-			Resource:    "localhost1111",
-			Login:       "my_favorite_username1111",
-			Password:    "my_favorite_password1111",
-			Description: "some description1111",
-		}
-		password2 = &entities.Credential{
-			Type:        entities.UserCred,
-			ID:          "ID2222",
-			Date:        time.Now().Add(time.Second * -500),
-			Resource:    "localhost2222",
-			Login:       "admin2222",
-			Password:    "secret password2222",
-			Description: "some new description2222",
-		}
-		password3 = &entities.Credential{
-			Type:        entities.UserCred,
-			ID:          "superID3333",
-			Date:        time.Now(),
-			Resource:    "localhost3333",
-			Login:       "my_favorite_username333",
-			Password:    "my_favorite_password3333",
-			Description: "some description3333",
-		}
-
-		time1, _  = time.Parse("01/06", "33/44")
-		time2, _  = time.Parse("01/06", "1/11")
-		testCards = []*entities.Card{
-			{
-				ID:          "ID_CARD_1111",
-				Type:        entities.UserCard,
-				Name:        "test1",
-				Bank:        entities.Banks[0],
-				Person:      "string",
-				Number:      122222222222,
-				CVC:         232,
-				Expiration:  time1,
-				PIN:         3333,
-				Description: "test description only",
-			},
-			{
-				ID:          "ID_CARD_22222",
-				Type:        entities.UserCard,
-				Name:        "test333331",
-				Bank:        entities.Banks[2],
-				Person:      "Major Tom",
-				Number:      234872398472,
-				CVC:         23244444,
-				Expiration:  time2,
-				PIN:         11111,
-				Description: "test description2",
-			},
-			{
-				ID:          "ID_CARD_33",
-				Type:        entities.UserCard,
-				Name:        "super secret card",
-				Bank:        entities.Banks[4],
-				Person:      "Major Jerry",
-				Number:      2348723984721111,
-				CVC:         232444443333,
-				Expiration:  time2.Add(time.Second * 500),
-				PIN:         2323,
-				Description: "test myself",
-			},
-		}
-
-		testNotes = []*entities.Note{
-			{
-				ID:   "ID_NOTE_1",
-				Type: entities.UserNote,
-				Name: "test1",
-				Date: time.Now().Add(time.Second * -300000),
-				Body: "Hello\nWorld!",
-			},
-			{
-				ID:   "ID_NOTE_2",
-				Type: entities.UserNote,
-				Name: "HELLO 222222",
-				Date: time.Now().Add(time.Second * -3000010),
-				Body: "Hello\nWorld! 9234928309482390480298340923809840",
-			},
-			{
-				ID:   "ID_NOTE_3",
-				Type: entities.UserNote,
-				Name: "New Test Blob",
-				Date: time.Now().Add(time.Second * -500000),
-				Body: "Hello\nWorld! Amigo",
-			},
-		}
-	)
-
-	key1, _ := hashes.GenerateCredsSecret(pass1, user1.ID, cryptSecret1)
-	key2, _ := hashes.GenerateCredsSecret(pass2, user2.ID, cryptSecret2)
-
-	users := map[string]*entities.User{
-		login1: user1,
-		login2: user2,
-	}
-
-	blob1, _ := hashes.EncryptBlob(password1, key1)
-	blob2, _ := hashes.EncryptBlob(password2, key1)
-	blob3, _ := hashes.EncryptBlob(password3, key2)
-	blob4, _ := hashes.EncryptBlob(testCards[0], key1)
-	blob5, _ := hashes.EncryptBlob(testCards[1], key1)
-	blob6, _ := hashes.EncryptBlob(testNotes[0], key1)
-	blob7, _ := hashes.EncryptBlob(testNotes[1], key1)
-	blob8, _ := hashes.EncryptBlob(testNotes[2], key1)
-
-	blobs := map[string][]*entities.CryptoBlob{
-		userid1: {
-			blob1, blob2, blob4, blob5, blob6, blob7, blob8,
-		},
-		userid2: {
-			blob3,
-		},
-	}
-
 	ctx := context.Background()
 
 	lg := logger.Init(conf.LogLevel)
 	lg.Info().Msg("[i] Logger init:  done")
+
+	users, blobs := InitTestData()
 
 	storage := memstorage.NewMemStorage(
 		memstorage.WithUsers(users),

@@ -35,3 +35,6 @@ vendor/
 # schemes
 schemes/
 builds/
+
+# test data
+cmd/server/test_data.go

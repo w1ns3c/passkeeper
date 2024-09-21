@@ -4,12 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"passkeeper/internal/config"
-	"passkeeper/internal/entities/hashes"
-
-	"passkeeper/internal/entities"
 
 	"github.com/w1ns3c/go-examples/crypto"
+
+	"passkeeper/internal/config"
+	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/hashes"
 )
 
 // RegisterUser function for register user in app

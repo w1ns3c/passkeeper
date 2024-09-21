@@ -6,9 +6,10 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-	"github.com/w1ns3c/go-examples/crypto"
 	"hash"
 	"io"
+
+	"github.com/w1ns3c/go-examples/crypto"
 
 	"golang.org/x/crypto/bcrypt"
 )

@@ -3,6 +3,7 @@ package hashes
 import (
 	"crypto/sha256"
 	"encoding/hex"
+
 	"github.com/w1ns3c/go-examples/crypto"
 )
 
