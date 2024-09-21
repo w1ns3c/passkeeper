@@ -63,6 +63,21 @@ type Note struct {
 	Body string    `json:"body"`
 }
 
+type File struct {
+	ID   string
+	Type BlobType
+	Name string
+	Body []byte
+}
+
+func (f *File) GetID() string {
+	return f.ID
+}
+
+func (f *File) SetID(id string) {
+	f.ID = id
+}
+
 func (n *Note) GetID() string {
 	return n.ID
 }
@@ -75,7 +90,8 @@ func (c *Note) SetID(id string) {
 type BlobType int
 
 const (
-	UserCred BlobType = iota + 1
-	UserCard
-	UserNote
+	BlobCred BlobType = iota + 1
+	BlobCard
+	BlobNote
+	BlobFile
 )

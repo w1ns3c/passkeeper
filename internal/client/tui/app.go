@@ -23,34 +23,23 @@ var (
 	PageMain      = "Main"      // main form, here choose login/register action
 	PageLogin     = "Login"     // form for user login
 	PageRegister  = "Register"  // form for user registration
-	PageCredsMenu = "CredsMenu" // form for user registration
+	PageBlobsMenu = "BlobsMenu" // form for user registration
 
-	PageAuthError       = "AuthErr"      // auth error modal
-	PageRegisterError   = "RegErr"       // register error modal
-	PageCredsListErr    = "CredsListErr" //creds list error modal
-	PageCredUpdError    = "CredUpdErr"
-	PageRegisterSuccess = "RegSuccess" // register success modal
-	PageAuthed          = "Authed"     //login success modal
+	PageAuthError       = "AuthErr"      // auth error modal page
+	PageRegisterError   = "RegErr"       // register error modal page
+	PageBlobsListErr    = "BlobsListErr" // blobs list error modal page
+	PageBlobUpdError    = "BlobUpdErr"   // blobs update error modal page
+	PageRegisterSuccess = "RegSuccess"   // register success modal
+	PageAuthed          = "Authed"       //login success modal
 
-	SubPageBank  = "Banking"
-	SubPageNotes = "Notes"
-	SubPageCreds = "Resources" // full form for view/edit/add user cred
+	SubPageBank  = "Banking"   // full form for view/edit/add user bank card blobs
+	SubPageNotes = "Notes"     // full form for view/edit/add user note blobs
+	SubPageCreds = "Resources" // full form for view/edit/add user text blobs
+	SubPageFiles = "Files"     // full form for view/edit/add user file blobs
 
 	Hint = tview.NewTextView().
 		SetTextColor(tcell.ColorBisque).
 		SetText("(Esc) to back to main page")
-
-	HintTextCreds = "" +
-		"(Space/Enter) - to choose credential\n" +
-		"(a)           - to add new credential\n" +
-		"(e)           - to edit credential\n" +
-		"(d/Del)       - to delete credential\n" +
-		"(Ctrl+L)      - to logout\n"
-	HintCreds = tview.NewTextView().
-			SetTextColor(tcell.ColorBisque).
-			SetText(HintTextCreds)
-
-	PassHidden = "******"
 )
 
 // TUI struct is tui client app
@@ -67,8 +56,6 @@ type TUI struct {
 	ctxCancel context.CancelFunc
 	wg        *sync.WaitGroup
 
-	//Creds []*entities.Credential
-
 	// logger
 	log *zerolog.Logger
 
@@ -82,6 +69,7 @@ type TUI struct {
 	SubformCreds *tview.Flex
 	SubformBank  *tview.Flex
 	SubformNotes *tview.Flex
+	SubformFiles *tview.Flex
 }
 
 // NewTUIconf is wrapper for NewTUI constructor with config parser
@@ -135,7 +123,7 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 	tuiApp.FormAuth = FlexAuth(tuiApp)
 	tuiApp.FormLogin = NewLoginForm(tuiApp)
 	tuiApp.FormReg = NewRegisterForm(tuiApp)
-	authedForm := NewModalWithParams(tuiApp, "Success!", PageCredsMenu)
+	authedForm := NewModalWithParams(tuiApp, "Success!", PageBlobsMenu)
 
 	header := NewHeader(0)
 	tuiApp.FormCredsMenu = tview.NewFlex().
@@ -144,22 +132,19 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 		AddItem(subPages, 0, 15, true)
 
 	// Main pages
-	// add pages
 	tuiApp.Pages.AddPage(PageMain, tuiApp.FormAuth, true, true) // login/register select form
 	tuiApp.Pages.AddPage(PageLogin, tuiApp.FormLogin, true, false)
 	tuiApp.Pages.AddPage(PageRegister, tuiApp.FormReg, true, false)
 	tuiApp.Pages.AddPage(PageAuthed, authedForm, true, false)
-	tuiApp.Pages.AddPage(PageCredsMenu, tuiApp.FormCredsMenu, true, false)
-	//tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
-	//tuiApp.FormMain = NewMainMenu(tuiApp.Pages)
+	tuiApp.Pages.AddPage(PageBlobsMenu, tuiApp.FormCredsMenu, true, false)
 
-	// Subpages
+	// Subpages will add after login
 	//tuiApp.SubPages.AddPage(SubPageCreds, subPages, true, false)
 	//tuiApp.SubPages.AddPage(SubPageBank, subPages, true, false)
 	//tuiApp.SubPages.AddPage(SubPageNotes, subPages, true, false)
 
 	// change hints layout
-	HintCreds.SetBorderPadding(0, 0, 1, 0)
+	hintCreds.SetBorderPadding(0, 0, 1, 0)
 	Hint.SetBorderPadding(0, 0, 1, 0)
 
 	return tuiApp, nil
@@ -218,6 +203,14 @@ func (tuiApp *TUI) Run(ctx context.Context) error {
 				item.ChangePage(3)
 				tuiApp.SubPages.AddPage(SubPageNotes, tuiApp.SubformNotes, true, false)
 				tuiApp.SubPages.SwitchToPage(SubPageNotes)
+			}
+		case tcell.KeyF5:
+			if tuiApp.Usecase.IsAuthed() {
+				tuiApp.SubformFiles = tuiApp.NewFiles(tuiApp.Usecase.GetFiles())
+				item := tuiApp.FormCredsMenu.GetItem(0).(*Header)
+				item.ChangePage(4)
+				tuiApp.SubPages.AddPage(SubPageFiles, tuiApp.SubformFiles, true, false)
+				tuiApp.SubPages.SwitchToPage(SubPageFiles)
 			}
 		default:
 			return event

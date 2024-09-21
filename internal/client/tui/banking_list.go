@@ -31,7 +31,7 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 
 	helpCards := tview.NewTextView().
 		SetTextColor(tcell.ColorBisque).
-		SetText(HintTextCards)
+		SetText(hintTextCards)
 
 	subFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
@@ -160,7 +160,7 @@ func (list *CardList) Delete(tuiApp *TUI, ind int) {
 		return
 	}
 
-	delConfirm := DeleteModal(tuiApp, ind, entities.UserCard)
+	delConfirm := DeleteModal(tuiApp, ind, entities.BlobCard)
 	pageConfirm := "confirmation"
 	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 	tuiApp.Pages.SwitchToPage(pageConfirm)

@@ -86,8 +86,8 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		if err != nil {
 			tuiApp.log.Error().Err(err).Msg("failed to get creds from server")
 			errModal := NewModalWithParams(tuiApp, err.Error(), PageLogin)
-			tuiApp.Pages.AddPage(PageCredsListErr, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredsListErr)
+			tuiApp.Pages.AddPage(PageBlobsListErr, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobsListErr)
 
 			return
 		}

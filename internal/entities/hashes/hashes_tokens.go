@@ -3,11 +3,13 @@ package hashes
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/metadata"
+
 	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
-	"time"
 )
 
 type Claims struct {

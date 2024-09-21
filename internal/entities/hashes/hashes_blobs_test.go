@@ -33,7 +33,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 			Description: "simple description",
 		}
 		cred2 = &entities.Credential{
-			Type:        entities.UserCred,
+			Type:        entities.BlobCred,
 			ID:          GeneratePassID2(),
 			Date:        time.Now(),
 			Resource:    "res1",
@@ -44,30 +44,30 @@ func TestEncryptDecryptBlob(t *testing.T) {
 
 		testCards = []*entities.Card{
 			{
-				Type:        entities.UserCard,
+				Type:        entities.BlobCard,
 				Name:        "test1",
 				Bank:        entities.Banks[0],
 				Person:      "string",
 				Number:      122222222222,
 				CVC:         232,
-				Expiration:  "33/44",
+				Expiration:  time.Now().Add(time.Second * -19999),
 				PIN:         3333,
 				Description: "test description only",
 			},
 			{
-				Type: entities.UserCard,
+				Type: entities.BlobCard,
 				Name: "test333331",
 			},
 		}
 
 		testNotes = []*entities.Note{
 			{
-				Type: entities.UserNote,
+				Type: entities.BlobNote,
 				Name: "New Test Blob",
 				Body: "Hello\nWorld! Amigo",
 			},
 			{
-				Type: entities.UserNote,
+				Type: entities.BlobNote,
 			},
 			{},
 		}

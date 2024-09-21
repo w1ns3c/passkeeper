@@ -158,7 +158,7 @@ func (list *NotesList) Delete(tuiApp *TUI, ind int) {
 		return
 	}
 
-	delConfirm := DeleteModal(tuiApp, ind, entities.UserNote)
+	delConfirm := DeleteModal(tuiApp, ind, entities.BlobNote)
 	pageConfirm := "confirmation"
 	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 	tuiApp.Pages.SwitchToPage(pageConfirm)

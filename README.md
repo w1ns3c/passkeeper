@@ -8,7 +8,8 @@ Please, give me some comments and advices for my code in review.
 # TODO Functionality
 ## Main Functionality
 - [x] Use gRPC protocol
-- [ ] Add terminal user interface
+- [ ] Add terminal user interface with main functionality
+- [ ] Fix bugs in TUI terminal user interface
 - [x] User login
 - [x] User register
 - [x] User logout
@@ -18,6 +19,19 @@ Please, give me some comments and advices for my code in review.
 - [x] Edit credential
 - [x] Add credential
 - [x] Del credential
+- [x] List bank cards 
+- [x] Edit bank cards
+- [x] Add bank cards
+- [x] Del bank cards
+- [x] List user notes
+- [x] Edit user notes
+- [x] Add user notes
+- [x] Del user notes
+- [x] List user files
+- [x] Download user files
+- [ ] Edit user files
+- [ ] Add user files (upload)
+- [ ] Del user files
 - [x] Asynchronous sync credentials (bugs fix)
 - [ ] Add DB storage
 - [x] Gracefull shutdown (client)
@@ -25,11 +39,10 @@ Please, give me some comments and advices for my code in review.
 - [x] Client parse args/env
 - [x] Server parse args/env
 - [ ] Add server access check before login/register user
+- [ ] Reconnect to server
 - [x] Move Creds from tuiApp to Usecase only
 - [x] Move User entity from tuiApp to Usecase only
 - [x] Move Token from tuiApp to Usecase only
-- [ ] Reconnect to server
-- [ ] TUI viewForm info about reconnect to server
 - [x] Client set logger in file
 - [ ] Split client interface to multi inf
 - [ ] Server logger interceptor
@@ -56,6 +69,9 @@ Please, give me some comments and advices for my code in review.
 - [ ] TUI move both login/register forms to center align 
 - [ ] TUI subpage: bank cards not auto update after delete card
 - [ ] TUI subpage: notes not auto update after delete note
+- [ ] Fix bug with Banks DropDown on Bank cards
+- [ ] TUI form info about reconnect to server
 
 ## Fill Readme.md
 - [ ] Add gif to show functionality
+- [ ] Write about program logs

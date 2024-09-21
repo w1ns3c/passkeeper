@@ -7,6 +7,15 @@ import (
 	"passkeeper/internal/entities"
 )
 
+var (
+	hintTextCreds = genHelp("card")
+	hintCreds     = tview.NewTextView().
+			SetTextColor(tcell.ColorBisque).
+			SetText(hintTextCreds)
+
+	passHidden = "******"
+)
+
 type CredListInf interface {
 	tview.Primitive
 	Rerender()
@@ -80,7 +89,7 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 		SetDirection(tview.FlexRow).
 		//AddItem(NewHeader(1), 0, 1, false).
 		AddItem(listFlex, 0, 10, true).
-		AddItem(HintCreds, 0, 2, false)
+		AddItem(hintCreds, 0, 2, false)
 
 	credList.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
 		viewForm.ShowFields()
@@ -103,7 +112,7 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 				return
 			}
 
-			delConfirm := DeleteModal(tuiApp, ind, entities.UserCred)
+			delConfirm := DeleteModal(tuiApp, ind, entities.BlobCred)
 			pageConfirm := "confirmation"
 			tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 			tuiApp.Pages.SwitchToPage(pageConfirm)

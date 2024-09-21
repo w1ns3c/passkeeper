@@ -108,7 +108,7 @@ func (form *Details) Add(ind int, list CredListInf) {
 		res, login, password, desc := form.GetCurrentValues()
 
 		newCred := &entities.Credential{
-			Type:        entities.UserCred,
+			Type:        entities.BlobCred,
 			ID:          hashes.GeneratePassID2(),
 			Date:        time.Now(),
 			Resource:    res,
@@ -121,8 +121,8 @@ func (form *Details) Add(ind int, list CredListInf) {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to add credential on server side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
-			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			form.tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -181,8 +181,8 @@ func (form *Details) Edit(ind int, list CredListInf) {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to edit credential on client side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
-			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			form.tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -197,8 +197,8 @@ func (form *Details) Edit(ind int, list CredListInf) {
 			form.tuiApp.log.Error().
 				Err(err).Msg("failed to edit credential on server side")
 			errModal := NewModalWithParams(form.tuiApp, err.Error(), SubPageCreds)
-			form.tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			form.tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			form.tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			form.tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -355,7 +355,7 @@ func (form *Details) SetHiddenCred(cred *entities.Credential) *Details {
 	}
 	if form.FieldPass != nil {
 		form.PassValue = cred.Password
-		form.FieldPass.SetText(PassHidden)
+		form.FieldPass.SetText(passHidden)
 		form.HiddenPass = true
 	}
 	if form.FieldDesc != nil {
@@ -393,7 +393,7 @@ func (form *Details) HidePassword() *Details {
 	form.HiddenPass = true
 	form.PassValue = form.FieldPass.GetText()
 	if form.PassValue != "" {
-		form.FieldPass.SetText(PassHidden)
+		form.FieldPass.SetText(passHidden)
 	}
 	return form
 }

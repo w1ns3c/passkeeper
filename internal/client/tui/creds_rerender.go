@@ -30,11 +30,11 @@ func (tuiApp *TUI) RerenderCreds() {
 			tuiApp.log.Info().
 				Msg("get new list of blobs, time to rerender all")
 
-			// check that is focused
-			if !tuiApp.SubformCreds.HasFocus() {
-
-				continue
-			}
+			//// check that is focused
+			//if !tuiApp.SubformCreds.HasFocus() {
+			//
+			//	continue
+			//}
 
 			// reinit subpages
 			tuiApp.SubformCreds = NewCredsList(tuiApp)

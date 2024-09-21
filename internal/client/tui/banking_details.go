@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	HintTextCards           = genHelp("card")
+	hintTextCards           = genHelp("card")
 	bankingExpirationFormat = "01/06"
 )
 
@@ -81,6 +81,7 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 	return form
 }
 
+// Rerender refresh form fields' values
 func (form *CardDetails) Rerender(card *entities.Card) {
 	form.FieldName.SetText(card.Name)
 	form.FieldBank.SetTextOptions("", "", "", "", card.Bank)
@@ -118,14 +119,15 @@ func (form *CardDetails) Rerender(card *entities.Card) {
 func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 	form.EmptyFields()
 
+	// handle save functionality
 	form.AddButton("Save", func() {
 		newCard, err := form.GetCurrentValues()
 		if err != nil {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to add new card on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -135,8 +137,8 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to add new card on server side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -153,6 +155,7 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 
 	})
 
+	// handle cancel functionality
 	form.AddButton("Cancel", func() {
 		//defer continue cred sync
 		defer tuiApp.Usecase.ContinueSync()
@@ -191,14 +194,15 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 		return
 	}
 
+	// handle save functionality
 	form.AddButton("Save", func() {
 		cur, err := tuiApp.Usecase.GetCardByIND(ind)
 		if err != nil {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to edit new card on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 
 			return
 		}
@@ -208,8 +212,8 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to edit card on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 
 			return
 		}
@@ -220,8 +224,8 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to edit card on server side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 
 			return
 		}
@@ -239,6 +243,7 @@ func (form *CardDetails) Edit(tuiApp *TUI, ind int, list *CardList) {
 
 	})
 
+	// handle cancel functionality
 	form.AddButton("Cancel", func() {
 		//defer continue cred sync
 		defer tuiApp.Usecase.ContinueSync()
@@ -321,7 +326,7 @@ func (form *CardDetails) EmptyFields() {
 // GetCurrentValues get values from user input and format it to Card entity
 func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) {
 	newCard = new(entities.Card)
-	newCard.Type = entities.UserCard
+	newCard.Type = entities.BlobCard
 
 	newCard.Name = form.FieldName.GetText()
 	_, newCard.Bank = form.FieldBank.GetCurrentOption()

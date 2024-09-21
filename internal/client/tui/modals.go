@@ -28,7 +28,7 @@ func DeleteModal(tuiApp *TUI, ind int, blobType entities.BlobType) *tview.Modal 
 				tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
 
 				pageDel := "deleted"
-				deletedPage := NewModalWithParams(tuiApp, "Credential successful deleted!", PageCredsMenu)
+				deletedPage := NewModalWithParams(tuiApp, "Credential successful deleted!", PageBlobsMenu)
 				tuiApp.Pages.AddPage(pageDel, deletedPage, true, false)
 				tuiApp.Pages.SwitchToPage(pageDel)
 
@@ -36,7 +36,7 @@ func DeleteModal(tuiApp *TUI, ind int, blobType entities.BlobType) *tview.Modal 
 			}
 
 			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(PageCredsMenu)
+				tuiApp.Pages.SwitchToPage(PageBlobsMenu)
 			}
 		}).
 		SetFocus(1)
@@ -85,7 +85,7 @@ func LogoutModal(tuiApp *TUI) *tview.Modal {
 				tuiApp.App.SetFocus(tuiApp.FormAuth)
 			}
 			if buttonLabel == btn2Name {
-				tuiApp.Pages.SwitchToPage(PageCredsMenu)
+				tuiApp.Pages.SwitchToPage(PageBlobsMenu)
 			}
 		}).
 		SetFocus(1)
@@ -115,7 +115,7 @@ func NewErrorEditModal(tuiApp *TUI, text string, returnPage tview.Primitive) *tv
 		AddButtons([]string{"OK"}).
 		SetDoneFunc(func(buttonIndex int, buttonLabel string) {
 			if buttonLabel == "OK" {
-				tuiApp.Pages.SwitchToPage(PageCredsMenu)
+				tuiApp.Pages.SwitchToPage(PageBlobsMenu)
 				tuiApp.App.SetFocus(returnPage)
 				return
 			}

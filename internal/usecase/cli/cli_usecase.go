@@ -12,6 +12,7 @@ import (
 
 	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/usecase/cli/filesUC"
 
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
@@ -34,6 +35,7 @@ type ClientUsecase interface {
 	GetCredByIND(credIND int) (cred *entities.Credential, err error)
 	GetCardByIND(cardIND int) (cred *entities.Card, err error)
 	GetNoteByIND(noteIND int) (cred *entities.Note, err error)
+	GetFileByIND(ind int) (file *entities.File, err error)
 
 	CredsLen() int
 	CredsNotNil() bool
@@ -43,13 +45,16 @@ type ClientUsecase interface {
 	ContinueSync()
 	CheckSync() bool
 
-	// moved from tuiApp
-	GetToken() string
-	GetHeader() string
 	GetCreds() []*entities.Credential
 	GetCards() []*entities.Card
 	GetNotes() []*entities.Note
+	GetFiles() []*entities.File
+
+	// moved from tuiApp
+	GetToken() string
 	GetSyncTime() time.Duration
+
+	filesUC.FilesUsecaseInf
 }
 
 type ClientUC struct {
@@ -58,23 +63,22 @@ type ClientUC struct {
 	Authed bool
 	User   *entities.User
 	Token  string // JWT token
-	//UserID      string // userID from JWT token
-	//CredsSecret string // full secret for decrypt user's creds, contains sha1(clear_pass+secret_from_server)
 
 	Creds         []*entities.Credential
 	Cards         []*entities.Card
 	Notes         []*entities.Note
-	m             *sync.RWMutex
+	Files         []*entities.File
 	viewPageFocus bool
+	SyncTime      time.Duration
+	m             *sync.RWMutex
 
 	userSvc  pb.UserSvcClient
 	passSvc  pb.UserChangePassSvcClient
 	credsSvc pb.BlobSvcClient
 
-	TokenHeader string
-	SyncTime    time.Duration
-
 	log *zerolog.Logger
+
+	*filesUC.FilesUC
 }
 
 func NewClientUC(opts ...ClientUCoptions) (cli *ClientUC, err error) {
@@ -99,10 +103,13 @@ func NewClientUC(opts ...ClientUCoptions) (cli *ClientUC, err error) {
 		return nil, err
 	}
 
+	// transport
 	cli.userSvc = pb.NewUserSvcClient(conn)
 	cli.passSvc = pb.NewUserChangePassSvcClient(conn)
 	cli.credsSvc = pb.NewBlobSvcClient(conn)
+
 	cli.m = &sync.RWMutex{}
+	cli.FilesUC = new(filesUC.FilesUC)
 
 	return cli, nil
 }
@@ -129,10 +136,6 @@ func WithLogger(l *zerolog.Logger) ClientUCoptions {
 
 func (c *ClientUC) GetToken() string {
 	return c.Token
-}
-
-func (c *ClientUC) GetHeader() string {
-	return c.TokenHeader
 }
 
 func (c *ClientUC) CredsLen() int {

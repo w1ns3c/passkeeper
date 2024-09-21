@@ -24,6 +24,7 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	creds := make([]*entities.Credential, 0)
 	cards := make([]*entities.Card, 0)
 	notes := make([]*entities.Note, 0)
+	files := make([]*entities.File, 0)
 
 	for i := 0; i < len(resp.Blobs); i++ {
 		blob := &entities.CryptoBlob{
@@ -32,7 +33,7 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 			Blob:   resp.Blobs[i].Blob,
 		}
 
-		tmpCred, err := hashes.DecryptBlob(blob, c.User.Secret)
+		tmp, err := hashes.DecryptBlob(blob, c.User.Secret)
 		if err != nil {
 			c.log.Error().
 				Err(err).Msg("can't decrypt cipher blob")
@@ -40,13 +41,15 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 			continue
 		}
 
-		switch tmpCred.(type) {
+		switch tmp.(type) {
 		case *entities.Card:
-			cards = append(cards, tmpCred.(*entities.Card))
+			cards = append(cards, tmp.(*entities.Card))
 		case *entities.Note:
-			notes = append(notes, tmpCred.(*entities.Note))
+			notes = append(notes, tmp.(*entities.Note))
 		case *entities.Credential:
-			creds = append(creds, tmpCred.(*entities.Credential))
+			creds = append(creds, tmp.(*entities.Credential))
+		case *entities.File:
+			files = append(files, tmp.(*entities.File))
 		default:
 			c.log.Error().
 				Err(fmt.Errorf("unknown type of blob")).Send()
@@ -63,13 +66,15 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	c.Creds = creds
 	c.Cards = cards
 	c.Notes = notes
+	c.Files = files
 
 	c.log.Info().Msgf("sync sum blobs:  %d", len(resp.Blobs))
 	c.log.Info().Msgf("decrypted blobs: %d", len(c.Creds)+len(c.Cards)+len(c.Notes))
 	c.log.Info().
 		Int("creds", len(c.Creds)).
 		Int("cards", len(c.Cards)).
-		Int("notes", len(c.Notes)).Msgf("blobs by type:")
+		Int("notes", len(c.Notes)).
+		Int("files", len(c.Files)).Msgf("blobs by type:")
 
 	return nil
 }
@@ -229,21 +234,21 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 
 	// check that blob with ind exist
 	switch blobType {
-	case entities.UserCred:
+	case entities.BlobCred:
 		tmp, err := c.GetCredByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of creds")
 		}
 		delID = tmp.ID
 
-	case entities.UserCard:
+	case entities.BlobCard:
 		tmp, err := c.GetCardByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of creds")
 		}
 		delID = tmp.ID
 
-	case entities.UserNote:
+	case entities.BlobNote:
 		tmp, err := c.GetNoteByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of notes")
@@ -268,7 +273,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 
 	// update blobs values
 	switch blobType {
-	case entities.UserCred:
+	case entities.BlobCred:
 		newCreds, err := entities.DeleteCred(c.Creds, ind)
 		if err != nil {
 			return err
@@ -276,7 +281,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 		c.Creds = newCreds
 		blobT = "credential"
 
-	case entities.UserCard:
+	case entities.BlobCard:
 		newCards, err := entities.DeleteCard(c.Cards, ind)
 		if err != nil {
 			return err
@@ -284,7 +289,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 		c.Cards = newCards
 		blobT = "card"
 
-	case entities.UserNote:
+	case entities.BlobNote:
 		newNotes, err := entities.DeleteNote(c.Notes, ind)
 		if err != nil {
 			return err
@@ -332,6 +337,16 @@ func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
 	return c.Notes[ind], nil
 }
 
+func (c *ClientUC) GetFileByIND(ind int) (file *entities.File, err error) {
+	c.m.Lock()
+	defer c.m.Unlock()
+	if ind < 0 || ind >= len(c.Files) {
+		return nil, fmt.Errorf("invalid index")
+	}
+
+	return c.Files[ind], nil
+}
+
 // SortCredsByDate sort creds, now the first cred is the latest added
 func SortCredsByDate(creds []*entities.Credential) {
 	sort.Slice(creds, func(i, j int) bool {
@@ -369,4 +384,8 @@ func (c *ClientUC) GetCards() []*entities.Card {
 
 func (c *ClientUC) GetNotes() []*entities.Note {
 	return c.Notes
+}
+
+func (c *ClientUC) GetFiles() []*entities.File {
+	return c.Files
 }

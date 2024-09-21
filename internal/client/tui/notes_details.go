@@ -71,8 +71,8 @@ func (form *NoteDetails) Add(tuiApp *TUI, ind int, list *NotesList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to add new note on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -82,8 +82,8 @@ func (form *NoteDetails) Add(tuiApp *TUI, ind int, list *NotesList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to add new note on server side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 			return
 		}
 
@@ -143,8 +143,8 @@ func (form *NoteDetails) Edit(tuiApp *TUI, ind int, list *NotesList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to edit note on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 
 			return
 		}
@@ -154,8 +154,8 @@ func (form *NoteDetails) Edit(tuiApp *TUI, ind int, list *NotesList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to edit note on client side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 
 			return
 		}
@@ -166,8 +166,8 @@ func (form *NoteDetails) Edit(tuiApp *TUI, ind int, list *NotesList) {
 			tuiApp.log.Error().
 				Err(err).Msg("failed to edit note on server side")
 			errModal := NewErrorEditModal(tuiApp, err.Error(), form)
-			tuiApp.Pages.AddPage(PageCredUpdError, errModal, true, false)
-			tuiApp.Pages.SwitchToPage(PageCredUpdError)
+			tuiApp.Pages.AddPage(PageBlobUpdError, errModal, true, false)
+			tuiApp.Pages.SwitchToPage(PageBlobUpdError)
 
 			return
 		}
@@ -231,7 +231,7 @@ func (form *NoteDetails) EmptyFields() {
 // GetCurrentValues get values from user input and format it to Note entity
 func (form *NoteDetails) GetCurrentValues() (newNote *entities.Note, err error) {
 	newNote = new(entities.Note)
-	newNote.Type = entities.UserNote
+	newNote.Type = entities.BlobNote
 
 	newNote.Name = form.FieldName.GetText()
 	newNote.Date = time.Now()
