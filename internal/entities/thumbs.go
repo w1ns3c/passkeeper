@@ -81,6 +81,23 @@ func AddNote(notes []*Note, newNote *Note) (newNotes []*Note, err error) {
 	return notes, nil
 }
 
+func AddFile(files []*File, newFile *File) (newFiles []*File, err error) {
+	if len(files) == 0 {
+
+		return append(files, newFile), nil
+	}
+
+	files = append(files, &File{})
+
+	for i := len(files) - 1; i > 0; i-- {
+		files[i] = files[i-1]
+	}
+
+	files[0] = newFile
+
+	return files, nil
+}
+
 func Add(creds []*Credential, res, login, password, desc string) (newCreds []*Credential, err error) {
 
 	tmpCred := &Credential{
@@ -131,6 +148,13 @@ func DeleteNote(notes []*Note, ind int) (newCreds []*Note, err error) {
 	return notes, nil
 }
 
+func DeleteFile(files []*File, ind int) (newFiles []*File, err error) {
+	for i := ind; i < len(files)-1; i++ {
+		files[i] = files[i+1]
+	}
+	files = files[:len(files)-1]
+	return files, nil
+}
 func GenHash(s string) string {
 	s1 := md5.Sum([]byte(s))
 

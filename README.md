@@ -23,10 +23,10 @@ Please, give me some comments and advices for my code in review.
 - [x] Edit bank cards
 - [x] Add bank cards
 - [x] Del bank cards
-- [x] List user notes
-- [x] Edit user notes
-- [x] Add user notes
-- [x] Del user notes
+- [x] List user files
+- [x] Edit user files
+- [x] Add user files
+- [x] Del user files
 - [x] List user files
 - [x] Download user files
 - [ ] Edit user files
@@ -63,12 +63,12 @@ Please, give me some comments and advices for my code in review.
 - [ ] Finall review all app code (again)
 
 ## TUI 
-- [x] TUI Order notes by date
-- [ ] TUI clean fields (notes->date, cards->number,cvc,pin)
+- [x] TUI Order files by date
+- [ ] TUI clean fields (files->date, cards->number,cvc,pin)
 - [x] TUI beautify cards number fields to "0000 0000 0000 0000"
 - [ ] TUI move both login/register forms to center align 
 - [ ] TUI subpage: bank cards not auto update after delete card
-- [ ] TUI subpage: notes not auto update after delete note
+- [ ] TUI subpage: files not auto update after delete note
 - [ ] Fix bug with Banks DropDown on Bank cards
 - [ ] TUI form info about reconnect to server
 

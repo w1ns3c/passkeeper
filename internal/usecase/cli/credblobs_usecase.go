@@ -79,6 +79,7 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	return nil
 }
 
+// EditBlob change user blob, encrypt it and save changes in storage on server side
 func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error) {
 	// check that blob with ind exist
 	switch cred.(type) {
@@ -154,6 +155,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 	return err
 }
 
+// AddBlob encrypt new blob and save in storage on server side
 func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err error) {
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
@@ -219,6 +221,17 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 		c.Notes = tmpNotes
 		blobT = "note"
 
+	case *entities.File:
+		tmpFiles, err := entities.AddFile(c.Files, cred.(*entities.File))
+		if err != nil {
+			// can't save creds localy
+			c.log.Error().
+				Err(err).Msg("can't save new cred locally")
+			return err
+		}
+		c.Files = tmpFiles
+		blobT = "file"
+
 	default:
 		return fmt.Errorf("unknown credential type")
 	}
@@ -229,6 +242,8 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 	return nil
 }
 
+// DelBlob search blobID by ind and blobType on client side,
+// then delete crypto blob from storage by blobID on server side
 func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobType) (err error) {
 	var delID string
 
@@ -252,6 +267,13 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 		tmp, err := c.GetNoteByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of notes")
+		}
+		delID = tmp.ID
+
+	case entities.BlobFile:
+		tmp, err := c.GetFileByIND(ind)
+		if err != nil {
+			return fmt.Errorf("invalid index of files")
 		}
 		delID = tmp.ID
 
@@ -295,6 +317,14 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 			return err
 		}
 		c.Notes = newNotes
+		blobT = "note"
+
+	case entities.BlobFile:
+		newFiles, err := entities.DeleteFile(c.Files, ind)
+		if err != nil {
+			return err
+		}
+		c.Files = newFiles
 		blobT = "note"
 
 	default:

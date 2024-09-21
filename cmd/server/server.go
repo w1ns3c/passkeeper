@@ -24,6 +24,7 @@ func main() {
 	lg := logger.Init(conf.LogLevel)
 	lg.Info().Msg("[i] Logger init:  done")
 
+	// TODO Change this
 	users, blobs := InitTestData()
 
 	storage := memstorage.NewMemStorage(

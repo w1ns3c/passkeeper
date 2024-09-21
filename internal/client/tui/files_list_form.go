@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	hintFiles = "\n" + genHelp("files")
+	hintFiles = strings.Replace("\n"+genHelp("file"), "choose", "download", 1)
 )
 
 func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
@@ -61,14 +61,10 @@ func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
 
 		switch event.Rune() {
 		case 'a':
-			//tuiApp.Usecase.StopSync()
-			//tuiApp.App.SetFocus(viewForm)
-			//viewForm.Add(tuiApp, ind, list)
-			//NewDownloadForm(tuiApp)
-
 			tuiApp.Usecase.StopSync()
 			form := tuiApp.NewUploadForm()
 			tuiApp.Pages.AddAndSwitchToPage("upload", form, true)
+			list.Rerender(tuiApp.Usecase.GetFiles())
 
 		case 'e':
 			//tuiApp.Usecase.StopSync()
@@ -76,7 +72,9 @@ func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
 			//viewForm.Edit(tuiApp, ind, list)
 
 		case 'd':
-			//	list.Delete(tuiApp, ind)
+			ind := list.GetCurrentItem()
+			list.Delete(tuiApp, ind)
+			list.Rerender(tuiApp.Usecase.GetFiles())
 		}
 
 		return event
@@ -167,6 +165,7 @@ func (list *FileList) Delete(tuiApp *TUI, ind int) {
 	tuiApp.Pages.SwitchToPage(pageConfirm)
 }
 
+// NewDownloadForm func unzip file and save it on local system
 func (tuiApp *TUI) NewDownloadForm(file *entities.File) tview.Primitive {
 	if file == nil {
 		return tview.NewForm()
@@ -184,6 +183,8 @@ func (tuiApp *TUI) NewDownloadForm(file *entities.File) tview.Primitive {
 	modal.SetBorder(true)
 
 	download := func() {
+		defer tuiApp.Usecase.ContinueSync()
+
 		input := modal.GetFormItem(0).(*tview.InputField)
 		dir := input.GetText() // directory to save file inputted in form
 
@@ -208,6 +209,8 @@ func (tuiApp *TUI) NewDownloadForm(file *entities.File) tview.Primitive {
 	}
 
 	cancel := func() {
+		defer tuiApp.Usecase.ContinueSync()
+
 		tuiApp.Pages.SwitchToPage(PageBlobsMenu)
 		tuiApp.Usecase.ContinueSync()
 	}
@@ -218,6 +221,7 @@ func (tuiApp *TUI) NewDownloadForm(file *entities.File) tview.Primitive {
 	return center(0, 7, modal)
 }
 
+// NewUploadForm func zip file, create file crypto blob and save it on server
 func (tuiApp *TUI) NewUploadForm() tview.Primitive {
 	var (
 		btnUpload = "Upload"
@@ -231,6 +235,8 @@ func (tuiApp *TUI) NewUploadForm() tview.Primitive {
 	modal.SetBorder(true)
 
 	upload := func() {
+		defer tuiApp.Usecase.ContinueSync()
+
 		input := modal.GetFormItem(0).(*tview.InputField)
 		filePath := strings.TrimSpace(input.GetText()) // file that need to upload
 
@@ -240,7 +246,7 @@ func (tuiApp *TUI) NewUploadForm() tview.Primitive {
 				Err(err).Msg("can't zip file blob")
 
 			errModal := NewModalWithParams(tuiApp, "can't zip file blob", PageBlobsMenu)
-			tuiApp.Pages.AddAndSwitchToPage("errDownload", errModal, true)
+			tuiApp.Pages.AddAndSwitchToPage(PageBlobUpdError, errModal, true)
 
 			return
 		}
@@ -251,23 +257,24 @@ func (tuiApp *TUI) NewUploadForm() tview.Primitive {
 				Err(err).Msg("can't add file blob on server side")
 
 			errModal := NewModalWithParams(tuiApp, "can't upload file blob", PageBlobsMenu)
-			tuiApp.Pages.AddAndSwitchToPage("errDownload", errModal, true)
+			tuiApp.Pages.AddAndSwitchToPage(PageBlobUpdError, errModal, true)
 
 			return
 		}
 
-		tuiApp.log.Error().
+		tuiApp.log.Info().
 			Str("id", file.ID).
 			Msg("add file blob successfully")
 
+		tuiApp.Rerender()
 		tuiApp.Pages.SwitchToPage(PageBlobsMenu)
-		tuiApp.Usecase.ContinueSync()
 
 	}
 
 	cancel := func() {
+		defer tuiApp.Usecase.ContinueSync()
+
 		tuiApp.Pages.SwitchToPage(PageBlobsMenu)
-		tuiApp.Usecase.ContinueSync()
 	}
 
 	modal.GetButton(0).SetSelectedFunc(upload)

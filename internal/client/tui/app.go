@@ -292,6 +292,8 @@ func (tuiApp *TUI) Rerender() {
 		ind = 2
 	case SubPageNotes:
 		ind = 3
+	case SubPageFiles:
+		ind = 4
 	}
 
 	tuiApp.SubformCreds = NewCredsList(tuiApp)
@@ -300,6 +302,8 @@ func (tuiApp *TUI) Rerender() {
 	tuiApp.SubPages.AddPage(SubPageBank, tuiApp.SubformBank, true, false)
 	tuiApp.SubformNotes = tuiApp.NewNotes(tuiApp.Usecase.GetNotes())
 	tuiApp.SubPages.AddPage(SubPageNotes, tuiApp.SubformNotes, true, false)
+	tuiApp.SubformFiles = tuiApp.NewFiles(tuiApp.Usecase.GetFiles())
+	tuiApp.SubPages.AddPage(SubPageFiles, tuiApp.SubformFiles, true, false)
 
 	item := tuiApp.FormCredsMenu.GetItem(0).(*Header)
 	item.ChangePage(ind)
