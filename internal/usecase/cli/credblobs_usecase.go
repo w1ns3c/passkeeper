@@ -153,7 +153,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 		if err = entities.SaveFile(c.Files, ind, cred.(*entities.File)); err != nil {
 			return err
 		}
-		blobT = "note"
+		blobT = "file"
 
 	default:
 		return fmt.Errorf("unknown credential type")

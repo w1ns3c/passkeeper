@@ -20,5 +20,6 @@ const (
 	SyncDefault = time.Second * 10
 
 	MaxNameLen     = 10
+	MaxFilenameLen = 40
 	MaxTextAreaLen = 200
 )

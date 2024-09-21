@@ -43,9 +43,13 @@ func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
 			tuiApp.Pages.SwitchToPage(pageName)
 
 		case tcell.KeyDelete:
-		//list.Delete(tuiApp, ind)
-		case tcell.KeyEnter:
+			// delete current selected  file
+			ind := list.GetCurrentItem()
+			list.Delete(tuiApp, ind)
+			list.Rerender(tuiApp.Usecase.GetFiles())
 
+		case tcell.KeyEnter:
+			// download current selected file
 			ind := list.GetCurrentItem()
 			file, err := tuiApp.Usecase.GetFileByIND(ind)
 			if err != nil {
@@ -54,24 +58,26 @@ func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
 
 			tuiApp.Usecase.StopSync()
 			form := tuiApp.NewDownloadForm(file)
-			//tuiApp.App.SetFocus(form)
 			tuiApp.Pages.AddAndSwitchToPage("download", form, true)
-
 		}
 
 		switch event.Rune() {
 		case 'a':
+			// upload new file
 			tuiApp.Usecase.StopSync()
-			form := tuiApp.NewUploadForm()
+			form := tuiApp.NewUploadForm(-1)
 			tuiApp.Pages.AddAndSwitchToPage("upload", form, true)
 			list.Rerender(tuiApp.Usecase.GetFiles())
 
 		case 'e':
-			//tuiApp.Usecase.StopSync()
-			//tuiApp.App.SetFocus(viewForm)
-			//viewForm.Edit(tuiApp, ind, list)
+			tuiApp.Usecase.StopSync()
+			ind := list.GetCurrentItem()
+			form := tuiApp.NewUploadForm(ind)
+			tuiApp.Pages.AddAndSwitchToPage("upload", form, true)
+			list.Rerender(tuiApp.Usecase.GetFiles())
 
 		case 'd':
+			// delete current file
 			ind := list.GetCurrentItem()
 			list.Delete(tuiApp, ind)
 			list.Rerender(tuiApp.Usecase.GetFiles())
@@ -81,13 +87,7 @@ func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
 	})
 
 	list.SetChangedFunc(func(ind int, mainText string, secondaryText string, shortcut rune) {
-		//card, err := tuiApp.Usecase.GetCardByIND(ind)
-		//if err != nil {
-		//	tuiApp.log.Error().
-		//		Err(err).Msg("wrong card ind")
-		//	return
-		//}
-		//viewForm.Rerender(card)
+		// TODO add functional to view addition file info in bottom of page (generate new form)
 	})
 
 	return flex
@@ -131,27 +131,13 @@ func (list *FileList) Rerender(files []*entities.File) {
 
 // GenFileShortName beautify file name to show it in the list
 func GenFileShortName(filePath string) string {
-
-	var (
-		res string
-		m   = config.MaxNameLen
-	)
+	var m = config.MaxFilenameLen
 
 	if len(filePath) > m {
-		parts := strings.Split(filePath, " ")
-		if len(parts) == 1 {
-			res = parts[0]
-		} else {
-			res = strings.Join(parts[:2], "_")
-			if len(res) > m {
-				res = res[:m]
-			}
-		}
-	} else {
-		res = filePath
+		return filePath[:m-4] + " ..."
 	}
 
-	return res
+	return filePath
 }
 
 func (list *FileList) Delete(tuiApp *TUI, ind int) {
@@ -222,7 +208,7 @@ func (tuiApp *TUI) NewDownloadForm(file *entities.File) tview.Primitive {
 }
 
 // NewUploadForm func zip file, create file crypto blob and save it on server
-func (tuiApp *TUI) NewUploadForm() tview.Primitive {
+func (tuiApp *TUI) NewUploadForm(ind int) tview.Primitive {
 	var (
 		btnUpload = "Upload"
 		btnCancel = "Cancel"
@@ -251,20 +237,49 @@ func (tuiApp *TUI) NewUploadForm() tview.Primitive {
 			return
 		}
 
-		err = tuiApp.Usecase.AddBlob(tuiApp.Ctx, file)
-		if err != nil {
-			tuiApp.log.Error().
-				Err(err).Msg("can't add file blob on server side")
+		if ind == -1 {
+			// just upload new file
+			err = tuiApp.Usecase.AddBlob(tuiApp.Ctx, file)
+			if err != nil {
+				tuiApp.log.Error().
+					Err(err).Msg("can't add file blob on server side")
 
-			errModal := NewModalWithParams(tuiApp, "can't upload file blob", PageBlobsMenu)
-			tuiApp.Pages.AddAndSwitchToPage(PageBlobUpdError, errModal, true)
+				errModal := NewModalWithParams(tuiApp, "can't upload file blob", PageBlobsMenu)
+				tuiApp.Pages.AddAndSwitchToPage(PageBlobUpdError, errModal, true)
 
-			return
+				return
+			}
+		} else {
+			// set current file ID
+			curFile, err := tuiApp.Usecase.GetFileByIND(ind)
+			if err != nil {
+				tuiApp.log.Error().
+					Err(err).Msg("can't edit current file blob")
+
+				errModal := NewModalWithParams(tuiApp, "can't edit current file blob", PageBlobsMenu)
+				tuiApp.Pages.AddAndSwitchToPage(PageBlobUpdError, errModal, true)
+
+				return
+			}
+
+			file.SetID(curFile.GetID())
+
+			// change already uploaded file
+			err = tuiApp.Usecase.EditBlob(tuiApp.Ctx, file, ind)
+			if err != nil {
+				tuiApp.log.Error().
+					Err(err).Msg("can't edit file blob on server side")
+
+				errModal := NewModalWithParams(tuiApp, "can't edit current file blob", PageBlobsMenu)
+				tuiApp.Pages.AddAndSwitchToPage(PageBlobUpdError, errModal, true)
+
+				return
+			}
 		}
 
 		tuiApp.log.Info().
 			Str("id", file.ID).
-			Msg("add file blob successfully")
+			Msg("edit file blob successfully")
 
 		tuiApp.Rerender()
 		tuiApp.Pages.SwitchToPage(PageBlobsMenu)
