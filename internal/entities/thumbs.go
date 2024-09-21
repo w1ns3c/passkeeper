@@ -30,6 +30,11 @@ func SaveNote(notes []*Note, ind int, note *Note) error {
 	return nil
 }
 
+func SaveFile(files []*File, ind int, file *File) error {
+	files[ind] = file
+	return nil
+}
+
 func AddCred(creds []*Credential, newCred *Credential) (newCreds []*Credential, err error) {
 	if len(creds) == 0 {
 

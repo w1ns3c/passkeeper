@@ -95,6 +95,10 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 		if ind < 0 && ind >= len(c.Notes) {
 			return fmt.Errorf("invalid index of notes")
 		}
+	case *entities.File:
+		if ind < 0 && ind >= len(c.Files) {
+			return fmt.Errorf("invalid index of files")
+		}
 	default:
 		return fmt.Errorf("unknown type of blob")
 	}
@@ -141,6 +145,12 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 
 	case *entities.Note:
 		if err = entities.SaveNote(c.Notes, ind, cred.(*entities.Note)); err != nil {
+			return err
+		}
+		blobT = "note"
+
+	case *entities.File:
+		if err = entities.SaveFile(c.Files, ind, cred.(*entities.File)); err != nil {
 			return err
 		}
 		blobT = "note"
