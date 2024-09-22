@@ -29,9 +29,9 @@ Please, give me some comments and advices for my code in review.
 - [x] Del user files
 - [x] List user files
 - [x] Download user files
-- [ ] Edit user files
-- [ ] Add user files (upload)
-- [ ] Del user files
+- [x] Edit user files
+- [x] Add user files (upload)
+- [x] Del user files
 - [x] Asynchronous sync credentials (bugs fix)
 - [ ] Add DB storage
 - [x] Gracefull shutdown (client)
@@ -71,6 +71,7 @@ Please, give me some comments and advices for my code in review.
 - [ ] TUI subpage: files not auto update after delete note
 - [ ] Fix bug with Banks DropDown on Bank cards
 - [ ] TUI form info about reconnect to server
+- 
 
 ## Fill Readme.md
 - [ ] Add gif to show functionality

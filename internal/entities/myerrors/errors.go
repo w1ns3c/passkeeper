@@ -1,6 +1,7 @@
-package entities
+package myerrors
 
 import (
+	"errors"
 	"fmt"
 
 	"google.golang.org/grpc/codes"
@@ -16,4 +17,11 @@ var (
 
 	ErrEmptyTokenMsg = "token is empty"
 	ErrEmptyToken    = status.Error(codes.Unauthenticated, ErrEmptyTokenMsg)
+
+	// DB
+	ErrWrongResultValues = errors.New("wrong count of results")
+	ErrUsersWrongResult  = fmt.Errorf("can't return user: %v", ErrWrongResultValues)
+	ErrUsersNotExist     = errors.New("user not exist")
+	ErrRepoNotInit       = errors.New("repo not initialize")
+	ErrDBConnect         = errors.New("can't connect to datebase")
 )

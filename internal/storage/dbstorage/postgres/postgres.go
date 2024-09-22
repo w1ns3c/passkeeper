@@ -9,7 +9,6 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/rs/zerolog"
 
-	"passkeeper/internal/entities/config"
 	"passkeeper/internal/storage"
 )
 
@@ -19,6 +18,23 @@ type PostgresStorage struct {
 	log *zerolog.Logger
 }
 
+const (
+	TableUsers = "users"
+	TableBlobs = "blobs"
+
+	fieldUserID = "userID"
+	fieldLogin  = "login"
+	fieldHash   = "hash"
+	fieldSalt   = "salt"
+	fieldSecret = "secret"
+	fieldEmail  = "email"
+	fieldPhone  = "phone"
+
+	fieldBlobID   = "blobID"
+	fiedlBlobData = "blobData"
+)
+
+// NewStorage is constructor for correct connect to DB and init tables
 func NewStorage(ctx context.Context, dbURL string) (repo storage.Storage, err error) {
 	db, err := sql.Open("pgx", dbURL)
 	if err != nil {
@@ -52,22 +68,26 @@ func (pg *PostgresStorage) Init(ctx context.Context) error {
 	}
 
 	queryTb1 := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s ("+
-		"userID varchar primary KEY UNIQUE,"+
-		"login varchar NOT NULL UNIQUE,"+
-		"hash varchar NOT NULL,"+
-		"salt varchar NOT NULL,"+
-		"secret varchar NOT NULL,"+
-		"email varchar,"+ // currently not using
-		"phone varchar,"+ // currently not using
+		"%s varchar primary KEY UNIQUE,"+
+		"%s varchar NOT NULL UNIQUE,"+
+		"%s varchar NOT NULL,"+
+		"%s varchar NOT NULL,"+
+		"%s varchar NOT NULL,"+
+		"%s varchar,"+ // currently not using
+		"%s varchar,"+ // currently not using
 		"CONSTRAINT users_fk FOREIGN KEY (userID) REFERENCES public.%s(userID));",
-		config.TableUsers, config.TableUsers)
+		TableUsers,
+		fieldUserID, fieldLogin, fieldHash, fieldSalt, fieldSecret, fieldEmail, fieldPhone,
+		TableUsers)
 
 	queryTb2 := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s ("+
-		"userID varchar primary KEY,"+
-		"blobID varchar NOT NULL UNIQUE,"+
-		"blobData varchar NOT NULL,"+
+		"%s varchar primary KEY,"+
+		"%s varchar NOT NULL UNIQUE,"+
+		"%s varchar NOT NULL,"+
 		"CONSTRAINT blobs_fk FOREIGN KEY (userID) REFERENCES public.%s(userID));",
-		config.TableBlobs, config.TableBlobs)
+		TableBlobs,
+		fieldUserID, fieldBlobID, fiedlBlobData,
+		TableBlobs)
 
 	tx, err := pg.db.Begin()
 	if err != nil {

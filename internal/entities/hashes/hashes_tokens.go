@@ -8,8 +8,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/metadata"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/myerrors"
 )
 
 type Claims struct {
@@ -72,12 +72,12 @@ func ExtractUserID(token string) (userID string, err error) {
 func ExtractUserInfo(ctx context.Context) (token string, err error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return "", entities.ErrNoToken
+		return "", myerrors.ErrNoToken
 	}
 
 	tokens := md.Get(config.TokenHeader)
 	if len(tokens) == 0 {
-		return "", entities.ErrEmptyToken
+		return "", myerrors.ErrEmptyToken
 	}
 	token = tokens[0]
 

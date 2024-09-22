@@ -25,14 +25,6 @@ func main() {
 	lg := logger.Init(conf.LogLevel)
 	lg.Info().Msg("[+] Logger init:  done")
 
-	// TODO Change this
-	//users, blobs := InitTestData()
-
-	//storage := memstorage.NewMemStorage(
-	//	memstorage.WithUsers(users),
-	//	memstorage.WithBlobs(blobs))
-	//lg.Info().Msg("[i] Storage init: done")
-
 	// try to connect to DB
 	storage, err := postgres.NewStorage(ctx, conf.DBurl)
 	if err != nil {
@@ -43,6 +35,24 @@ func main() {
 	} else {
 		lg.Info().Str("db", entities.HideDBpass(conf.DBurl)).
 			Msg("[+] Storage init: done (successfully connected to DB)")
+	}
+
+	// 	 TODO Change this
+	users, _ := InitTestData()
+
+	//storage := memstorage.NewMemStorage(
+	//	memstorage.WithUsers(users),
+	//	memstorage.WithBlobs(blobs))
+	//lg.Info().Msg("[i] Storage init: done")
+
+	errs := InitTestUsersTable(storage, users)
+	for _, err = range errs {
+		lg.Error().Err(err).Send()
+	}
+
+	err = TestGetUser(storage)
+	if err != nil {
+		lg.Error().Err(err).Send()
 	}
 
 	credsUC := blobsUC.NewBlobUCWithOpts(

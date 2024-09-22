@@ -91,7 +91,7 @@ func (UnimplementedUserSvcServer) testEmbeddedByValue()                 {}
 
 // UnsafeUserSvcServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to UserSvcServer will
-// result in compilation errors.
+// result in compilation myerrors.
 type UnsafeUserSvcServer interface {
 	mustEmbedUnimplementedUserSvcServer()
 }

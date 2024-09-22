@@ -8,12 +8,12 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"passkeeper/internal/entities"
+	errors2 "passkeeper/internal/entities/myerrors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
-// response errors
+// response myerrors
 var (
 	ErrAlreadyExistMsg = "user already exist"
 	ErrAlreadyExist    = status.Error(codes.AlreadyExists, ErrAlreadyExistMsg)
@@ -42,7 +42,7 @@ func NewUsersHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *Us
 func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegisterRequest) (resp *pb.UserRegisterResponse, err error) {
 	token, secret, err := h.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
 	if err != nil {
-		if !errors.Is(err, entities.ErrUserNotFound) {
+		if !errors.Is(err, errors2.ErrUserNotFound) {
 			h.log.Error().
 				Err(err).Msg(ErrAlreadyExistMsg)
 			return nil, ErrAlreadyExist

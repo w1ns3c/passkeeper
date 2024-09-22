@@ -136,7 +136,7 @@ func (UnimplementedBlobSvcServer) testEmbeddedByValue()                 {}
 
 // UnsafeBlobSvcServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to BlobSvcServer will
-// result in compilation errors.
+// result in compilation myerrors.
 type UnsafeBlobSvcServer interface {
 	mustEmbedUnimplementedBlobSvcServer()
 }

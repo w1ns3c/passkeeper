@@ -10,6 +10,7 @@ import (
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
+	errors2 "passkeeper/internal/entities/myerrors"
 )
 
 // RegisterUser function for register user in app
@@ -31,7 +32,7 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 
 	// checking login free
 	exist, err := u.storage.CheckUserExist(ctx, login)
-	if (!errors.Is(err, entities.ErrUserNotFound) && err != nil) || exist {
+	if (!errors.Is(err, errors2.ErrUserNotFound) && err != nil) || exist {
 		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
 
