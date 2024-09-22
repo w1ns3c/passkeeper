@@ -23,9 +23,9 @@ type UserStorage interface {
 }
 
 type CredentialStorage interface {
-	AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
-	GetBlob(ctx context.Context, userID, passwordID string) (blob *entities.CryptoBlob, err error)
+	AddBlob(ctx context.Context, blob *entities.CryptoBlob) error
+	GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error)
 	GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)
 	DeleteBlob(ctx context.Context, userID, blobID string) error
-	UpdateBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
+	UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error
 }

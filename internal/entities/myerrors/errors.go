@@ -24,4 +24,7 @@ var (
 	ErrUsersNotExist     = errors.New("user not exist")
 	ErrRepoNotInit       = errors.New("repo not initialize")
 	ErrDBConnect         = errors.New("can't connect to datebase")
+
+	// Server
+	ErrBlobsUserIDdifferent = errors.New("blob.UserID and userID in JWT are not the same")
 )

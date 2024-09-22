@@ -6,17 +6,17 @@ import (
 	"passkeeper/internal/entities"
 )
 
-func (m *MemStorage) AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error {
+func (m *MemStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
 
-	if m.blobs[userID] == nil {
-		m.blobs[userID] = make([]*entities.CryptoBlob, 1)
-		m.blobs[userID][0] = blob
+	if m.blobs[blob.UserID] == nil {
+		m.blobs[blob.UserID] = make([]*entities.CryptoBlob, 1)
+		m.blobs[blob.UserID][0] = blob
 		return nil
 	}
 
-	m.blobs[userID] = append(m.blobs[userID], blob)
+	m.blobs[blob.UserID] = append(m.blobs[blob.UserID], blob)
 	return nil
 }
 
@@ -67,13 +67,13 @@ func (m *MemStorage) DeleteBlob(ctx context.Context, userID, blobID string) erro
 	return ErrBlobNotFound
 }
 
-func (m *MemStorage) UpdateBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error {
+func (m *MemStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
 
-	for ind, pass := range m.blobs[userID] {
+	for ind, pass := range m.blobs[blob.UserID] {
 		if pass.ID == blob.ID {
-			m.blobs[userID][ind] = blob
+			m.blobs[blob.UserID][ind] = blob
 			return nil
 		}
 	}

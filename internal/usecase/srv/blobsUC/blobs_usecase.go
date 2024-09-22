@@ -14,12 +14,13 @@ var (
 )
 
 type BlobUsecaseInf interface {
-	GetUserSalt(ctx context.Context, blobID string) string // return secret user string
 	GetBlob(ctx context.Context, userID, blobID string) (cred *entities.CryptoBlob, err error)
 	AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
 	UpdBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
 	DelBlob(ctx context.Context, userID, blobID string) error
 	ListBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)
+
+	//GetUserSalt(ctx context.Context, blobID string) string // return secret user string
 
 	//VerifyCredDate(cred *entities.Credential) // check date/time in received credential
 

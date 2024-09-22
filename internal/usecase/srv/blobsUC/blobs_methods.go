@@ -4,43 +4,53 @@ import (
 	"context"
 
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/myerrors"
 )
 
-func (u *BlobUsecase) GetBlob(ctx context.Context, userToken, blobID string) (blob *entities.CryptoBlob, err error) {
-	return u.storage.GetBlob(ctx, userToken, blobID)
+func (u *BlobUsecase) GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error) {
+	return u.storage.GetBlob(ctx, userID, blobID)
 }
 
 func (u *BlobUsecase) AddBlob(ctx context.Context,
 	userID string, blob *entities.CryptoBlob) error {
 
-	//blob.Password, err = EncryptPass(blob.Password)
-	//blob.ID = hashes.GeneratePassID(sec, salt)
+	// user try to add blob to someone else's
+	if userID != blob.UserID {
+		return myerrors.ErrBlobsUserIDdifferent
+	}
 
-	//blob.ID = hashes.GeneratePassID2()
-	//VerifyCredDate(blob)
-
-	return u.storage.AddBlob(ctx, userID, blob)
+	return u.storage.AddBlob(ctx, blob)
 }
 
 func (u *BlobUsecase) UpdBlob(ctx context.Context,
 	userID string, blob *entities.CryptoBlob) error {
 
-	return u.storage.UpdateBlob(ctx, userID, blob)
+	// user try to update someone else's blob
+	if userID != blob.UserID {
+		return myerrors.ErrBlobsUserIDdifferent
+	}
+
+	return u.storage.UpdateBlob(ctx, blob)
 }
 
 func (u *BlobUsecase) DelBlob(ctx context.Context,
-	userToken, blobID string) error {
+	userID, blobID string) error {
 
-	return u.storage.DeleteBlob(ctx, userToken, blobID)
+	blob, err := u.storage.GetBlob(ctx, userID, blobID)
+	if err != nil {
+		return err
+	}
+
+	// user try to delete someone else's blob
+	if blob.UserID != userID {
+		return myerrors.ErrBlobsUserIDdifferent
+	}
+
+	return u.storage.DeleteBlob(ctx, userID, blobID)
 }
 
 func (u *BlobUsecase) ListBlobs(ctx context.Context,
 	userID string) (blobs []*entities.CryptoBlob, err error) {
 
 	return u.storage.GetAllBlobs(ctx, userID)
-}
-
-func (u *BlobUsecase) GetUserSalt(ctx context.Context, userID string) string {
-	//TODO implement me
-	panic("implement me")
 }

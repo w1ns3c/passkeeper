@@ -54,13 +54,13 @@ func (h *BlobsHandler) BlobAdd(ctx context.Context, req *pb.BlobAddRequest) (*em
 		return nil, err
 	}
 
-	cred := &entities.CryptoBlob{
+	blob := &entities.CryptoBlob{
 		ID:     req.Cred.ID,
 		UserID: userID,
 		Blob:   req.Cred.Blob,
 	}
 
-	err = h.service.AddBlob(ctx, userID, cred)
+	err = h.service.AddBlob(ctx, userID, blob)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredAddMsg)
@@ -106,13 +106,13 @@ func (h *BlobsHandler) BlobUpd(ctx context.Context, req *pb.BlobUpdRequest) (*em
 		return nil, err
 	}
 
-	cred := &entities.CryptoBlob{
+	blob := &entities.CryptoBlob{
 		ID:     req.Blob.ID,
 		UserID: userID,
 		Blob:   req.Blob.Blob,
 	}
 
-	err = h.service.UpdBlob(ctx, userID, cred)
+	err = h.service.UpdBlob(ctx, userID, blob)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredUpdMsg)
@@ -153,9 +153,9 @@ func (h *BlobsHandler) BlobList(ctx context.Context, req *empty.Empty) (resp *pb
 	}
 
 	h.log.Info().
-		Msgf("User \"%s\" request creds list", userID)
+		Msgf("User \"%s\" request blobs list", userID)
 
-	creds, err := h.service.ListBlobs(ctx, userID)
+	blobs, err := h.service.ListBlobs(ctx, userID)
 	if err != nil {
 		h.log.Error().
 			Err(err).Msg(ErrCredListMsg)
@@ -164,15 +164,15 @@ func (h *BlobsHandler) BlobList(ctx context.Context, req *empty.Empty) (resp *pb
 	}
 
 	h.log.Info().
-		Msgf("User \"%s\" have: %d creds", userID, len(creds))
+		Msgf("User \"%s\" have: %d blobs", userID, len(blobs))
 
 	resp = &pb.BlobListResponse{
-		Blobs: make([]*pb.CryptoBlob, len(creds)),
+		Blobs: make([]*pb.CryptoBlob, len(blobs)),
 	}
-	for i := 0; i < len(creds); i++ {
+	for i := 0; i < len(blobs); i++ {
 		resp.Blobs[i] = &pb.CryptoBlob{
-			ID:   creds[i].ID,
-			Blob: creds[i].Blob,
+			ID:   blobs[i].ID,
+			Blob: blobs[i].Blob,
 		}
 	}
 

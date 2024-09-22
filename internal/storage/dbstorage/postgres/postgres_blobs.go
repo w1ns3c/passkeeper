@@ -8,7 +8,7 @@ import (
 	"passkeeper/internal/entities"
 )
 
-func (pg *PostgresStorage) AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error {
+func (pg *PostgresStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	var (
 		query = fmt.Sprintf("insert into %s (%s, %s, %s) "+
 			"values ($1, $2, $3);",
@@ -23,7 +23,7 @@ func (pg *PostgresStorage) AddBlob(ctx context.Context, userID string, blob *ent
 
 		return err
 	}
-	_, err = tx.ExecContext(ctx, query, userID, blob.ID, blob.Blob)
+	_, err = tx.ExecContext(ctx, query, blob.UserID, blob.ID, blob.Blob)
 	if err != nil {
 		tx.Rollback()
 
@@ -48,7 +48,7 @@ func (pg *PostgresStorage) DeleteBlob(ctx context.Context, userID, blobID string
 	panic("implement me")
 }
 
-func (pg *PostgresStorage) UpdateBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error {
+func (pg *PostgresStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	//TODO implement me
 	panic("implement me")
 }
