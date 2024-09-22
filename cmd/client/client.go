@@ -4,9 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os/signal"
-	"passkeeper/internal/client/tui"
-	"passkeeper/internal/config/client"
 	"syscall"
+
+	"passkeeper/internal/client/tui"
+	"passkeeper/internal/entities/config/client"
 )
 
 func main() {

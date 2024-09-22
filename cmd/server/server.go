@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 
-	"passkeeper/internal/config"
-	cnf "passkeeper/internal/config/server"
-	"passkeeper/internal/logger"
+	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
+	cnf "passkeeper/internal/entities/config/server"
+	"passkeeper/internal/entities/logger"
 	"passkeeper/internal/server"
+	"passkeeper/internal/storage/dbstorage/postgres"
+	"passkeeper/internal/storage/memstorage"
 	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
-
-	"passkeeper/internal/storage/memstorage"
 )
 
 func main() {
@@ -22,15 +23,27 @@ func main() {
 	ctx := context.Background()
 
 	lg := logger.Init(conf.LogLevel)
-	lg.Info().Msg("[i] Logger init:  done")
+	lg.Info().Msg("[+] Logger init:  done")
 
 	// TODO Change this
-	users, blobs := InitTestData()
+	//users, blobs := InitTestData()
 
-	storage := memstorage.NewMemStorage(
-		memstorage.WithUsers(users),
-		memstorage.WithBlobs(blobs))
-	lg.Info().Msg("[i] Storage init: done")
+	//storage := memstorage.NewMemStorage(
+	//	memstorage.WithUsers(users),
+	//	memstorage.WithBlobs(blobs))
+	//lg.Info().Msg("[i] Storage init: done")
+
+	// try to connect to DB
+	storage, err := postgres.NewStorage(ctx, conf.DBurl)
+	if err != nil {
+		lg.Warn().Err(err).
+			Msg("fail to init DB storage, use memory storage")
+
+		storage = memstorage.NewMemStorage(ctx)
+	} else {
+		lg.Info().Str("db", entities.HideDBpass(conf.DBurl)).
+			Msg("[+] Storage init: done (successfully connected to DB)")
+	}
 
 	credsUC := blobsUC.NewBlobUCWithOpts(
 		blobsUC.WithContext(ctx),
@@ -38,13 +51,12 @@ func main() {
 		blobsUC.WithLogger(lg),
 	)
 
-	uc := usersUC.NewUserUsecase().
-		SetContext(ctx).
+	uc := usersUC.NewUserUsecase(ctx).
 		SetStorage(storage).
 		SetLog(lg).
 		SetSaltLen(saltLen)
 
-	lg.Info().Msg("[i] Usecase init: done")
+	lg.Info().Msg("[+] Usecase init: done")
 
 	srv, err := server.NewServer(
 		server.WithAddr(conf.Addr),
@@ -58,7 +70,7 @@ func main() {
 		return
 	}
 
-	lg.Info().Msg("[i] Server init:  done")
+	lg.Info().Msg("[+] Server init:  done")
 
 	err = srv.Run()
 	if err != nil {

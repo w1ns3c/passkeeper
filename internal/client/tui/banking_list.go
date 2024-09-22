@@ -7,8 +7,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 )
 
 func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {

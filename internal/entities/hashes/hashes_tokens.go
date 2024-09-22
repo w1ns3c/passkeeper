@@ -8,8 +8,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc/metadata"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 )
 
 type Claims struct {

@@ -22,4 +22,8 @@ const (
 	MaxNameLen     = 10
 	MaxFilenameLen = 40
 	MaxTextAreaLen = 200
+
+	// Storage
+	TableUsers = "users"
+	TableBlobs = "blobs"
 )

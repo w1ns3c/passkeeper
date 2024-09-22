@@ -9,10 +9,10 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"passkeeper/internal/config/client"
-	"passkeeper/internal/logger"
+	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/config/client"
+	"passkeeper/internal/entities/logger"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/usecase/cli"
 
 	"github.com/gdamore/tcell/v2"

@@ -7,7 +7,7 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"passkeeper/internal/config"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/storage"
 	"passkeeper/internal/storage/memstorage"
 )
@@ -60,9 +60,9 @@ func (u *UserUsecase) GetTokenSalt(ctx context.Context, userID string) string {
 	return user.Salt
 }
 
-func NewUserUsecase() *UserUsecase {
+func NewUserUsecase(ctx context.Context) *UserUsecase {
 	return &UserUsecase{
-		storage:         memstorage.NewMemStorage(),
+		storage:         memstorage.NewMemStorage(ctx),
 		tokenLifeTime:   config.TokenLifeTime,
 		userPassSaltLen: config.UserPassSaltLen,
 		userSecretLen:   config.UserSecretLen,

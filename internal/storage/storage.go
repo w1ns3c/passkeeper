@@ -8,6 +8,9 @@ import (
 
 type Storage interface {
 	Init(ctx context.Context) error
+	Close() error
+	CheckConnection() error
+
 	UserStorage
 	CredentialStorage
 }

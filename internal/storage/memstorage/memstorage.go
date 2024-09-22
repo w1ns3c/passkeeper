@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"passkeeper/internal/entities"
+	"passkeeper/internal/storage"
 )
 
 var (
@@ -20,21 +21,41 @@ type MemStorage struct {
 	blobMU  *sync.RWMutex
 }
 
-func NewMemStorage(options ...MemOptions) *MemStorage {
-	storage := NewEmptyMemStorage()
+func (m *MemStorage) Close() error {
+	m.usersMU.Lock()
+	m.blobMU.Lock()
+	defer m.usersMU.Unlock()
+	defer m.blobMU.Unlock()
+
+	m.users = nil
+	m.blobs = nil
+
+	return nil
+}
+
+func NewMemStorage(ctx context.Context, options ...MemOptions) storage.Storage {
+	storage := NewEmptyMemStorage(ctx)
 	for _, option := range options {
 		option(storage)
 	}
 	return storage
 }
 
-func NewEmptyMemStorage() *MemStorage {
-	return &MemStorage{
+func NewEmptyMemStorage(ctx context.Context) *MemStorage {
+	var m = &MemStorage{
 		users:   make(map[string]*entities.User),
 		usersMU: &sync.RWMutex{},
 		blobs:   make(map[string][]*entities.CryptoBlob),
 		blobMU:  &sync.RWMutex{},
 	}
+
+	err := m.Init(ctx)
+	if err != nil {
+
+		return nil
+	}
+
+	return m
 }
 
 type MemOptions func(*MemStorage)
@@ -72,5 +93,9 @@ func (m *MemStorage) Init(ctx context.Context) error {
 		m.blobs = make(map[string][]*entities.CryptoBlob)
 	}
 
+	return nil
+}
+
+func (m *MemStorage) CheckConnection() error {
 	return nil
 }

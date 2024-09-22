@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/grpc/metadata"
 
-	"passkeeper/internal/config"
+	"passkeeper/internal/entities/config"
 )
 
 func (c *ClientUC) SyncBlobs(ctx context.Context) {

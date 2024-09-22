@@ -5,8 +5,8 @@ import (
 
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
 )
 

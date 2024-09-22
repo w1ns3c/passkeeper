@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 )
 
 func TestEncryptDecryptBlob(t *testing.T) {

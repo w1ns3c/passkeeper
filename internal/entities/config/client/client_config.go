@@ -4,9 +4,10 @@ import (
 	"flag"
 	"net"
 	"os"
-	"passkeeper/internal/config"
 	"slices"
 	"strconv"
+
+	config2 "passkeeper/internal/entities/config"
 )
 
 type Args struct {
@@ -28,10 +29,10 @@ func CliParseArgs() *Args {
 		realLogFile     string
 		realSyncTimeVal int
 
-		defaultAddr     = config.DefaultAddr
-		defaultLogLevel = config.Level
-		defaultLogPath  = config.CliLogFilePath
-		defaultSyncTime = int(config.SyncDefault.Seconds())
+		defaultAddr     = config2.DefaultAddr
+		defaultLogLevel = config2.Level
+		defaultLogPath  = config2.CliLogFilePath
+		defaultSyncTime = int(config2.SyncDefault.Seconds())
 
 		addrFlag     = "addr"
 		levelFlag    = "level"

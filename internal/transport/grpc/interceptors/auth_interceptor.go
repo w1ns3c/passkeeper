@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	"passkeeper/internal/config"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/usecase/srv/usersUC"
 )

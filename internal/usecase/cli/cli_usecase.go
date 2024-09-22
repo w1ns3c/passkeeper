@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/cli/filesUC"
 )

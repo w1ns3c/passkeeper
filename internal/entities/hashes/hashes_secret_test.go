@@ -4,8 +4,9 @@ import (
 	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
-	"passkeeper/internal/config"
 	"testing"
+
+	"passkeeper/internal/entities/config"
 )
 
 func TestEncryptDecryptSecret(t *testing.T) {

@@ -7,7 +7,6 @@ import (
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/storage"
-	"passkeeper/internal/storage/memstorage"
 )
 
 var (
@@ -38,9 +37,7 @@ type BlobUsecase struct {
 type CredOption func(usecase *BlobUsecase)
 
 func newBlobUC() *BlobUsecase {
-	return &BlobUsecase{
-		storage: memstorage.NewMemStorage(),
-	}
+	return &BlobUsecase{}
 }
 
 func NewBlobUCWithOpts(opts ...CredOption) *BlobUsecase {

@@ -5,8 +5,8 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"passkeeper/internal/config"
-	"passkeeper/internal/logger"
+	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/logger"
 	mygrpc "passkeeper/internal/transport/grpc"
 	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"

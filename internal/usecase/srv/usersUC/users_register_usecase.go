@@ -7,8 +7,8 @@ import (
 
 	"github.com/w1ns3c/go-examples/crypto"
 
-	"passkeeper/internal/config"
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
 )
 
