@@ -11,7 +11,7 @@ import (
 )
 
 func (pg *PostgresStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
-	return pg.getUserByAny(cxt, fieldLogin, userID)
+	return pg.getUserByAny(cxt, fieldUserID, userID)
 }
 
 func (pg *PostgresStorage) GetUserByLogin(ctx context.Context, login string) (user *entities.User, err error) {
