@@ -14,7 +14,7 @@ Please, give me some comments and advices for my code in review.
 - [x] User register
 - [x] User logout
 - [ ] User delete account
-- [ ] Change user password
+- [ ] Change user blob
 - [x] List credentials
 - [x] Edit credential
 - [x] Add credential
@@ -32,7 +32,7 @@ Please, give me some comments and advices for my code in review.
 - [x] Edit user files
 - [x] Add user files (upload)
 - [x] Del user files
-- [x] Asynchronous sync credentials (bugs fix)
+- [x] Asynchronous sync blobs (bugs fix)
 - [ ] Add DB storage
 - [x] Gracefull shutdown (client)
 - [ ] Gracefull shutdown (server)
@@ -58,7 +58,7 @@ Please, give me some comments and advices for my code in review.
 - [ ] Generate app doc
 - [ ] Swagger
 - [ ] Add email validation with sending message
-- [ ] Add onetime passwords
+- [ ] Add onetime blobs
 - [ ] Change TUI to navigate with up/down arrow
 - [ ] Finall review all app code (again)
 

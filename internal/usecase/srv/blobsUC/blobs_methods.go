@@ -7,7 +7,7 @@ import (
 )
 
 func (u *BlobUsecase) GetBlob(ctx context.Context, userToken, blobID string) (blob *entities.CryptoBlob, err error) {
-	return u.storage.GetCredential(ctx, userToken, blobID)
+	return u.storage.GetBlob(ctx, userToken, blobID)
 }
 
 func (u *BlobUsecase) AddBlob(ctx context.Context,
@@ -19,25 +19,25 @@ func (u *BlobUsecase) AddBlob(ctx context.Context,
 	//blob.ID = hashes.GeneratePassID2()
 	//VerifyCredDate(blob)
 
-	return u.storage.AddCredential(ctx, userID, blob)
+	return u.storage.AddBlob(ctx, userID, blob)
 }
 
 func (u *BlobUsecase) UpdBlob(ctx context.Context,
 	userID string, blob *entities.CryptoBlob) error {
 
-	return u.storage.UpdateCredential(ctx, userID, blob)
+	return u.storage.UpdateBlob(ctx, userID, blob)
 }
 
 func (u *BlobUsecase) DelBlob(ctx context.Context,
 	userToken, blobID string) error {
 
-	return u.storage.DeleteCredential(ctx, userToken, blobID)
+	return u.storage.DeleteBlob(ctx, userToken, blobID)
 }
 
 func (u *BlobUsecase) ListBlobs(ctx context.Context,
 	userID string) (blobs []*entities.CryptoBlob, err error) {
 
-	return u.storage.GetAllCredentials(ctx, userID)
+	return u.storage.GetAllBlobs(ctx, userID)
 }
 
 func (u *BlobUsecase) GetUserSalt(ctx context.Context, userID string) string {

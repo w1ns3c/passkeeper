@@ -31,7 +31,7 @@ const (
 	fieldPhone  = "phone"
 
 	fieldBlobID   = "blobID"
-	fiedlBlobData = "blobData"
+	fieldBlobData = "blobData"
 )
 
 // NewStorage is constructor for correct connect to DB and init tables
@@ -75,19 +75,21 @@ func (pg *PostgresStorage) Init(ctx context.Context) error {
 		"%s varchar NOT NULL,"+
 		"%s varchar,"+ // currently not using
 		"%s varchar,"+ // currently not using
-		"CONSTRAINT users_fk FOREIGN KEY (userID) REFERENCES public.%s(userID));",
+		"CONSTRAINT users_fk FOREIGN KEY (%s) REFERENCES public.%s(%s));",
 		TableUsers,
 		fieldUserID, fieldLogin, fieldHash, fieldSalt, fieldSecret, fieldEmail, fieldPhone,
-		TableUsers)
+		fieldUserID, TableUsers, fieldUserID,
+	)
 
 	queryTb2 := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s ("+
-		"%s varchar primary KEY,"+
-		"%s varchar NOT NULL UNIQUE,"+
 		"%s varchar NOT NULL,"+
-		"CONSTRAINT blobs_fk FOREIGN KEY (userID) REFERENCES public.%s(userID));",
+		"%s varchar primary KEY UNIQUE,"+
+		"%s varchar NOT NULL,"+
+		"CONSTRAINT blobs_fk FOREIGN KEY (%s) REFERENCES public.%s(%s));",
 		TableBlobs,
-		fieldUserID, fieldBlobID, fiedlBlobData,
-		TableBlobs)
+		fieldUserID, fieldBlobID, fieldBlobData,
+		fieldBlobID, TableBlobs, fieldBlobID,
+	)
 
 	tx, err := pg.db.Begin()
 	if err != nil {

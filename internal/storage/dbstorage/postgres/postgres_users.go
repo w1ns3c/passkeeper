@@ -10,14 +10,17 @@ import (
 	"passkeeper/internal/entities/myerrors"
 )
 
+// GetUserByID return entities.User by userID
 func (pg *PostgresStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
 	return pg.getUserByAny(cxt, fieldUserID, userID)
 }
 
+// GetUserByLogin return entities.User by login
 func (pg *PostgresStorage) GetUserByLogin(ctx context.Context, login string) (user *entities.User, err error) {
 	return pg.getUserByAny(ctx, fieldLogin, login)
 }
 
+// getUserByAny return entities.User by field:value
 func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value string) (user *entities.User, err error) {
 	var (
 		query = fmt.Sprintf("SELECT *"+
@@ -82,6 +85,7 @@ func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value
 	return result[0], nil
 }
 
+// CheckUserExist check user existing in storage
 func (pg *PostgresStorage) CheckUserExist(ctx context.Context, login string) (exist bool, err error) {
 	_, err = pg.GetUserByLogin(ctx, login)
 	if err != nil {
@@ -91,6 +95,7 @@ func (pg *PostgresStorage) CheckUserExist(ctx context.Context, login string) (ex
 	return true, nil
 }
 
+// SaveUser save user in storage
 func (pg *PostgresStorage) SaveUser(ctx context.Context, user *entities.User) error {
 	var (
 		query = fmt.Sprintf("insert into %s (%s, %s, %s, %s, %s,%s, %s) "+

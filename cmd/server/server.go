@@ -38,14 +38,14 @@ func main() {
 	}
 
 	// 	 TODO Change this
-	users, _ := InitTestData()
+	users, blobs := InitTestData()
 
 	//storage := memstorage.NewMemStorage(
 	//	memstorage.WithUsers(users),
 	//	memstorage.WithBlobs(blobs))
 	//lg.Info().Msg("[i] Storage init: done")
 
-	errs := InitTestUsersTable(storage, users)
+	errs := InitTestDB(storage, users, blobs)
 	for _, err = range errs {
 		lg.Error().Err(err).Send()
 	}

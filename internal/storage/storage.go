@@ -20,16 +20,12 @@ type UserStorage interface {
 	GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error)
 	CheckUserExist(ctx context.Context, login string) (exist bool, err error)
 	SaveUser(ctx context.Context, u *entities.User) error
-
-	//LoginUser(ctx context.Context, login, hash string) (user *entities.User, err error)
-	//RefreshToken(ctx context.Context, login string) error
-	//SaveChallenge(ctx context.Context, challenge string) error
 }
 
 type CredentialStorage interface {
-	AddCredential(ctx context.Context, userID string, password *entities.CryptoBlob) error
-	GetCredential(ctx context.Context, userID, passwordID string) (password *entities.CryptoBlob, err error)
-	GetAllCredentials(ctx context.Context, userID string) (passwords []*entities.CryptoBlob, err error)
-	DeleteCredential(ctx context.Context, userID, passwordID string) error
-	UpdateCredential(ctx context.Context, userID string, password *entities.CryptoBlob) error
+	AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
+	GetBlob(ctx context.Context, userID, passwordID string) (blob *entities.CryptoBlob, err error)
+	GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)
+	DeleteBlob(ctx context.Context, userID, blobID string) error
+	UpdateBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
 }
