@@ -10,6 +10,7 @@ import (
 	"passkeeper/internal/entities/structs"
 )
 
+// Details contains subpage with text credentials info
 type Details struct {
 	*tview.Form
 
@@ -39,6 +40,7 @@ type Details struct {
 	PassValue string
 }
 
+// NewDetailsForm draws subpage with text credential info
 func NewDetailsForm(tuiApp *TUI) *Details {
 	form := &Details{
 		tuiApp:      tuiApp,
@@ -81,6 +83,7 @@ func NewDetailsForm(tuiApp *TUI) *Details {
 	return form
 }
 
+// HideButtons hide buttons of Details form
 func (form *Details) HideButtons() {
 	if form.GetButtonCount() <= 0 {
 		return
@@ -227,11 +230,13 @@ func (form *Details) cancel() {
 	defer form.HidePassword() // hide password
 }
 
+// Rerender will
 func (form *Details) Rerender() {
 	form.HideFields()
 	form.ShowFields()
 }
 
+// ShowFields will show item info again
 func (form *Details) ShowFields() {
 	if form.GetFormItemCount() > 0 {
 		return
@@ -243,11 +248,9 @@ func (form *Details) ShowFields() {
 	form.Form.AddFormItem(form.FieldDate)
 	form.Form.AddFormItem(form.FieldDesc)
 
-	//form.CurrentField = 0
-	//form.SetFocus(form.CurrentField)
-
 }
 
+// ShowPartFields will show item info (only some of them)
 func (form *Details) ShowPartFields() {
 	if form.GetFormItemCount() > 0 {
 		return
@@ -264,50 +267,13 @@ func (form *Details) ShowPartFields() {
 
 }
 
+// ShowItems show password value
 func (form *Details) ShowItems() {
 	form.ShowFields()
 	form.ShowPassword()
 }
 
-func (form *Details) keyUp() {
-	minInd := 0
-	maxInd := form.GetFormItemCount() - 1
-
-	if maxInd < 0 {
-		return
-	}
-
-	if form.CurrentField == minInd {
-		form.CurrentField = maxInd
-		form.SetFocus(form.CurrentField)
-		return
-	}
-
-	form.CurrentField--
-	form.SetFocus(form.CurrentField)
-
-}
-
-func (form *Details) keyDown() {
-
-	maxInd := form.GetFormItemCount() - 1
-
-	if maxInd < 0 {
-		return
-	}
-
-	if form.CurrentField == maxInd {
-		// switch to the first item
-		form.CurrentField = 0
-		form.SetFocus(form.CurrentField)
-		return
-	}
-
-	form.CurrentField++
-	form.SetFocus(form.CurrentField)
-
-}
-
+// HideFields delete all fields in form
 func (form *Details) HideFields() {
 	for ind := form.Form.GetFormItemCount() - 1; ind >= 0; ind-- {
 		form.Form.RemoveFormItem(ind)
@@ -343,6 +309,7 @@ func (form *Details) EmptyFields() {
 	}
 }
 
+// SetHiddenCred set text credentials info with hidden password value
 func (form *Details) SetHiddenCred(cred *structs.Credential) *Details {
 	if form.FieldRes != nil {
 		form.FieldRes.SetText(cred.Resource)
@@ -364,6 +331,7 @@ func (form *Details) SetHiddenCred(cred *structs.Credential) *Details {
 	return form
 }
 
+// SetCurrentCred set text credentials info with hidden password value
 func (form *Details) SetCurrentCred(cred *structs.Credential) *Details {
 	if form.FieldRes != nil {
 		form.FieldRes.SetText(cred.Resource)
@@ -384,6 +352,7 @@ func (form *Details) SetCurrentCred(cred *structs.Credential) *Details {
 	return form
 }
 
+// HidePassword hide credentials password in form
 func (form *Details) HidePassword() *Details {
 	if form.FieldPass == nil {
 		return form
@@ -398,12 +367,16 @@ func (form *Details) HidePassword() *Details {
 	return form
 }
 
+// ShowPassword show credentials password in form
 func (form *Details) ShowPassword() {
-	form.tuiApp.log.Info().Msg("show current cred password")
+	form.tuiApp.log.Info().
+		Msg("show current cred password")
+
 	form.HiddenPass = false
 	form.FieldPass.SetText(form.PassValue)
 }
 
+// ShowSwitchPass switch between hidden and clear password
 func (form *Details) ShowSwitchPass() {
 	if form.HiddenPass {
 		form.ShowPassword()
@@ -417,6 +390,7 @@ func (form *Details) FillFields(cred *structs.Credential) {
 	form.SetCurrentCred(cred)
 }
 
+// GetCurrentValues return current user's input
 func (form *Details) GetCurrentValues() (resource, login, password, description string) {
 	resource = form.FieldRes.GetText()
 	login = form.FieldLogin.GetText()
@@ -427,6 +401,7 @@ func (form *Details) GetCurrentValues() (resource, login, password, description 
 	return resource, login, password, description
 }
 
+// FieldsIsEmpty reset form fields values
 func (form *Details) FieldsIsEmpty() bool {
 	return form.FieldRes.GetText() == "" &&
 		form.FieldLogin.GetText() == "" &&

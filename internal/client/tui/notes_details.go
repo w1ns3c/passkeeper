@@ -10,6 +10,7 @@ import (
 	"passkeeper/internal/entities/structs"
 )
 
+// NoteDetails contains subpage with user note body
 type NoteDetails struct {
 	*tview.Form
 
@@ -27,6 +28,7 @@ type NoteDetails struct {
 	maxSigns    int
 }
 
+// NewNoteDetails draws subpage with user note blob
 func NewNoteDetails(note *structs.Note) *NoteDetails {
 	if note == nil {
 		note = &structs.Note{}
@@ -58,6 +60,7 @@ func NewNoteDetails(note *structs.Note) *NoteDetails {
 	return form
 }
 
+// Rerender redraws subpage with user note blob
 func (form *NoteDetails) Rerender(note *structs.Note) {
 	form.FieldName.SetText(note.Name)
 	form.FieldDate.SetText(note.Date.Format(time.DateTime))
@@ -210,7 +213,6 @@ func (form *NoteDetails) Edit(tuiApp *TUI, ind int, list *NotesList) {
 		}
 
 		// clear fields if there isn't any blobsUC
-		//form.EmptyFields()
 		form.HideFields()
 	})
 }

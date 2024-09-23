@@ -7,11 +7,13 @@ import (
 	"github.com/rivo/tview"
 )
 
+// Header containing navigation bar
 type Header struct {
 	*tview.Flex
 	curID int
 }
 
+// NewHeader draws navigation bar
 func NewHeader(ind int) *Header {
 	ind += 1 // to skip the first empty item
 
@@ -40,6 +42,7 @@ func NewHeader(ind int) *Header {
 
 }
 
+// ChangePage change Header if user switch to another page
 func (h *Header) ChangePage(ind int) {
 	// already switched, do nothing
 	if ind == h.curID {

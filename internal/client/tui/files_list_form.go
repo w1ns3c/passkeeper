@@ -14,6 +14,25 @@ var (
 	hintFiles = strings.Replace("\n"+genHelp("file"), "choose", "download", 1)
 )
 
+// FileList is a struct, containing page with user files
+type FileList struct {
+	*tview.List
+	files []*structs.File
+}
+
+// NewFileList is a constructor for FileList
+func NewFileList(files []*structs.File) *FileList {
+	list := tview.NewList()
+	list.ShowSecondaryText(false).
+		SetBorderPadding(0, 0, 0, 0)
+
+	return &FileList{
+		List:  list,
+		files: files,
+	}
+}
+
+// NewFiles draws subpage with list of stored files
 func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 
 	list := NewFileList(files)
@@ -32,7 +51,7 @@ func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 
 	list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 
-		// inputs for bank files
+		// inputs for files
 		switch event.Key() {
 		case tcell.KeyEsc:
 			fallthrough
@@ -93,22 +112,7 @@ func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 	return flex
 }
 
-type FileList struct {
-	*tview.List
-	files []*structs.File
-}
-
-func NewFileList(files []*structs.File) *FileList {
-	list := tview.NewList()
-	list.ShowSecondaryText(false).
-		SetBorderPadding(0, 0, 0, 0)
-
-	return &FileList{
-		List:  list,
-		files: files,
-	}
-}
-
+// Rerender redraws subpage with list of stored files
 func (list *FileList) Rerender(files []*structs.File) {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
@@ -140,6 +144,7 @@ func GenFileShortName(filePath string) string {
 	return filePath
 }
 
+// Delete is a form to confirm file deletion
 func (list *FileList) Delete(tuiApp *TUI, ind int) {
 	if list.GetItemCount() == 0 {
 		return

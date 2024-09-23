@@ -11,6 +11,25 @@ import (
 	"passkeeper/internal/entities/structs"
 )
 
+// CardList contains subpage with bank cards list
+type CardList struct {
+	*tview.List
+	cards []*structs.Card
+}
+
+// NewCardList draws subpage CardList
+func NewCardList(cards []*structs.Card) *CardList {
+	list := tview.NewList()
+	list.ShowSecondaryText(false).
+		SetBorderPadding(0, 0, 0, 0)
+
+	return &CardList{
+		List:  list,
+		cards: cards,
+	}
+}
+
+// NewBanking draws subpage, join CardList and CardDetails
 func (tuiApp *TUI) NewBanking(cards []*structs.Card) *tview.Flex {
 	var (
 		viewForm *CardDetails
@@ -89,22 +108,7 @@ func (tuiApp *TUI) NewBanking(cards []*structs.Card) *tview.Flex {
 	return flex
 }
 
-type CardList struct {
-	*tview.List
-	cards []*structs.Card
-}
-
-func NewCardList(cards []*structs.Card) *CardList {
-	list := tview.NewList()
-	list.ShowSecondaryText(false).
-		SetBorderPadding(0, 0, 0, 0)
-
-	return &CardList{
-		List:  list,
-		cards: cards,
-	}
-}
-
+// Rerender redraws subpage CardList
 func (list *CardList) Rerender(cards []*structs.Card) {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
@@ -155,6 +159,7 @@ func GenCardShortName(card *structs.Card) string {
 	return res
 }
 
+// Delete is a form to confirm bank card deletion
 func (list *CardList) Delete(tuiApp *TUI, ind int) {
 	if list.GetItemCount() == 0 {
 		return

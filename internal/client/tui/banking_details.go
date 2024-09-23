@@ -19,6 +19,7 @@ var (
 	bankingExpirationFormat = "01/06"
 )
 
+// CardDetails contains subpage with bank card info
 type CardDetails struct {
 	*tview.Form
 
@@ -39,6 +40,7 @@ type CardDetails struct {
 	maxSigns    int
 }
 
+// NewCardDetails draw subpage with bank card info
 func NewCardDetails(card *structs.Card) *CardDetails {
 	if card == nil {
 		card = &structs.Card{}

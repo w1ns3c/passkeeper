@@ -14,6 +14,13 @@ var (
 	HintTextNotes = "note"
 )
 
+// NotesList contains subpage with user note list
+type NotesList struct {
+	*tview.List
+	notes []*structs.Note
+}
+
+// NewNotes draws subpage NotesList
 func (tuiApp *TUI) NewNotes(notes []*structs.Note) *tview.Flex {
 	var viewForm *NoteDetails
 
@@ -91,11 +98,7 @@ func (tuiApp *TUI) NewNotes(notes []*structs.Note) *tview.Flex {
 	return flex
 }
 
-type NotesList struct {
-	*tview.List
-	notes []*structs.Note
-}
-
+// NewNotesList draws subpage, join NotesList and NoteDetails
 func NewNotesList(notes []*structs.Note) *NotesList {
 	list := tview.NewList()
 	list.ShowSecondaryText(false).
@@ -106,6 +109,7 @@ func NewNotesList(notes []*structs.Note) *NotesList {
 	}
 }
 
+// Rerender redraws subpage NotesList
 func (list *NotesList) Rerender(notes []*structs.Note) {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
@@ -153,6 +157,7 @@ func GenNoteShortName(note *structs.Note) string {
 	return res
 }
 
+// Delete is a form to confirm note deletion
 func (list *NotesList) Delete(tuiApp *TUI, ind int) {
 	if list.GetItemCount() == 0 {
 		return

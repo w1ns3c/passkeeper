@@ -138,11 +138,6 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 	tuiApp.Pages.AddPage(PageAuthed, authedForm, true, false)
 	tuiApp.Pages.AddPage(PageBlobsMenu, tuiApp.FormCredsMenu, true, false)
 
-	// Subpages will add after login
-	//tuiApp.SubPages.AddPage(SubPageCreds, subPages, true, false)
-	//tuiApp.SubPages.AddPage(SubPageBank, subPages, true, false)
-	//tuiApp.SubPages.AddPage(SubPageNotes, subPages, true, false)
-
 	// change hints layout
 	hintCreds.SetBorderPadding(0, 0, 1, 0)
 	Hint.SetBorderPadding(0, 0, 1, 0)
@@ -150,6 +145,7 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 	return tuiApp, nil
 }
 
+// Logout tui action by catching signals to log out
 func (tuiApp *TUI) Logout() {
 	tuiApp.Ctx = context.Background()
 	tuiApp.Usecase.Logout()
@@ -161,6 +157,7 @@ func (tuiApp *TUI) Logout() {
 
 }
 
+// Run start to draw tui app
 func (tuiApp *TUI) Run(ctx context.Context) error {
 	tuiApp.Ctx = ctx
 
@@ -235,18 +232,17 @@ func (tuiApp *TUI) Run(ctx context.Context) error {
 	tuiApp.Stop()
 
 	return nil
-
-	//return err
 }
 
+// Stop correctly stop all
 func (tuiApp *TUI) Stop() {
 	// wait async creds update
 	tuiApp.wg.Wait()
 
 	tuiApp.log.Info().Msg("[i] Client stopped correctly!")
-
 }
 
+// interruptSignal using to send exit signal to app (gracefully shutdown)
 func (tuiApp *TUI) interruptSignal() error {
 	tuiApp.log.Info().
 		Msg("catch \"Ctrl+C\" signal")
@@ -269,6 +265,7 @@ func (tuiApp *TUI) interruptSignal() error {
 	return nil
 }
 
+// genHelp generate help tips to page hot keys
 func genHelp(page string) string {
 	prefix := " "
 	return fmt.Sprintf(""+
@@ -280,6 +277,7 @@ func genHelp(page string) string {
 
 }
 
+// Rerender redraw terminal interface
 func (tuiApp *TUI) Rerender() {
 	page, _ := tuiApp.SubPages.GetFrontPage()
 	var ind int

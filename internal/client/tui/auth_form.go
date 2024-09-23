@@ -11,11 +11,13 @@ import (
 	"passkeeper/internal/entities/config"
 )
 
+// LoginStruct store data, collected from login page
 type LoginStruct struct {
 	Login string
 	Pass  string
 }
 
+// RegisterStruct store data, collected from register page
 type RegisterStruct struct {
 	Email  string
 	Login  string
@@ -23,6 +25,7 @@ type RegisterStruct struct {
 	Repeat string
 }
 
+// NewLoginForm draw user login form
 func NewLoginForm(tuiApp *TUI) *tview.Flex {
 
 	var loginForm = tview.NewForm().
@@ -69,9 +72,9 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 				return
 			}
 
-			// TODO delete log output user/pass to log
-			// not authed
-			tuiApp.log.Error().Err(err).Msgf("wrong username or password: %s:%s", username, password)
+			tuiApp.log.Error().Err(err).
+				Msgf("wrong username or password")
+
 			errAuthForm := NewModalWithParams(tuiApp, "Wrong username/password!", PageLogin)
 			tuiApp.Pages.AddPage(PageAuthError, errAuthForm, true, false)
 			tuiApp.Pages.SwitchToPage(PageAuthError)
@@ -138,6 +141,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 	return loginFlex
 }
 
+// NewRegisterForm draw user register form
 func NewRegisterForm(tuiApp *TUI) *tview.Flex {
 	var regForm = tview.NewForm().
 		SetItemPadding(1)

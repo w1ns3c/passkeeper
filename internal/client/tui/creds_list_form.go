@@ -16,43 +16,20 @@ var (
 	passHidden = "******"
 )
 
+// CredListInf describe form of text credential behavior
 type CredListInf interface {
 	tview.Primitive
 	Rerender()
 	SetItemText(index int, main string, secondary string)
 }
 
+// CredList implement CredListInf
 type CredList struct {
 	*tview.List
 	tuiApp *TUI
 }
 
-func (list *CredList) Rerender() {
-	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
-		list.RemoveItem(ind)
-	}
-
-	// fill list fields with values
-	creds := list.tuiApp.Usecase.GetCreds()
-	if creds != nil {
-		for ind, cred := range creds {
-			res := FilterResource(cred.Resource)
-			if ind < 9 {
-				list.AddItem(res, "", rune(49+ind), nil)
-			} else if ind == 9 {
-				list.AddItem(res, "", 'X', nil)
-			} else {
-				list.AddItem(res, "", rune(65+ind-10), nil)
-
-			}
-		}
-	}
-}
-
-func (list *CredList) SetItemText(index int, main string, secondary string) {
-	list.List.SetItemText(index, main, secondary)
-}
-
+// NewList is an empty constructor for CredList
 func NewList(tuiApp *TUI) *CredList {
 	return &CredList{
 		List: tview.NewList().
@@ -61,6 +38,7 @@ func NewList(tuiApp *TUI) *CredList {
 	}
 }
 
+// NewCredsList draws subpage with list of text credential
 func NewCredsList(tuiApp *TUI) *tview.Flex {
 
 	credList := NewList(tuiApp)
@@ -87,7 +65,6 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 
 	fullFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		//AddItem(NewHeader(1), 0, 1, false).
 		AddItem(listFlex, 0, 10, true).
 		AddItem(hintCreds, 0, 2, false)
 
@@ -148,7 +125,6 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 		case 'd':
 			delFunc()
 		case ' ':
-			//showFunc(false)
 			viewForm.ShowSwitchPass()
 		}
 		return event
@@ -165,8 +141,14 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 			viewForm.EmptyFields()
 			viewForm.tuiApp.App.SetFocus(credList)
 			l := tuiApp.Usecase.CredsLen()
-			cred, _ := tuiApp.Usecase.GetCredByIND(ind)
-			//if tuiApp.Creds != nil {
+			cred, err := tuiApp.Usecase.GetCredByIND(ind)
+			if err != nil {
+				tuiApp.log.Error().
+					Err(err).Msg("can't get current cred from list")
+
+				return event
+			}
+
 			if tuiApp.Usecase.CredsNotNil() {
 				if l > 0 {
 					if l > ind {
@@ -182,4 +164,32 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 	})
 
 	return fullFlex
+}
+
+// Rerender redraws subpage with list of text credential
+func (list *CredList) Rerender() {
+	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
+		list.RemoveItem(ind)
+	}
+
+	// fill list fields with values
+	creds := list.tuiApp.Usecase.GetCreds()
+	if creds != nil {
+		for ind, cred := range creds {
+			res := FilterResource(cred.Resource)
+			if ind < 9 {
+				list.AddItem(res, "", rune(49+ind), nil)
+			} else if ind == 9 {
+				list.AddItem(res, "", 'X', nil)
+			} else {
+				list.AddItem(res, "", rune(65+ind-10), nil)
+
+			}
+		}
+	}
+}
+
+// SetItemText change selected position in list
+func (list *CredList) SetItemText(index int, main string, secondary string) {
+	list.List.SetItemText(index, main, secondary)
 }

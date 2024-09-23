@@ -84,7 +84,9 @@ func main() {
 
 	err = srv.Run()
 	if err != nil {
-		lg.Error().Err(err).Msg("[+] Server stopped...")
+		lg.Error().Err(err).
+			Msg("[+] Server stopping...")
+
 		defer srv.Stop()
 	}
 

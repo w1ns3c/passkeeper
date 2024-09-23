@@ -6,6 +6,7 @@ import (
 	"passkeeper/internal/entities/structs"
 )
 
+// DeleteModal generate confirmation modal before delete blob from tui
 func DeleteModal(tuiApp *TUI, ind int, blobType structs.BlobType) *tview.Modal {
 	btn1Name := "Yes"
 	btn2Name := "No"
@@ -47,6 +48,7 @@ func DeleteModal(tuiApp *TUI, ind int, blobType structs.BlobType) *tview.Modal {
 	return errModal
 }
 
+// ExitModal generate confirmation modal before exit from tui
 func ExitModal(tuiApp *TUI) *tview.Modal {
 	btn1Name := "Yes"
 	btn2Name := "No"
@@ -74,6 +76,7 @@ func ExitModal(tuiApp *TUI) *tview.Modal {
 
 }
 
+// LogoutModal generate confirmation modal before user log out
 func LogoutModal(tuiApp *TUI) *tview.Modal {
 	btn1Name := "Logout"
 	btn2Name := "Cancel"
@@ -96,6 +99,7 @@ func LogoutModal(tuiApp *TUI) *tview.Modal {
 	return logoutModal
 }
 
+// NewModalWithParams generate modal to view some info
 func NewModalWithParams(tuiApp *TUI, text string, page string) *tview.Modal {
 	text = CapitalizeFirst(text)
 	errModal := tview.NewModal().
@@ -111,6 +115,7 @@ func NewModalWithParams(tuiApp *TUI, text string, page string) *tview.Modal {
 	return errModal
 }
 
+// NewErrorEditModal generate modal to view any error
 func NewErrorEditModal(tuiApp *TUI, text string, returnPage tview.Primitive) *tview.Modal {
 	text = CapitalizeFirst(text)
 	errModal := tview.NewModal().
