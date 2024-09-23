@@ -20,6 +20,9 @@ func DeleteModal(tuiApp *TUI, ind int, blobType entities.BlobType) *tview.Modal 
 					tuiApp.log.Error().
 						Err(err).Msg("can't delete cred on server side")
 
+					errModal := NewErrorEditModal(tuiApp, "can't delete cred on server side", tuiApp.Pages)
+					tuiApp.Pages.AddAndSwitchToPage("pageDel", errModal, true)
+
 					return
 				}
 

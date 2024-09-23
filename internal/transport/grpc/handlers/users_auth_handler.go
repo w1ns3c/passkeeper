@@ -42,7 +42,7 @@ func NewUsersHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *Us
 func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegisterRequest) (resp *pb.UserRegisterResponse, err error) {
 	token, secret, err := h.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
 	if err != nil {
-		if !errors.Is(err, errors2.ErrUserNotFound) {
+		if !errors.Is(err, errors2.ErrUserNotExist) {
 			h.log.Error().
 				Err(err).Msg(ErrAlreadyExistMsg)
 			return nil, ErrAlreadyExist

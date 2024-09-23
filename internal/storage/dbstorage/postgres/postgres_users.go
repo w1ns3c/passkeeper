@@ -23,8 +23,11 @@ func (pg *PostgresStorage) GetUserByLogin(ctx context.Context, login string) (us
 // getUserByAny return entities.User by field:value
 func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value string) (user *entities.User, err error) {
 	var (
-		query = fmt.Sprintf("SELECT *"+
-			"FROM %s WHERE %s=$1;", TableUsers, field)
+		query = fmt.Sprintf("SELECT %s,%s,%s,%s,%s,%s,%s "+
+			"FROM %s WHERE %s=$1;",
+			fieldUserID, fieldLogin, fieldHash,
+			fieldSecret, fieldSalt, fieldEmail, fieldPhone,
+			TableUsers, field)
 	)
 
 	rows, err := pg.db.QueryContext(ctx, query, value)
@@ -55,8 +58,8 @@ func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value
 			ID:     userID,
 			Login:  login,
 			Hash:   hash,
-			Salt:   secret,
-			Secret: salt,
+			Salt:   salt,
+			Secret: secret,
 			Phone:  email.String,
 			Email:  phone.String,
 		})
@@ -74,7 +77,7 @@ func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value
 
 	// User not exist
 	if len(result) == 0 {
-		return nil, myerrors.ErrUsersNotExist
+		return nil, myerrors.ErrUserNotExist
 	}
 
 	// More than one user trying to return

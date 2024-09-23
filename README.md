@@ -14,7 +14,7 @@ Please, give me some comments and advices for my code in review.
 - [x] User register
 - [x] User logout
 - [ ] User delete account
-- [ ] Change user blob
+- [ ] Change user tmpBlob
 - [x] List credentials
 - [x] Edit credential
 - [x] Add credential

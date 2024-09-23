@@ -12,7 +12,7 @@ type Storage interface {
 	CheckConnection() error
 
 	UserStorage
-	CredentialStorage
+	BlobStorage
 }
 
 type UserStorage interface {
@@ -22,7 +22,7 @@ type UserStorage interface {
 	SaveUser(ctx context.Context, u *entities.User) error
 }
 
-type CredentialStorage interface {
+type BlobStorage interface {
 	AddBlob(ctx context.Context, blob *entities.CryptoBlob) error
 	GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error)
 	GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)

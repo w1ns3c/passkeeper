@@ -32,7 +32,7 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 
 	// checking login free
 	exist, err := u.storage.CheckUserExist(ctx, login)
-	if (!errors.Is(err, errors2.ErrUserNotFound) && err != nil) || exist {
+	if (!errors.Is(err, errors2.ErrUserNotExist) && err != nil) || exist {
 		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
 

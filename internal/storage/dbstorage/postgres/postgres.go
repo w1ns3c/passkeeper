@@ -22,7 +22,7 @@ const (
 	TableUsers = "users"
 	TableBlobs = "blobs"
 
-	fieldUserID = "userID"
+	fieldUserID = "user_id"
 	fieldLogin  = "login"
 	fieldHash   = "hash"
 	fieldSalt   = "salt"
@@ -30,8 +30,8 @@ const (
 	fieldEmail  = "email"
 	fieldPhone  = "phone"
 
-	fieldBlobID   = "blobID"
-	fieldBlobData = "blobData"
+	fieldBlobID   = "blob_id"
+	fieldBlobData = "data"
 )
 
 // NewStorage is constructor for correct connect to DB and init tables

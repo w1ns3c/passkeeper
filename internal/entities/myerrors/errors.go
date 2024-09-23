@@ -9,7 +9,6 @@ import (
 )
 
 var (
-	ErrUserNotFound = fmt.Errorf("user with this login not found")
 
 	// token
 	ErrNoTokenMsg = "no token in context"
@@ -19,9 +18,10 @@ var (
 	ErrEmptyToken    = status.Error(codes.Unauthenticated, ErrEmptyTokenMsg)
 
 	// DB
+	ErrUserNotExist      = fmt.Errorf("user with this login not found")
 	ErrWrongResultValues = errors.New("wrong count of results")
 	ErrUsersWrongResult  = fmt.Errorf("can't return user: %v", ErrWrongResultValues)
-	ErrUsersNotExist     = errors.New("user not exist")
+	ErrBlobWrongResult   = fmt.Errorf("can't return blob: %v", ErrWrongResultValues)
 	ErrRepoNotInit       = errors.New("repo not initialize")
 	ErrDBConnect         = errors.New("can't connect to datebase")
 

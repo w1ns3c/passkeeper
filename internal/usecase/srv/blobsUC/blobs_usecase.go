@@ -30,7 +30,7 @@ type BlobUsecaseInf interface {
 
 type BlobUsecase struct {
 	ctx     context.Context
-	storage storage.CredentialStorage
+	storage storage.BlobStorage
 	//salt    string
 	log *zerolog.Logger
 }
