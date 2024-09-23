@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/myerrors"
 )
 
+// CheckUserExist check user's login in memory storage
 func (m *MemStorage) CheckUserExist(ctx context.Context, login string) (exist bool, err error) {
 	m.usersMU.RLock()
 	defer m.usersMU.RUnlock()
@@ -14,18 +16,7 @@ func (m *MemStorage) CheckUserExist(ctx context.Context, login string) (exist bo
 	return ok, nil
 }
 
-func (m *MemStorage) LoginUser(ctx context.Context, login, hash string) (user *entities.User, err error) {
-	m.usersMU.RLock()
-	defer m.usersMU.RUnlock()
-
-	user, ok := m.users[login]
-	if !ok {
-		return nil, ErrUserNotFound
-	}
-
-	return user, err
-}
-
+// SaveUser save entities.User in memory storage
 func (m *MemStorage) SaveUser(ctx context.Context, u *entities.User) error {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
@@ -36,6 +27,7 @@ func (m *MemStorage) SaveUser(ctx context.Context, u *entities.User) error {
 	return nil
 }
 
+// GetUserByID return entities.User by userID from memory storage
 func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
@@ -45,16 +37,17 @@ func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *enti
 		}
 	}
 
-	return nil, ErrUserNotFound
+	return nil, myerrors.ErrUserNotFound
 }
 
+// GetUserByLogin return entities.User by login from memory storage
 func (m *MemStorage) GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error) {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
 
 	u, ok := m.users[login]
 	if !ok {
-		return nil, ErrUserNotFound
+		return nil, myerrors.ErrUserNotFound
 	}
 
 	return u, nil

@@ -22,6 +22,7 @@ const (
 	TableUsers = "users"
 	TableBlobs = "blobs"
 
+	// Table fields <TableUsers>
 	fieldUserID = "user_id"
 	fieldLogin  = "login"
 	fieldHash   = "hash"
@@ -30,6 +31,7 @@ const (
 	fieldEmail  = "email"
 	fieldPhone  = "phone"
 
+	// Table fields <TableBlobs>
 	fieldBlobID   = "blob_id"
 	fieldBlobData = "data"
 )

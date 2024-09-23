@@ -2,18 +2,13 @@ package memstorage
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/storage"
 )
 
-var (
-	ErrBlobNotFound = fmt.Errorf("blob not exist")
-	ErrUserNotFound = fmt.Errorf("user not exist")
-)
-
+// MemStorage in memory storage for tests
 type MemStorage struct {
 	users   map[string]*entities.User
 	usersMU *sync.RWMutex
@@ -21,18 +16,7 @@ type MemStorage struct {
 	blobMU  *sync.RWMutex
 }
 
-func (m *MemStorage) Close() error {
-	m.usersMU.Lock()
-	m.blobMU.Lock()
-	defer m.usersMU.Unlock()
-	defer m.blobMU.Unlock()
-
-	m.users = nil
-	m.blobs = nil
-
-	return nil
-}
-
+// NewMemStorage is a constructor for MemStorage with options
 func NewMemStorage(ctx context.Context, options ...MemOptions) storage.Storage {
 	storage := NewEmptyMemStorage(ctx)
 	for _, option := range options {
@@ -41,6 +25,7 @@ func NewMemStorage(ctx context.Context, options ...MemOptions) storage.Storage {
 	return storage
 }
 
+// NewEmptyMemStorage is an empty constructor for MemStorage
 func NewEmptyMemStorage(ctx context.Context) *MemStorage {
 	var m = &MemStorage{
 		users:   make(map[string]*entities.User),
@@ -58,6 +43,7 @@ func NewEmptyMemStorage(ctx context.Context) *MemStorage {
 	return m
 }
 
+// MemOptions new type to use in constructor of MemStorage
 type MemOptions func(*MemStorage)
 
 // WithUsers func allow init storage
@@ -76,6 +62,7 @@ func WithBlobs(passwords map[string][]*entities.CryptoBlob) MemOptions {
 	}
 }
 
+// Init init storage values
 func (m *MemStorage) Init(ctx context.Context) error {
 	if m.usersMU == nil {
 		m.usersMU = &sync.RWMutex{}
@@ -96,6 +83,20 @@ func (m *MemStorage) Init(ctx context.Context) error {
 	return nil
 }
 
+// CheckConnection is a stub
 func (m *MemStorage) CheckConnection() error {
+	return nil
+}
+
+// Close will set all maps to nil
+func (m *MemStorage) Close() error {
+	m.usersMU.Lock()
+	m.blobMU.Lock()
+	defer m.usersMU.Unlock()
+	defer m.blobMU.Unlock()
+
+	m.users = nil
+	m.blobs = nil
+
 	return nil
 }

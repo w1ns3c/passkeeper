@@ -4,8 +4,10 @@ import (
 	"context"
 
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/myerrors"
 )
 
+// AddBlob add blob to memory storage
 func (m *MemStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
@@ -20,12 +22,13 @@ func (m *MemStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) err
 	return nil
 }
 
+// GetBlob get a blob from memory storage
 func (m *MemStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error) {
 	m.blobMU.RLock()
 	defer m.blobMU.RUnlock()
 
 	if m.blobs[userID] == nil {
-		return nil, ErrBlobNotFound
+		return nil, myerrors.ErrBlobNotFound
 	}
 
 	for _, pass := range m.blobs[userID] {
@@ -33,21 +36,23 @@ func (m *MemStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *
 			return pass, nil
 		}
 	}
-	return nil, ErrBlobNotFound
+	return nil, myerrors.ErrBlobNotFound
 }
 
+// GetAllBlobs return all blobs from memory storage for specific user
 func (m *MemStorage) GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error) {
 	m.blobMU.RLock()
 	defer m.blobMU.RUnlock()
 
 	pass, ok := m.blobs[userID]
 	if !ok {
-		return nil, ErrBlobNotFound
+		return nil, myerrors.ErrBlobNotFound
 	}
 
 	return pass, nil
 }
 
+// DeleteBlob delete blob from memory storage
 func (m *MemStorage) DeleteBlob(ctx context.Context, userID, blobID string) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
@@ -64,9 +69,10 @@ func (m *MemStorage) DeleteBlob(ctx context.Context, userID, blobID string) erro
 		}
 	}
 
-	return ErrBlobNotFound
+	return myerrors.ErrBlobNotFound
 }
 
+// UpdateBlob change blob in memory storage
 func (m *MemStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
@@ -78,5 +84,5 @@ func (m *MemStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) 
 		}
 	}
 
-	return ErrBlobNotFound
+	return myerrors.ErrBlobNotFound
 }

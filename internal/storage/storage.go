@@ -6,6 +6,7 @@ import (
 	"passkeeper/internal/entities"
 )
 
+// Storage describe main storage functionality
 type Storage interface {
 	Init(ctx context.Context) error
 	Close() error
@@ -15,6 +16,7 @@ type Storage interface {
 	BlobStorage
 }
 
+// UserStorage describe store that keep entities.User
 type UserStorage interface {
 	GetUserByID(cxt context.Context, userID string) (user *entities.User, err error)
 	GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error)
@@ -22,6 +24,7 @@ type UserStorage interface {
 	SaveUser(ctx context.Context, u *entities.User) error
 }
 
+// BlobStorage describe store that keep entities.CryptoBlob
 type BlobStorage interface {
 	AddBlob(ctx context.Context, blob *entities.CryptoBlob) error
 	GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error)

@@ -17,13 +17,17 @@ var (
 	ErrEmptyTokenMsg = "token is empty"
 	ErrEmptyToken    = status.Error(codes.Unauthenticated, ErrEmptyTokenMsg)
 
-	// DB
+	// DB storage
 	ErrUserNotExist      = fmt.Errorf("user with this login not found")
 	ErrWrongResultValues = errors.New("wrong count of results")
 	ErrUsersWrongResult  = fmt.Errorf("can't return user: %v", ErrWrongResultValues)
 	ErrBlobWrongResult   = fmt.Errorf("can't return blob: %v", ErrWrongResultValues)
 	ErrRepoNotInit       = errors.New("repo not initialize")
 	ErrDBConnect         = errors.New("can't connect to datebase")
+
+	// Memory storage
+	ErrBlobNotFound = fmt.Errorf("blob not exist")
+	ErrUserNotFound = fmt.Errorf("user not exist")
 
 	// Server
 	ErrBlobsUserIDdifferent = errors.New("blob.UserID and userID in JWT are not the same")
