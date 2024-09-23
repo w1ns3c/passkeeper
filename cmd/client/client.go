@@ -12,6 +12,7 @@ import (
 
 var (
 	BuildVersion = "N/A"
+	BuildCommit  = "N/A"
 	BuildDate    = "N/A"
 )
 
@@ -20,9 +21,9 @@ func main() {
 
 	if args.ShowVersion {
 		fmt.Printf("Passkeeper Client\n"+
-			" - version:    %s\n"+
+			" - version:    %s     %s\n"+
 			" - build date: %s\n",
-			BuildVersion, BuildDate)
+			BuildVersion, BuildCommit, BuildDate)
 
 		return
 	}

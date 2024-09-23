@@ -23,14 +23,18 @@ proto:
 
 
 DATE=`date -u '+%Y-%m-%d %H:%M:%S'`
-GIT_TAG="${git tag -l | tail -n 1}"
-VER=`if [ "${GIT_TAG}" = "" ]; then echo "N/A"; else echo ${GIT_TAG}; fi`
-BUILD_VER=main.BuildVersion=${VER}
+GIT_TAG=`git tag -l | tail -n 1`
+GIT_VER=`git log --oneline | head -n1 | cut -f1 -d' '`
+BUILD_VER=main.BuildVersion=${GIT_TAG}
+BUILD_GIT=main.BuildCommit=${GIT_VER}
 BUILD_DATE=main.BuildDate=${DATE}
 
+LD_FLAGS="-X \"${BUILD_DATE}\" -X \"${BUILD_VER}\" -X \"${BUILD_GIT}\""
+
 client:
+	echo ${GIT_TAG};
 	mkdir -p builds
-	go build -o builds/client.elf -ldflags "-X \"${BUILD_DATE}\" -X \"${BUILD_VER}\"" cmd/client/client.go
+	go build -o builds/client.elf -ldflags ${LD_FLAGS} cmd/client/client.go
 	GOOS=windows go build -o builds/client.exe cmd/client/client.go
 
 server:
