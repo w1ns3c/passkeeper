@@ -5,7 +5,7 @@ import (
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
-	cnf "passkeeper/internal/entities/config/server"
+	srvconf "passkeeper/internal/entities/config/server"
 	"passkeeper/internal/entities/logger"
 	"passkeeper/internal/server"
 	"passkeeper/internal/storage/dbstorage/postgres"
@@ -16,7 +16,7 @@ import (
 
 func main() {
 
-	conf := cnf.SrvParseArgs()
+	conf := srvconf.SrvParseArgs()
 
 	saltLen := config.UserPassSaltLen
 
@@ -55,13 +55,13 @@ func main() {
 		lg.Error().Err(err).Send()
 	}
 
-	credsUC := blobsUC.NewBlobUCWithOpts(
+	blobsUC := blobsUC.NewBlobUCWithOpts(
 		blobsUC.WithContext(ctx),
 		blobsUC.WithStorage(storage),
 		blobsUC.WithLogger(lg),
 	)
 
-	uc := usersUC.NewUserUsecase(ctx).
+	usersUC := usersUC.NewUserUsecase(ctx).
 		SetStorage(storage).
 		SetLog(lg).
 		SetSaltLen(saltLen)
@@ -70,8 +70,8 @@ func main() {
 
 	srv, err := server.NewServer(
 		server.WithAddr(conf.Addr),
-		server.WithUCblobs(credsUC),
-		server.WithUCusers(uc),
+		server.WithUCblobs(blobsUC),
+		server.WithUCusers(usersUC),
 		server.WithLogger(lg),
 	)
 	if err != nil {

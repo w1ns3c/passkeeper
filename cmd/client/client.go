@@ -10,16 +10,22 @@ import (
 	"passkeeper/internal/entities/config/client"
 )
 
+var (
+	BuildVersion = "N/A"
+	BuildDate    = "N/A"
+)
+
 func main() {
 	args := client.CliParseArgs()
 
-	//ex, err := os.Executable()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//fmt.Println(ex)
-	//exPath := filepath.Dir(ex)
-	//fmt.Println(exPath)
+	if args.ShowVersion {
+		fmt.Printf("Passkeeper Client\n"+
+			" - version:    %s\n"+
+			" - build date: %s\n",
+			BuildVersion, BuildDate)
+
+		return
+	}
 
 	tuiApp, _ := tui.NewTUIconf(args)
 

@@ -23,4 +23,5 @@ const (
 	MaxFilenameLen = 40   // max len for blob's name in file list
 	MaxTextAreaLen = 200  // max len for blob's description
 	MaxNoteLen     = 1000 // max len for note blob body
+
 )

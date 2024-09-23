@@ -16,6 +16,8 @@ type Args struct {
 	LogLevel string
 	LogFile  string
 	SyncTime int // inseconds
+
+	ShowVersion bool
 }
 
 // CliParseArgs parse Client params from command line
@@ -25,6 +27,7 @@ func CliParseArgs() *Args {
 		flagLogLevelVal string
 		flagLogFile     string
 		flagSyncTime    int
+		flagVersion     bool
 
 		realAddr        string
 		realLogLevel    string
@@ -40,6 +43,7 @@ func CliParseArgs() *Args {
 		levelFlag    = "level"
 		logFlag      = "log"
 		syncTimeFlag = "time"
+		versionFlag  = "version"
 	)
 
 	inArgs := os.Args
@@ -52,6 +56,7 @@ func CliParseArgs() *Args {
 	flag.StringVar(&flagLogLevelVal, levelFlag, defaultLogLevel, "log level")
 	flag.StringVar(&flagLogFile, logFlag, defaultLogPath, "log file path")
 	flag.IntVar(&flagSyncTime, syncTimeFlag, defaultSyncTime, "time to sync credentials in seconds")
+	flag.BoolVar(&flagVersion, versionFlag, false, "show client version info and exit")
 	flag.Parse()
 
 	// Read ENV only if flags not set !!!
@@ -97,10 +102,11 @@ func CliParseArgs() *Args {
 	}
 
 	return &Args{
-		Addr:     realAddr,
-		LogLevel: realLogLevel,
-		LogFile:  realLogFile,
-		SyncTime: realSyncTimeVal,
+		Addr:        realAddr,
+		LogLevel:    realLogLevel,
+		LogFile:     realLogFile,
+		SyncTime:    realSyncTimeVal,
+		ShowVersion: flagVersion,
 	}
 
 }

@@ -55,7 +55,7 @@ C:\Windows\Temp\passkeeper.log
 - [ ] Server DDOS interceptor
 - [ ] Setup TLS 
 - [ ] Test cover more than 80%
-- [ ] Doc every function
+- [x] Doc every function
 - [ ] Refactor client TUI code
 - [ ] Review all app code
 - [ ] Check all TODO
