@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
@@ -16,10 +15,7 @@ import (
 	"passkeeper/internal/usecase/cli/filesUC"
 )
 
-var (
-	ErrPassNotSame = fmt.Errorf("pass and pass repeat are not the same")
-)
-
+// ClientUsecase describe client functionality
 type ClientUsecase interface {
 	Login(ctx context.Context, login, password string) (err error)
 	Register(ctx context.Context, email, login, password, repeat string) error
@@ -56,6 +52,7 @@ type ClientUsecase interface {
 	filesUC.FilesUsecaseInf
 }
 
+// ClientUC implement ClientUsecase
 type ClientUC struct {
 	Addr string
 
@@ -80,6 +77,7 @@ type ClientUC struct {
 	*filesUC.FilesUC
 }
 
+// NewClientUC is a constructor for ClientUC
 func NewClientUC(opts ...ClientUCoptions) (cli *ClientUC, err error) {
 
 	cli = new(ClientUC)
@@ -113,38 +111,40 @@ func NewClientUC(opts ...ClientUCoptions) (cli *ClientUC, err error) {
 	return cli, nil
 }
 
+// ClientUCoptions new type to use in constructor of ClientUC
 type ClientUCoptions func(*ClientUC)
 
+// WithAddr add address of server to ClientUC
 func WithAddr(addr string) ClientUCoptions {
 	return func(cli *ClientUC) {
 		cli.Addr = addr
 	}
 }
 
+// WithSyncTime setup sync time to ClientUC
 func WithSyncTime(t time.Duration) ClientUCoptions {
 	return func(cli *ClientUC) {
 		cli.SyncTime = t
 	}
 }
 
+// WithLogger setup logger to ClientUC
 func WithLogger(l *zerolog.Logger) ClientUCoptions {
 	return func(cli *ClientUC) {
 		cli.log = l
 	}
 }
 
+// GetToken return user token
 func (c *ClientUC) GetToken() string {
 	return c.Token
 }
 
+// CredsLen return credentiaonals len
 func (c *ClientUC) CredsLen() int {
 	c.m.RLock()
 	defer c.m.RUnlock()
 	return len(c.Creds)
-}
-
-func (c *ClientUC) GetSyncTime() time.Duration {
-	return c.SyncTime
 }
 
 func (c *ClientUC) CredsNotNil() bool {
@@ -152,4 +152,9 @@ func (c *ClientUC) CredsNotNil() bool {
 	defer c.m.RUnlock()
 
 	return c.Creds != nil
+}
+
+// GetSyncTime return preset sync time
+func (c *ClientUC) GetSyncTime() time.Duration {
+	return c.SyncTime
 }

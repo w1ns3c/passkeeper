@@ -29,12 +29,12 @@ type BlobUsecase struct {
 // BlobsOption new type to use in constructor of BlobUsecase
 type BlobsOption func(usecase *BlobUsecase)
 
-// newBlobUC is empty constructor for BlobUsecase
+// newBlobUC is an empty constructor for BlobUsecase
 func newBlobUC() *BlobUsecase {
 	return &BlobUsecase{}
 }
 
-// NewBlobUCWithOpts is constructor that can add BlobsOption to BlobUsecase
+// NewBlobUCWithOpts is a constructor that can add BlobsOption to BlobUsecase
 func NewBlobUCWithOpts(opts ...BlobsOption) *BlobUsecase {
 	credsUC := newBlobUC()
 	for _, opt := range opts {

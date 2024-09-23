@@ -8,14 +8,17 @@ import (
 	"passkeeper/internal/entities/hashes"
 )
 
+// FilesUsecaseInf describe some actions under file blobs
 type FilesUsecaseInf interface {
 	ZipAndUpload(uploadingFile string) (file *entities.File, err error)
 	UnzipAndDownload(dirToDownload string, file *entities.File) error
 }
 
+// FilesUC implement FilesUsecaseInf
 type FilesUC struct {
 }
 
+// ZipAndUpload zip local file and return file blob
 func (f *FilesUC) ZipAndUpload(uploadingFile string) (file *entities.File, err error) {
 	zipData, err := compress.CompressFile(uploadingFile)
 	if err != nil {
@@ -34,6 +37,7 @@ func (f *FilesUC) ZipAndUpload(uploadingFile string) (file *entities.File, err e
 	return file, nil
 }
 
+// UnzipAndDownload unzip file blob and save it
 func (f *FilesUC) UnzipAndDownload(dirToDownload string, file *entities.File) error {
 	fileName := filepath.Join(dirToDownload, file.Name)
 

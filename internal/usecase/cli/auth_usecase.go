@@ -7,17 +7,10 @@ import (
 	"strings"
 
 	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/myerrors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
-)
-
-var (
-	ErrInvalidEmail        = fmt.Errorf("email is not valid by new regexp")
-	ErrPassDiff            = fmt.Errorf("passwords are not the same")
-	ErrEmptyUsername       = fmt.Errorf("username is empty")
-	ErrEmptyEmail          = fmt.Errorf("email is empty")
-	ErrEmptyPassword       = fmt.Errorf("pass is empty")
-	ErrEmptyPasswordRepeat = fmt.Errorf("pass repeat is empty")
 )
 
 // Login func is client login logic for tui app
@@ -41,14 +34,12 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) (err error
 	if err != nil {
 		return err
 	}
-	//c.UserID = userID
 	cryptSecret := resp.SrvSecret
 
 	fullSecret, err := hashes.GenerateCredsSecret(password, userID, cryptSecret)
 	if err != nil {
 		return err
 	}
-	//c.CredsSecret = fullSecret
 
 	c.User = &entities.User{
 		ID:     userID,
@@ -75,7 +66,7 @@ func (c *ClientUC) Register(ctx context.Context, email, login, password, repeat 
 	hash1 := hashes.Hash(password)
 	hash2 := hashes.Hash(repeat)
 	if hash1 != hash2 {
-		return ErrPassNotSame
+		return myerrors.ErrPassNotSame
 	}
 
 	req := &pb.UserRegisterRequest{
@@ -100,18 +91,18 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 	password = strings.Trim(password, "\n\t")
 
 	if username == "" {
-		return ErrEmptyUsername
+		return myerrors.ErrEmptyUsername
 	}
 	if email == "" {
-		return ErrEmptyEmail
+		return myerrors.ErrEmptyEmail
 	}
 
 	if password == "" {
-		return ErrEmptyPassword
+		return myerrors.ErrEmptyPassword
 	}
 
 	if passRepeat == "" {
-		return ErrEmptyPasswordRepeat
+		return myerrors.ErrEmptyPasswordRepeat
 	}
 
 	if err := FilterEmail(email); err != nil {
@@ -119,18 +110,12 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 	}
 
 	if password != passRepeat {
-		return ErrPassDiff
+		return myerrors.ErrPassDiff
 	}
 
-	// TODO Uncomment it
-	//if len(password) < app.MinPassLen {
-	//	return fmt.Errorf("password len should be a least %d signs", app.MinPassLen)
-	//}
-
-	// TODO Change User check
-	//if _, ok := usersUC[username]; ok {
-	//	return fmt.Errorf("user already exist")
-	//}
+	if len(password) < config.MinPassLen {
+		return fmt.Errorf("password len should be a least %d signs", config.MinPassLen)
+	}
 
 	return nil
 }
@@ -141,12 +126,12 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 func FilterEmail(email string) error {
 	pattern := "^[a-zA-Z0-9._-]*[a-zA-Z0-9]+@[a-zA-Z0-9-.]+[a-zA-A0-9].[a-zA-Z]{2,}$"
 	if result, _ := regexp.MatchString(pattern, email); !result {
-		return ErrInvalidEmail
+		return myerrors.ErrInvalidEmail
 	}
 
 	username := strings.Split(email, "@")[0]
 	if strings.Contains(username, "..") {
-		return ErrInvalidEmail // double dots in username
+		return myerrors.ErrInvalidEmail // double dots in username
 	}
 
 	return nil
@@ -164,6 +149,7 @@ func (c *ClientUC) Logout() {
 	return
 }
 
+// IsAuthed check that user is logged in or not
 func (c *ClientUC) IsAuthed() bool {
 	return c.User != nil
 }

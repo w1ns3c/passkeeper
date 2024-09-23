@@ -347,6 +347,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 	return err
 }
 
+// GetCredByIND return cred by it's ind in slice (safety)
 func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -357,6 +358,7 @@ func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) 
 	return c.Creds[ind], nil
 }
 
+// GetCardByIND return cred by it's ind in slice (safety)
 func (c *ClientUC) GetCardByIND(ind int) (card *entities.Card, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -367,6 +369,7 @@ func (c *ClientUC) GetCardByIND(ind int) (card *entities.Card, err error) {
 	return c.Cards[ind], nil
 }
 
+// GetNoteByIND return note by it's ind in slice (safety)
 func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -377,6 +380,7 @@ func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
 	return c.Notes[ind], nil
 }
 
+// GetFileByIND return cred by it's ind in slice (safety)
 func (c *ClientUC) GetFileByIND(ind int) (file *entities.File, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -407,6 +411,7 @@ func SortNotesByDate(notes []*entities.Note) {
 	})
 }
 
+// GetCreds return a copy of creds to view
 func (c *ClientUC) GetCreds() []*entities.Credential {
 	c.m.Lock()
 
@@ -418,14 +423,17 @@ func (c *ClientUC) GetCreds() []*entities.Credential {
 	return tmpCreds
 }
 
+// GetCards return a copy of cards to view
 func (c *ClientUC) GetCards() []*entities.Card {
 	return c.Cards
 }
 
+// GetNotes return a copy of notes to view
 func (c *ClientUC) GetNotes() []*entities.Note {
 	return c.Notes
 }
 
+// GetFiles return a copy of files to view
 func (c *ClientUC) GetFiles() []*entities.File {
 	return c.Files
 }
