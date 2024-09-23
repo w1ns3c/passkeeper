@@ -20,7 +20,7 @@ C:\Windows\Temp\passkeeper.log
 - [x] User register
 - [x] User logout
 - [ ] User delete account
-- [ ] Change user tmpBlob
+- [ ] Change user password
 - [x] List credentials
 - [x] Edit credential
 - [x] Add credential
@@ -73,8 +73,8 @@ C:\Windows\Temp\passkeeper.log
 - [ ] TUI clean fields (files->date, cards->number,cvc,pin)
 - [x] TUI beautify cards number fields to "0000 0000 0000 0000"
 - [ ] TUI move both login/register forms to center align 
-- [ ] TUI subpage: bank cards not auto update after delete card
-- [ ] TUI subpage: files not auto update after delete note
+- [x] TUI subpage: bank cards not auto update after delete card
+- [x] TUI subpage: files not auto update after delete note
 - [ ] Fix bug with Banks DropDown on Bank cards
 - [ ] TUI form info about reconnect to server
 - 
