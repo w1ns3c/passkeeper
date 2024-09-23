@@ -6,13 +6,13 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 )
 
 func TestSortCredsByDate(t *testing.T) {
 	var (
 		t1     = time.Now()
-		creds1 = []*entities.Credential{
+		creds1 = []*structs.Credential{
 			{
 				ID:          "1111",
 				Resource:    "res_1111",
@@ -39,7 +39,7 @@ func TestSortCredsByDate(t *testing.T) {
 	)
 	tests := []struct {
 		name    string
-		creds   []*entities.Credential
+		creds   []*structs.Credential
 		orderID []string
 	}{
 		{

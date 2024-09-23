@@ -7,10 +7,6 @@ import (
 	"github.com/w1ns3c/go-examples/crypto"
 )
 
-var (
-// ErrorDecode = fmt.Errorf("can't decode secret from hex")
-)
-
 // GenerateSecret func for generate random hex string
 func GenerateSecret(secretLen int) (secret string, err error) {
 	s, err := crypto.GenRandStr(secretLen)

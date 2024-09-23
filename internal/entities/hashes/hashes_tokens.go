@@ -12,6 +12,7 @@ import (
 	"passkeeper/internal/entities/myerrors"
 )
 
+// Claims for JWT token
 type Claims struct {
 	jwt.RegisteredClaims
 	UserID string
@@ -49,7 +50,7 @@ func CheckToken(tokenStr, secret string) (userID string, err error) {
 	}
 
 	if !token.Valid {
-		return "", ErrInvalidToken
+		return "", myerrors.ErrInvalidToken
 	}
 
 	// return user ID in readable format
@@ -69,6 +70,7 @@ func ExtractUserID(token string) (userID string, err error) {
 	return claims.UserID, nil
 }
 
+// ExtractUserInfo func for extract JWT auth token from transport context
 func ExtractUserInfo(ctx context.Context) (token string, err error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

@@ -5,17 +5,17 @@ import (
 
 	"github.com/rs/zerolog"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 	"passkeeper/internal/storage"
 )
 
 // BlobUsecaseInf describe main blob functional on server side
 type BlobUsecaseInf interface {
-	GetBlob(ctx context.Context, userID, blobID string) (cred *entities.CryptoBlob, err error)
-	AddBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
-	UpdBlob(ctx context.Context, userID string, blob *entities.CryptoBlob) error
+	GetBlob(ctx context.Context, userID, blobID string) (cred *structs.CryptoBlob, err error)
+	AddBlob(ctx context.Context, userID string, blob *structs.CryptoBlob) error
+	UpdBlob(ctx context.Context, userID string, blob *structs.CryptoBlob) error
 	DelBlob(ctx context.Context, userID, blobID string) error
-	ListBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)
+	ListBlobs(ctx context.Context, userID string) (blobs []*structs.CryptoBlob, err error)
 }
 
 // BlobUsecase implement BlobUsecaseInf

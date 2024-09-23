@@ -4,7 +4,7 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 )
 
 var (
@@ -112,7 +112,7 @@ func NewCredsList(tuiApp *TUI) *tview.Flex {
 				return
 			}
 
-			delConfirm := DeleteModal(tuiApp, ind, entities.BlobCred)
+			delConfirm := DeleteModal(tuiApp, ind, structs.BlobCred)
 			pageConfirm := "confirmation"
 			tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 			tuiApp.Pages.SwitchToPage(pageConfirm)

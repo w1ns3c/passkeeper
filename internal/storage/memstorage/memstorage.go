@@ -4,15 +4,15 @@ import (
 	"context"
 	"sync"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 	"passkeeper/internal/storage"
 )
 
 // MemStorage in memory storage for tests
 type MemStorage struct {
-	users   map[string]*entities.User
+	users   map[string]*structs.User
 	usersMU *sync.RWMutex
-	blobs   map[string][]*entities.CryptoBlob
+	blobs   map[string][]*structs.CryptoBlob
 	blobMU  *sync.RWMutex
 }
 
@@ -28,9 +28,9 @@ func NewMemStorage(ctx context.Context, options ...MemOptions) storage.Storage {
 // NewEmptyMemStorage is an empty constructor for MemStorage
 func NewEmptyMemStorage(ctx context.Context) *MemStorage {
 	var m = &MemStorage{
-		users:   make(map[string]*entities.User),
+		users:   make(map[string]*structs.User),
 		usersMU: &sync.RWMutex{},
-		blobs:   make(map[string][]*entities.CryptoBlob),
+		blobs:   make(map[string][]*structs.CryptoBlob),
 		blobMU:  &sync.RWMutex{},
 	}
 
@@ -48,7 +48,7 @@ type MemOptions func(*MemStorage)
 
 // WithUsers func allow init storage
 // with already registered usersUC
-func WithUsers(users map[string]*entities.User) MemOptions {
+func WithUsers(users map[string]*structs.User) MemOptions {
 	return func(s *MemStorage) {
 		s.users = users
 	}
@@ -56,7 +56,7 @@ func WithUsers(users map[string]*entities.User) MemOptions {
 
 // WithBlobs func allow init storage
 // with encrypted blobs
-func WithBlobs(passwords map[string][]*entities.CryptoBlob) MemOptions {
+func WithBlobs(passwords map[string][]*structs.CryptoBlob) MemOptions {
 	return func(s *MemStorage) {
 		s.blobs = passwords
 	}
@@ -73,11 +73,11 @@ func (m *MemStorage) Init(ctx context.Context) error {
 	}
 
 	if m.users == nil {
-		m.users = make(map[string]*entities.User)
+		m.users = make(map[string]*structs.User)
 	}
 
 	if m.blobs == nil {
-		m.blobs = make(map[string][]*entities.CryptoBlob)
+		m.blobs = make(map[string][]*structs.CryptoBlob)
 	}
 
 	return nil

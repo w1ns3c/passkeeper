@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"time"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 )
 
 // AddBlob add new crypto blob
-func (pg *PostgresStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) error {
+func (pg *PostgresStorage) AddBlob(ctx context.Context, blob *structs.CryptoBlob) error {
 	var (
 		query = fmt.Sprintf("INSERT INTO %s (%s, %s, %s) "+
 			"values ($1, $2, $3);",
@@ -36,7 +36,7 @@ func (pg *PostgresStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlo
 }
 
 // GetBlob return crypto blob by blobID and userID
-func (pg *PostgresStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error) {
+func (pg *PostgresStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *structs.CryptoBlob, err error) {
 	var (
 		query = fmt.Sprintf("SELECT %s,%s,%s "+
 			"FROM %s WHERE %s=$1 and %s=$2 ;",
@@ -50,9 +50,9 @@ func (pg *PostgresStorage) GetBlob(ctx context.Context, userID, blobID string) (
 	}
 	defer rows.Close()
 
-	blobs := make([]*entities.CryptoBlob, 0)
+	blobs := make([]*structs.CryptoBlob, 0)
 	for rows.Next() {
-		var tmpBlob = &entities.CryptoBlob{}
+		var tmpBlob = &structs.CryptoBlob{}
 
 		err = rows.Scan(&tmpBlob.UserID, &tmpBlob.ID, &tmpBlob.Blob)
 		if err != nil {
@@ -81,7 +81,7 @@ func (pg *PostgresStorage) GetBlob(ctx context.Context, userID, blobID string) (
 }
 
 // GetAllBlobs return all crypto blobs for userID
-func (pg *PostgresStorage) GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error) {
+func (pg *PostgresStorage) GetAllBlobs(ctx context.Context, userID string) (blobs []*structs.CryptoBlob, err error) {
 	var (
 		query = fmt.Sprintf("SELECT %s, %s, %s "+
 			"FROM %s WHERE %s=$1 ;",
@@ -95,9 +95,9 @@ func (pg *PostgresStorage) GetAllBlobs(ctx context.Context, userID string) (blob
 	}
 	defer rows.Close()
 
-	blobs = make([]*entities.CryptoBlob, 0)
+	blobs = make([]*structs.CryptoBlob, 0)
 	for rows.Next() {
-		var blob = &entities.CryptoBlob{}
+		var blob = &structs.CryptoBlob{}
 
 		err = rows.Scan(&blob.UserID, &blob.ID, &blob.Blob)
 		if err != nil {
@@ -146,7 +146,7 @@ func (pg *PostgresStorage) DeleteBlob(ctx context.Context, userID, blobID string
 }
 
 // UpdateBlob update crypto blob data by blobID and userID
-func (pg *PostgresStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error {
+func (pg *PostgresStorage) UpdateBlob(ctx context.Context, blob *structs.CryptoBlob) error {
 	var (
 		query = fmt.Sprintf("UPDATE %s SET %s=$1 WHERE %s=$2",
 			TableBlobs, fieldBlobData, fieldBlobID,

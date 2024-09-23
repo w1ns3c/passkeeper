@@ -9,6 +9,7 @@ import (
 	"github.com/rs/zerolog/pkgerrors"
 )
 
+// Init setup logger output
 func Init(level string) *zerolog.Logger {
 	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMs
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
@@ -26,6 +27,7 @@ func Init(level string) *zerolog.Logger {
 	return &logger
 }
 
+// InitFile setup logger output to file
 func InitFile(level, filepath string) *zerolog.Logger {
 	//zerolog.TimeFieldFormat = zerolog.TimeFormatUnixMs
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
@@ -48,6 +50,7 @@ func InitFile(level, filepath string) *zerolog.Logger {
 	return &logger
 }
 
+// SelectLevel choose level of logging, return specific zerolog.Level
 func SelectLevel(level string) zerolog.Level {
 	level = strings.ToTitle(level)
 	switch level {
@@ -74,7 +77,7 @@ func SelectLevel(level string) zerolog.Level {
 	// Error level
 	case "ERR":
 		return zerolog.ErrorLevel
-	case "EROR":
+	case "ERROR":
 		return zerolog.ErrorLevel
 
 	default:

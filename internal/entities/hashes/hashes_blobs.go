@@ -7,11 +7,11 @@ import (
 
 	"github.com/w1ns3c/go-examples/crypto"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 )
 
 // EncryptBlob func just encrypt Credential to CryptoBlob with key
-func EncryptBlob(cred entities.CredInf, key string) (blob *entities.CryptoBlob, err error) {
+func EncryptBlob(cred structs.CredInf, key string) (blob *structs.CryptoBlob, err error) {
 	jsonCred, err := json.Marshal(cred)
 	if err != nil {
 		return nil, fmt.Errorf("can't marshal cred: %v", err)
@@ -25,14 +25,14 @@ func EncryptBlob(cred entities.CredInf, key string) (blob *entities.CryptoBlob, 
 
 	cryptoStr := hex.EncodeToString(cryptoCred)
 
-	return &entities.CryptoBlob{
+	return &structs.CryptoBlob{
 		ID:   cred.GetID(),
 		Blob: cryptoStr,
 	}, nil
 }
 
 // DecryptBlob func just decrypt CryptoBlob back to Credential with key
-func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, err error) {
+func DecryptBlob(blob *structs.CryptoBlob, key string) (cred structs.CredInf, err error) {
 	cryptoCred, err := hex.DecodeString(blob.Blob)
 	if err != nil {
 		return nil, fmt.Errorf("can't decode from hex: %v", err)
@@ -45,7 +45,7 @@ func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, 
 	}
 
 	type blobType struct {
-		BlobType entities.BlobType `json:"type"`
+		BlobType structs.BlobType `json:"type"`
 	}
 	var tmp blobType
 
@@ -55,8 +55,8 @@ func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, 
 	}
 
 	switch tmp.BlobType {
-	case entities.BlobCred:
-		var tmpCred *entities.Credential
+	case structs.BlobCred:
+		var tmpCred *structs.Credential
 		err = json.Unmarshal(jsonCred, &tmpCred)
 		if err != nil {
 			return nil, fmt.Errorf("can't unmarshal Cred from json: %v", err)
@@ -64,8 +64,8 @@ func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, 
 
 		cred = tmpCred
 
-	case entities.BlobCard:
-		var tmpCard *entities.Card
+	case structs.BlobCard:
+		var tmpCard *structs.Card
 		err = json.Unmarshal(jsonCred, &tmpCard)
 		if err != nil {
 			return nil, fmt.Errorf("can't unmarshal Card from json: %v", err)
@@ -73,8 +73,8 @@ func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, 
 
 		cred = tmpCard
 
-	case entities.BlobNote:
-		var tmpNote *entities.Note
+	case structs.BlobNote:
+		var tmpNote *structs.Note
 		err = json.Unmarshal(jsonCred, &tmpNote)
 		if err != nil {
 			return nil, fmt.Errorf("can't unmarshal Card from json: %v", err)
@@ -82,8 +82,8 @@ func DecryptBlob(blob *entities.CryptoBlob, key string) (cred entities.CredInf, 
 
 		cred = tmpNote
 
-	case entities.BlobFile:
-		var tmpFile *entities.File
+	case structs.BlobFile:
+		var tmpFile *structs.File
 		err = json.Unmarshal(jsonCred, &tmpFile)
 		if err != nil {
 			return nil, fmt.Errorf("can't unmarshal Card from json: %v", err)

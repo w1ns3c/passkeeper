@@ -5,8 +5,9 @@ import (
 
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/structs"
 )
 
 type NoteDetails struct {
@@ -18,7 +19,7 @@ type NoteDetails struct {
 	FieldDate *tview.InputField
 	FieldBody *tview.TextArea
 
-	CurrentNote *entities.Note
+	CurrentNote *structs.Note
 
 	// fields sizes
 	FieldWidth  int
@@ -26,9 +27,9 @@ type NoteDetails struct {
 	maxSigns    int
 }
 
-func NewNoteDetails(note *entities.Note) *NoteDetails {
+func NewNoteDetails(note *structs.Note) *NoteDetails {
 	if note == nil {
-		note = &entities.Note{}
+		note = &structs.Note{}
 	}
 
 	form := &NoteDetails{
@@ -39,7 +40,7 @@ func NewNoteDetails(note *entities.Note) *NoteDetails {
 		CurrentNote: note,
 		FieldWidth:  40,
 		FieldHeight: 6,
-		maxSigns:    0,
+		maxSigns:    config.MaxNoteLen,
 	}
 
 	form.Form.SetBorder(true).
@@ -48,6 +49,8 @@ func NewNoteDetails(note *entities.Note) *NoteDetails {
 	form.FieldDate.SetFieldWidth(form.FieldWidth).
 		SetDisabled(true)
 
+	form.FieldBody.SetMaxLength(form.maxSigns)
+
 	form.Form.AddFormItem(form.FieldName)
 	form.Form.AddFormItem(form.FieldDate)
 	form.Form.AddFormItem(form.FieldBody)
@@ -55,7 +58,7 @@ func NewNoteDetails(note *entities.Note) *NoteDetails {
 	return form
 }
 
-func (form *NoteDetails) Rerender(note *entities.Note) {
+func (form *NoteDetails) Rerender(note *structs.Note) {
 	form.FieldName.SetText(note.Name)
 	form.FieldDate.SetText(note.Date.Format(time.DateTime))
 	form.FieldBody.SetText(note.Body, true)
@@ -76,7 +79,7 @@ func (form *NoteDetails) Add(tuiApp *TUI, ind int, list *NotesList) {
 			return
 		}
 
-		newNote.ID = hashes.GeneratePassID2()
+		newNote.ID = hashes.GeneratePassID()
 
 		if err := tuiApp.Usecase.AddBlob(tuiApp.Ctx, newNote); err != nil {
 			tuiApp.log.Error().
@@ -229,9 +232,9 @@ func (form *NoteDetails) EmptyFields() {
 }
 
 // GetCurrentValues get values from user input and format it to Note entity
-func (form *NoteDetails) GetCurrentValues() (newNote *entities.Note, err error) {
-	newNote = new(entities.Note)
-	newNote.Type = entities.BlobNote
+func (form *NoteDetails) GetCurrentValues() (newNote *structs.Note, err error) {
+	newNote = new(structs.Note)
+	newNote.Type = structs.BlobNote
 
 	newNote.Name = form.FieldName.GetText()
 	newNote.Date = time.Now()

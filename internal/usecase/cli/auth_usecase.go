@@ -6,10 +6,10 @@ import (
 	"regexp"
 	"strings"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
 
@@ -41,7 +41,7 @@ func (c *ClientUC) Login(ctx context.Context, login, password string) (err error
 		return err
 	}
 
-	c.User = &entities.User{
+	c.User = &structs.User{
 		ID:     userID,
 		Login:  login,
 		Hash:   password,

@@ -6,15 +6,15 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/structs"
 )
 
 var (
 	HintTextNotes = "note"
 )
 
-func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
+func (tuiApp *TUI) NewNotes(notes []*structs.Note) *tview.Flex {
 	var viewForm *NoteDetails
 
 	list := NewNotesList(notes)
@@ -93,10 +93,10 @@ func (tuiApp *TUI) NewNotes(notes []*entities.Note) *tview.Flex {
 
 type NotesList struct {
 	*tview.List
-	notes []*entities.Note
+	notes []*structs.Note
 }
 
-func NewNotesList(notes []*entities.Note) *NotesList {
+func NewNotesList(notes []*structs.Note) *NotesList {
 	list := tview.NewList()
 	list.ShowSecondaryText(false).
 		SetBorderPadding(0, 0, 0, 0)
@@ -106,7 +106,7 @@ func NewNotesList(notes []*entities.Note) *NotesList {
 	}
 }
 
-func (list *NotesList) Rerender(notes []*entities.Note) {
+func (list *NotesList) Rerender(notes []*structs.Note) {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
 	}
@@ -126,7 +126,7 @@ func (list *NotesList) Rerender(notes []*entities.Note) {
 	}
 }
 
-func GenNoteShortName(note *entities.Note) string {
+func GenNoteShortName(note *structs.Note) string {
 	if note == nil {
 		return ""
 	}
@@ -158,7 +158,7 @@ func (list *NotesList) Delete(tuiApp *TUI, ind int) {
 		return
 	}
 
-	delConfirm := DeleteModal(tuiApp, ind, entities.BlobNote)
+	delConfirm := DeleteModal(tuiApp, ind, structs.BlobNote)
 	pageConfirm := "confirmation"
 	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 	tuiApp.Pages.SwitchToPage(pageConfirm)

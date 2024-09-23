@@ -3,10 +3,10 @@ package tui
 import (
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 )
 
-func DeleteModal(tuiApp *TUI, ind int, blobType entities.BlobType) *tview.Modal {
+func DeleteModal(tuiApp *TUI, ind int, blobType structs.BlobType) *tview.Modal {
 	btn1Name := "Yes"
 	btn2Name := "No"
 

@@ -6,22 +6,22 @@ import (
 	"fmt"
 	"time"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 )
 
 // GetUserByID return entities.User by userID
-func (pg *PostgresStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
+func (pg *PostgresStorage) GetUserByID(cxt context.Context, userID string) (user *structs.User, err error) {
 	return pg.getUserByAny(cxt, fieldUserID, userID)
 }
 
 // GetUserByLogin return entities.User by login
-func (pg *PostgresStorage) GetUserByLogin(ctx context.Context, login string) (user *entities.User, err error) {
+func (pg *PostgresStorage) GetUserByLogin(ctx context.Context, login string) (user *structs.User, err error) {
 	return pg.getUserByAny(ctx, fieldLogin, login)
 }
 
 // getUserByAny return entities.User by field:value
-func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value string) (user *entities.User, err error) {
+func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value string) (user *structs.User, err error) {
 	var (
 		query = fmt.Sprintf("SELECT %s,%s,%s,%s,%s,%s,%s "+
 			"FROM %s WHERE %s=$1;",
@@ -36,7 +36,7 @@ func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value
 	}
 	defer rows.Close()
 
-	result := make([]*entities.User, 0)
+	result := make([]*structs.User, 0)
 	for rows.Next() {
 		var (
 			userID string
@@ -54,7 +54,7 @@ func (pg *PostgresStorage) getUserByAny(ctx context.Context, field string, value
 			return nil, err
 		}
 
-		result = append(result, &entities.User{
+		result = append(result, &structs.User{
 			ID:     userID,
 			Login:  login,
 			Hash:   hash,
@@ -99,7 +99,7 @@ func (pg *PostgresStorage) CheckUserExist(ctx context.Context, login string) (ex
 }
 
 // SaveUser save user in storage
-func (pg *PostgresStorage) SaveUser(ctx context.Context, user *entities.User) error {
+func (pg *PostgresStorage) SaveUser(ctx context.Context, user *structs.User) error {
 	var (
 		query = fmt.Sprintf("insert into %s (%s, %s, %s, %s, %s,%s, %s) "+
 			"values ($1, $2, $3, $4, $5, $6, $7);",

@@ -9,7 +9,9 @@ import (
 )
 
 var (
-
+	// Hashes
+	ErrInvalidToken = fmt.Errorf("token sign is not valid")
+	
 	// token
 	ErrNoTokenMsg = "no token in context"
 	ErrNoToken    = status.Error(codes.Unauthenticated, ErrNoTokenMsg)

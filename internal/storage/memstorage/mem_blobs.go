@@ -3,17 +3,17 @@ package memstorage
 import (
 	"context"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 )
 
 // AddBlob add blob to memory storage
-func (m *MemStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) error {
+func (m *MemStorage) AddBlob(ctx context.Context, blob *structs.CryptoBlob) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
 
 	if m.blobs[blob.UserID] == nil {
-		m.blobs[blob.UserID] = make([]*entities.CryptoBlob, 1)
+		m.blobs[blob.UserID] = make([]*structs.CryptoBlob, 1)
 		m.blobs[blob.UserID][0] = blob
 		return nil
 	}
@@ -23,7 +23,7 @@ func (m *MemStorage) AddBlob(ctx context.Context, blob *entities.CryptoBlob) err
 }
 
 // GetBlob get a blob from memory storage
-func (m *MemStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error) {
+func (m *MemStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *structs.CryptoBlob, err error) {
 	m.blobMU.RLock()
 	defer m.blobMU.RUnlock()
 
@@ -40,7 +40,7 @@ func (m *MemStorage) GetBlob(ctx context.Context, userID, blobID string) (blob *
 }
 
 // GetAllBlobs return all blobs from memory storage for specific user
-func (m *MemStorage) GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error) {
+func (m *MemStorage) GetAllBlobs(ctx context.Context, userID string) (blobs []*structs.CryptoBlob, err error) {
 	m.blobMU.RLock()
 	defer m.blobMU.RUnlock()
 
@@ -73,7 +73,7 @@ func (m *MemStorage) DeleteBlob(ctx context.Context, userID, blobID string) erro
 }
 
 // UpdateBlob change blob in memory storage
-func (m *MemStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error {
+func (m *MemStorage) UpdateBlob(ctx context.Context, blob *structs.CryptoBlob) error {
 	m.blobMU.Lock()
 	defer m.blobMU.Unlock()
 

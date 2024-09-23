@@ -8,11 +8,12 @@ import (
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/structs"
 )
 
 func TestEncryptDecryptBlob(t *testing.T) {
 	type args struct {
-		cred entities.CredInf
+		cred structs.CredInf
 		key  string
 	}
 
@@ -24,17 +25,17 @@ func TestEncryptDecryptBlob(t *testing.T) {
 		ss, _  = EncryptSecret(s, hash)
 		key, _ = GenerateCredsSecret(pass, userID, ss)
 
-		cred1 = &entities.Credential{
-			ID:          GeneratePassID2(),
+		cred1 = &structs.Credential{
+			ID:          GeneratePassID(),
 			Date:        time.Now(),
 			Resource:    "res1",
 			Login:       "login1",
 			Password:    "pass1",
 			Description: "simple description",
 		}
-		cred2 = &entities.Credential{
-			Type:        entities.BlobCred,
-			ID:          GeneratePassID2(),
+		cred2 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          GeneratePassID(),
 			Date:        time.Now(),
 			Resource:    "res1",
 			Login:       "login1",
@@ -42,9 +43,9 @@ func TestEncryptDecryptBlob(t *testing.T) {
 			Description: "Long description -----------------------------------------------------------------------------------------------------\nsidfosdouioewaifsdjsdljfalkfdjalkdsjfklasjdfuiahsdfiua\nsdjfsiodfoiwueroisj sdajkfalkj-*(@(HIUH jsdfkldsfkj",
 		}
 
-		testCards = []*entities.Card{
+		testCards = []*structs.Card{
 			{
-				Type:        entities.BlobCard,
+				Type:        structs.BlobCard,
 				Name:        "test1",
 				Bank:        entities.Banks[0],
 				Person:      "string",
@@ -55,19 +56,19 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				Description: "test description only",
 			},
 			{
-				Type: entities.BlobCard,
+				Type: structs.BlobCard,
 				Name: "test333331",
 			},
 		}
 
-		testNotes = []*entities.Note{
+		testNotes = []*structs.Note{
 			{
-				Type: entities.BlobNote,
+				Type: structs.BlobNote,
 				Name: "New Test Blob",
 				Body: "Hello\nWorld! Amigo",
 			},
 			{
-				Type: entities.BlobNote,
+				Type: structs.BlobNote,
 			},
 			{},
 		}
@@ -153,9 +154,9 @@ func TestEncryptDecryptBlob(t *testing.T) {
 			}
 
 			switch got.(type) {
-			case *entities.Credential:
-				gotCred := got.(*entities.Credential)
-				putCred := tt.args.cred.(*entities.Credential)
+			case *structs.Credential:
+				gotCred := got.(*structs.Credential)
+				putCred := tt.args.cred.(*structs.Credential)
 				require.Equal(t, putCred.ID, gotCred.ID, "Encrypt/DecryptBlob() creds ID are not the same")
 				//require.Equal(t, putCred.Date, gotCred.Date, "Encrypt/DecryptBlob() creds Date are not the same")
 				require.Equal(t, putCred.Resource, gotCred.Resource, "Encrypt/DecryptBlob() creds Resource are not the same")
@@ -163,9 +164,9 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				require.Equal(t, putCred.Password, gotCred.Password, "Encrypt/DecryptBlob() creds Password are not the same")
 				require.Equal(t, putCred.Description, gotCred.Description, "Encrypt/DecryptBlob() creds Description are not the same")
 
-			case *entities.Card:
-				gotCard := got.(*entities.Card)
-				putCard := tt.args.cred.(*entities.Card)
+			case *structs.Card:
+				gotCard := got.(*structs.Card)
+				putCard := tt.args.cred.(*structs.Card)
 
 				require.Equal(t, putCard.ID, gotCard.ID, "Encrypt/DecryptBlob() card ID are not the same")
 				require.Equal(t, putCard.Name, gotCard.Name, "Encrypt/DecryptBlob() card Name are not the same")
@@ -177,9 +178,9 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				require.Equal(t, putCard.PIN, gotCard.PIN, "Encrypt/DecryptBlob() card PIN are not the same")
 				require.Equal(t, putCard.Description, gotCard.Description, "Encrypt/DecryptBlob() card Description are not the same")
 
-			case *entities.Note:
-				gotNote := got.(*entities.Note)
-				putNote := tt.args.cred.(*entities.Note)
+			case *structs.Note:
+				gotNote := got.(*structs.Note)
+				putNote := tt.args.cred.(*structs.Note)
 
 				require.Equal(t, putNote.ID, gotNote.ID, "Encrypt/DecryptBlob() note ID are not the same")
 				require.Equal(t, putNote.Name, gotNote.Name, "Encrypt/DecryptBlob() note Name are not the same")

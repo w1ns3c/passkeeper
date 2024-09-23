@@ -7,11 +7,11 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/structs"
 )
 
-func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
+func (tuiApp *TUI) NewBanking(cards []*structs.Card) *tview.Flex {
 	var (
 		viewForm *CardDetails
 	)
@@ -91,10 +91,10 @@ func (tuiApp *TUI) NewBanking(cards []*entities.Card) *tview.Flex {
 
 type CardList struct {
 	*tview.List
-	cards []*entities.Card
+	cards []*structs.Card
 }
 
-func NewCardList(cards []*entities.Card) *CardList {
+func NewCardList(cards []*structs.Card) *CardList {
 	list := tview.NewList()
 	list.ShowSecondaryText(false).
 		SetBorderPadding(0, 0, 0, 0)
@@ -105,7 +105,7 @@ func NewCardList(cards []*entities.Card) *CardList {
 	}
 }
 
-func (list *CardList) Rerender(cards []*entities.Card) {
+func (list *CardList) Rerender(cards []*structs.Card) {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
 	}
@@ -126,7 +126,7 @@ func (list *CardList) Rerender(cards []*entities.Card) {
 }
 
 // GenCardShortName beautify card name to show it in the list
-func GenCardShortName(card *entities.Card) string {
+func GenCardShortName(card *structs.Card) string {
 	if card == nil {
 		return ""
 	}
@@ -160,7 +160,7 @@ func (list *CardList) Delete(tuiApp *TUI, ind int) {
 		return
 	}
 
-	delConfirm := DeleteModal(tuiApp, ind, entities.BlobCard)
+	delConfirm := DeleteModal(tuiApp, ind, structs.BlobCard)
 	pageConfirm := "confirmation"
 	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 	tuiApp.Pages.SwitchToPage(pageConfirm)

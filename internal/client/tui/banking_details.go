@@ -11,6 +11,7 @@ import (
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/structs"
 )
 
 var (
@@ -30,7 +31,7 @@ type CardDetails struct {
 	FieldPIN        *tview.InputField
 	FieldDesc       *tview.TextArea
 
-	CurrentCard *entities.Card
+	CurrentCard *structs.Card
 
 	// fields sizes
 	FieldWidth  int
@@ -38,9 +39,9 @@ type CardDetails struct {
 	maxSigns    int
 }
 
-func NewCardDetails(card *entities.Card) *CardDetails {
+func NewCardDetails(card *structs.Card) *CardDetails {
 	if card == nil {
-		card = &entities.Card{}
+		card = &structs.Card{}
 	}
 
 	bank := tview.NewDropDown().
@@ -82,7 +83,7 @@ func NewCardDetails(card *entities.Card) *CardDetails {
 }
 
 // Rerender refresh form fields' values
-func (form *CardDetails) Rerender(card *entities.Card) {
+func (form *CardDetails) Rerender(card *structs.Card) {
 	form.FieldName.SetText(card.Name)
 	form.FieldBank.SetTextOptions("", "", "", "", card.Bank)
 	form.FieldPerson.SetText(card.Person)
@@ -131,7 +132,7 @@ func (form *CardDetails) Add(tuiApp *TUI, ind int, list *CardList) {
 			return
 		}
 
-		newCard.ID = hashes.GeneratePassID2()
+		newCard.ID = hashes.GeneratePassID()
 
 		if err := tuiApp.Usecase.AddBlob(tuiApp.Ctx, newCard); err != nil {
 			tuiApp.log.Error().
@@ -324,9 +325,9 @@ func (form *CardDetails) EmptyFields() {
 }
 
 // GetCurrentValues get values from user input and format it to Card entity
-func (form *CardDetails) GetCurrentValues() (newCard *entities.Card, err error) {
-	newCard = new(entities.Card)
-	newCard.Type = entities.BlobCard
+func (form *CardDetails) GetCurrentValues() (newCard *structs.Card, err error) {
+	newCard = new(structs.Card)
+	newCard.Type = structs.BlobCard
 
 	newCard.Name = form.FieldName.GetText()
 	_, newCard.Bank = form.FieldBank.GetCurrentOption()

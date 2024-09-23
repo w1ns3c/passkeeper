@@ -6,15 +6,15 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/structs"
 )
 
 var (
 	hintFiles = strings.Replace("\n"+genHelp("file"), "choose", "download", 1)
 )
 
-func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
+func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 
 	list := NewFileList(files)
 	list.Rerender(files)
@@ -95,10 +95,10 @@ func (tuiApp *TUI) NewFiles(files []*entities.File) *tview.Flex {
 
 type FileList struct {
 	*tview.List
-	files []*entities.File
+	files []*structs.File
 }
 
-func NewFileList(files []*entities.File) *FileList {
+func NewFileList(files []*structs.File) *FileList {
 	list := tview.NewList()
 	list.ShowSecondaryText(false).
 		SetBorderPadding(0, 0, 0, 0)
@@ -109,7 +109,7 @@ func NewFileList(files []*entities.File) *FileList {
 	}
 }
 
-func (list *FileList) Rerender(files []*entities.File) {
+func (list *FileList) Rerender(files []*structs.File) {
 	for ind := list.GetItemCount() - 1; ind >= 0; ind-- {
 		list.RemoveItem(ind)
 	}
@@ -145,14 +145,14 @@ func (list *FileList) Delete(tuiApp *TUI, ind int) {
 		return
 	}
 
-	delConfirm := DeleteModal(tuiApp, ind, entities.BlobFile)
+	delConfirm := DeleteModal(tuiApp, ind, structs.BlobFile)
 	pageConfirm := "confirmation"
 	tuiApp.Pages.AddPage(pageConfirm, delConfirm, true, false)
 	tuiApp.Pages.SwitchToPage(pageConfirm)
 }
 
 // NewDownloadForm func unzip file and save it on local system
-func (tuiApp *TUI) NewDownloadForm(file *entities.File) tview.Primitive {
+func (tuiApp *TUI) NewDownloadForm(file *structs.File) tview.Primitive {
 	if file == nil {
 		return tview.NewForm()
 	}

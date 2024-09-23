@@ -3,15 +3,15 @@ package filesUC
 import (
 	"path/filepath"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/compress"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/structs"
 )
 
 // FilesUsecaseInf describe some actions under file blobs
 type FilesUsecaseInf interface {
-	ZipAndUpload(uploadingFile string) (file *entities.File, err error)
-	UnzipAndDownload(dirToDownload string, file *entities.File) error
+	ZipAndUpload(uploadingFile string) (file *structs.File, err error)
+	UnzipAndDownload(dirToDownload string, file *structs.File) error
 }
 
 // FilesUC implement FilesUsecaseInf
@@ -19,7 +19,7 @@ type FilesUC struct {
 }
 
 // ZipAndUpload zip local file and return file blob
-func (f *FilesUC) ZipAndUpload(uploadingFile string) (file *entities.File, err error) {
+func (f *FilesUC) ZipAndUpload(uploadingFile string) (file *structs.File, err error) {
 	zipData, err := compress.CompressFile(uploadingFile)
 	if err != nil {
 		return nil, err
@@ -27,9 +27,9 @@ func (f *FilesUC) ZipAndUpload(uploadingFile string) (file *entities.File, err e
 
 	name := filepath.Base(uploadingFile)
 
-	file = &entities.File{
-		ID:   hashes.GeneratePassID2(),
-		Type: entities.BlobFile,
+	file = &structs.File{
+		ID:   hashes.GeneratePassID(),
+		Type: structs.BlobFile,
 		Name: name,
 		Body: zipData,
 	}
@@ -38,7 +38,7 @@ func (f *FilesUC) ZipAndUpload(uploadingFile string) (file *entities.File, err e
 }
 
 // UnzipAndDownload unzip file blob and save it
-func (f *FilesUC) UnzipAndDownload(dirToDownload string, file *entities.File) error {
+func (f *FilesUC) UnzipAndDownload(dirToDownload string, file *structs.File) error {
 	fileName := filepath.Join(dirToDownload, file.Name)
 
 	err := compress.DecompressFile(file.Body, fileName)

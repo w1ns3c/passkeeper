@@ -4,5 +4,5 @@
 package config
 
 var (
-	CliLogFilePath = "/var/log/passkeeper.log"
+	CliLogFilePath = "/var/log/passkeeper.log" // path to log file on Linux machines
 )

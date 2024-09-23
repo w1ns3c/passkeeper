@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/structs"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/cli/filesUC"
 )
@@ -23,14 +23,14 @@ type ClientUsecase interface {
 	IsAuthed() bool
 
 	GetBlobs(ctx context.Context) (err error)
-	EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error)
-	AddBlob(ctx context.Context, cred entities.CredInf) (err error)
-	DelBlob(ctx context.Context, ind int, blobType entities.BlobType) (err error)
+	EditBlob(ctx context.Context, cred structs.CredInf, ind int) (err error)
+	AddBlob(ctx context.Context, cred structs.CredInf) (err error)
+	DelBlob(ctx context.Context, ind int, blobType structs.BlobType) (err error)
 
-	GetCredByIND(credIND int) (cred *entities.Credential, err error)
-	GetCardByIND(cardIND int) (cred *entities.Card, err error)
-	GetNoteByIND(noteIND int) (cred *entities.Note, err error)
-	GetFileByIND(ind int) (file *entities.File, err error)
+	GetCredByIND(credIND int) (cred *structs.Credential, err error)
+	GetCardByIND(cardIND int) (cred *structs.Card, err error)
+	GetNoteByIND(noteIND int) (cred *structs.Note, err error)
+	GetFileByIND(ind int) (file *structs.File, err error)
 
 	CredsLen() int
 	CredsNotNil() bool
@@ -40,10 +40,10 @@ type ClientUsecase interface {
 	ContinueSync()
 	CheckSync() bool
 
-	GetCreds() []*entities.Credential
-	GetCards() []*entities.Card
-	GetNotes() []*entities.Note
-	GetFiles() []*entities.File
+	GetCreds() []*structs.Credential
+	GetCards() []*structs.Card
+	GetNotes() []*structs.Note
+	GetFiles() []*structs.File
 
 	// moved from tuiApp
 	GetToken() string
@@ -57,13 +57,13 @@ type ClientUC struct {
 	Addr string
 
 	Authed bool
-	User   *entities.User
+	User   *structs.User
 	Token  string // JWT token
 
-	Creds         []*entities.Credential
-	Cards         []*entities.Card
-	Notes         []*entities.Note
-	Files         []*entities.File
+	Creds         []*structs.Credential
+	Cards         []*structs.Card
+	Notes         []*structs.Note
+	Files         []*structs.File
 	viewPageFocus bool
 	SyncTime      time.Duration
 	m             *sync.RWMutex

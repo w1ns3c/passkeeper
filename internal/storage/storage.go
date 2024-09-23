@@ -3,7 +3,7 @@ package storage
 import (
 	"context"
 
-	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 )
 
 // Storage describe main storage functionality
@@ -18,17 +18,17 @@ type Storage interface {
 
 // UserStorage describe store that keep entities.User
 type UserStorage interface {
-	GetUserByID(cxt context.Context, userID string) (user *entities.User, err error)
-	GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error)
+	GetUserByID(cxt context.Context, userID string) (user *structs.User, err error)
+	GetUserByLogin(cxt context.Context, login string) (user *structs.User, err error)
 	CheckUserExist(ctx context.Context, login string) (exist bool, err error)
-	SaveUser(ctx context.Context, u *entities.User) error
+	SaveUser(ctx context.Context, u *structs.User) error
 }
 
 // BlobStorage describe store that keep entities.CryptoBlob
 type BlobStorage interface {
-	AddBlob(ctx context.Context, blob *entities.CryptoBlob) error
-	GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error)
-	GetAllBlobs(ctx context.Context, userID string) (blobs []*entities.CryptoBlob, err error)
+	AddBlob(ctx context.Context, blob *structs.CryptoBlob) error
+	GetBlob(ctx context.Context, userID, blobID string) (blob *structs.CryptoBlob, err error)
+	GetAllBlobs(ctx context.Context, userID string) (blobs []*structs.CryptoBlob, err error)
 	DeleteBlob(ctx context.Context, userID, blobID string) error
-	UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error
+	UpdateBlob(ctx context.Context, blob *structs.CryptoBlob) error
 }

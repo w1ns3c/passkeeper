@@ -9,12 +9,14 @@ import (
 	"passkeeper/internal/entities/config"
 )
 
+// Args struct to save Server params
 type Args struct {
 	Addr     string
 	LogLevel string
 	DBurl    string
 }
 
+// SrvParseArgs parse Server params from command line
 func SrvParseArgs() *Args {
 	var (
 		flagAddrVal     string

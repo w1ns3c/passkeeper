@@ -7,9 +7,10 @@ import (
 	"slices"
 	"strconv"
 
-	config2 "passkeeper/internal/entities/config"
+	"passkeeper/internal/entities/config"
 )
 
+// Args struct to save Client params
 type Args struct {
 	Addr     string
 	LogLevel string
@@ -17,6 +18,7 @@ type Args struct {
 	SyncTime int // inseconds
 }
 
+// CliParseArgs parse Client params from command line
 func CliParseArgs() *Args {
 	var (
 		flagAddrVal     string
@@ -29,10 +31,10 @@ func CliParseArgs() *Args {
 		realLogFile     string
 		realSyncTimeVal int
 
-		defaultAddr     = config2.DefaultAddr
-		defaultLogLevel = config2.Level
-		defaultLogPath  = config2.CliLogFilePath
-		defaultSyncTime = int(config2.SyncDefault.Seconds())
+		defaultAddr     = config.DefaultAddr
+		defaultLogLevel = config.Level
+		defaultLogPath  = config.CliLogFilePath
+		defaultSyncTime = int(config.SyncDefault.Seconds())
 
 		addrFlag     = "addr"
 		levelFlag    = "level"

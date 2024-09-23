@@ -3,45 +3,42 @@ package entities
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"time"
+
+	"passkeeper/internal/entities/structs"
 )
 
-func Save(creds []*Credential, ind int, res, login, password, desc string) error {
-	creds[ind].Resource = res
-	creds[ind].Login = login
-	creds[ind].Password = password
-	creds[ind].Description = desc
-
-	return nil
-}
-
-func SaveCred(creds []*Credential, ind int, cred *Credential) error {
+// SaveCred save cred blob on client side
+func SaveCred(creds []*structs.Credential, ind int, cred *structs.Credential) error {
 	creds[ind] = cred
 	return nil
 }
 
-func SaveCard(cards []*Card, ind int, card *Card) error {
+// SaveCard save card blob on client side
+func SaveCard(cards []*structs.Card, ind int, card *structs.Card) error {
 	cards[ind] = card
 	return nil
 }
 
-func SaveNote(notes []*Note, ind int, note *Note) error {
+// SaveNote save note blob on client side
+func SaveNote(notes []*structs.Note, ind int, note *structs.Note) error {
 	notes[ind] = note
 	return nil
 }
 
-func SaveFile(files []*File, ind int, file *File) error {
+// SaveFile save file blob on client side
+func SaveFile(files []*structs.File, ind int, file *structs.File) error {
 	files[ind] = file
 	return nil
 }
 
-func AddCred(creds []*Credential, newCred *Credential) (newCreds []*Credential, err error) {
+// AddCred add cred blob on client side
+func AddCred(creds []*structs.Credential, newCred *structs.Credential) (newCreds []*structs.Credential, err error) {
 	if len(creds) == 0 {
 
 		return append(creds, newCred), nil
 	}
 
-	creds = append(creds, &Credential{})
+	creds = append(creds, &structs.Credential{})
 
 	for i := len(creds) - 1; i > 0; i-- {
 		creds[i] = creds[i-1]
@@ -52,13 +49,14 @@ func AddCred(creds []*Credential, newCred *Credential) (newCreds []*Credential, 
 	return creds, nil
 }
 
-func AddCard(cards []*Card, newCard *Card) (newCards []*Card, err error) {
+// AddCard add card blob on client side
+func AddCard(cards []*structs.Card, newCard *structs.Card) (newCards []*structs.Card, err error) {
 	if len(cards) == 0 {
 
 		return append(cards, newCard), nil
 	}
 
-	cards = append(cards, &Card{})
+	cards = append(cards, &structs.Card{})
 
 	for i := len(cards) - 1; i > 0; i-- {
 		cards[i] = cards[i-1]
@@ -69,13 +67,14 @@ func AddCard(cards []*Card, newCard *Card) (newCards []*Card, err error) {
 	return cards, nil
 }
 
-func AddNote(notes []*Note, newNote *Note) (newNotes []*Note, err error) {
+// AddNote add note blob on client side
+func AddNote(notes []*structs.Note, newNote *structs.Note) (newNotes []*structs.Note, err error) {
 	if len(notes) == 0 {
 
 		return append(notes, newNote), nil
 	}
 
-	notes = append(notes, &Note{})
+	notes = append(notes, &structs.Note{})
 
 	for i := len(notes) - 1; i > 0; i-- {
 		notes[i] = notes[i-1]
@@ -86,13 +85,14 @@ func AddNote(notes []*Note, newNote *Note) (newNotes []*Note, err error) {
 	return notes, nil
 }
 
-func AddFile(files []*File, newFile *File) (newFiles []*File, err error) {
+// AddFile add file blob on client side
+func AddFile(files []*structs.File, newFile *structs.File) (newFiles []*structs.File, err error) {
 	if len(files) == 0 {
 
 		return append(files, newFile), nil
 	}
 
-	files = append(files, &File{})
+	files = append(files, &structs.File{})
 
 	for i := len(files) - 1; i > 0; i-- {
 		files[i] = files[i-1]
@@ -103,33 +103,8 @@ func AddFile(files []*File, newFile *File) (newFiles []*File, err error) {
 	return files, nil
 }
 
-func Add(creds []*Credential, res, login, password, desc string) (newCreds []*Credential, err error) {
-
-	tmpCred := &Credential{
-		ID:          GenHash(res),
-		Date:        time.Now(),
-		Resource:    res,
-		Login:       login,
-		Password:    password,
-		Description: desc,
-	}
-
-	if len(creds) == 0 {
-		return append(creds, tmpCred), nil
-	}
-
-	creds = append(creds, &Credential{})
-
-	for i := len(creds) - 1; i > 0; i-- {
-		creds[i] = creds[i-1]
-	}
-
-	creds[0] = tmpCred
-
-	return creds, nil
-}
-
-func DeleteCred(creds []*Credential, ind int) (newCreds []*Credential, err error) {
+// DeleteCred delete cred blob on client side
+func DeleteCred(creds []*structs.Credential, ind int) (newCreds []*structs.Credential, err error) {
 	for i := ind; i < len(creds)-1; i++ {
 		creds[i] = creds[i+1]
 	}
@@ -137,7 +112,8 @@ func DeleteCred(creds []*Credential, ind int) (newCreds []*Credential, err error
 	return creds, nil
 }
 
-func DeleteCard(cards []*Card, ind int) (newCards []*Card, err error) {
+// DeleteCard delete card blob on client side
+func DeleteCard(cards []*structs.Card, ind int) (newCards []*structs.Card, err error) {
 	for i := ind; i < len(cards)-1; i++ {
 		cards[i] = cards[i+1]
 	}
@@ -145,7 +121,8 @@ func DeleteCard(cards []*Card, ind int) (newCards []*Card, err error) {
 	return cards, nil
 }
 
-func DeleteNote(notes []*Note, ind int) (newCreds []*Note, err error) {
+// DeleteNote delete note blob on client side
+func DeleteNote(notes []*structs.Note, ind int) (newCreds []*structs.Note, err error) {
 	for i := ind; i < len(notes)-1; i++ {
 		notes[i] = notes[i+1]
 	}
@@ -153,13 +130,16 @@ func DeleteNote(notes []*Note, ind int) (newCreds []*Note, err error) {
 	return notes, nil
 }
 
-func DeleteFile(files []*File, ind int) (newFiles []*File, err error) {
+// DeleteFile delete file blob on client side
+func DeleteFile(files []*structs.File, ind int) (newFiles []*structs.File, err error) {
 	for i := ind; i < len(files)-1; i++ {
 		files[i] = files[i+1]
 	}
 	files = files[:len(files)-1]
 	return files, nil
 }
+
+// GenHash just generate md5 hash of string
 func GenHash(s string) string {
 	s1 := md5.Sum([]byte(s))
 

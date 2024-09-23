@@ -7,10 +7,10 @@ import (
 
 	"github.com/w1ns3c/go-examples/crypto"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 )
 
 // RegisterUser function for register user in app on server side
@@ -55,7 +55,7 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 
 	secureSecret, err := hashes.EncryptSecret(secret, password)
 
-	user := &entities.User{
+	user := &structs.User{
 		ID:     id,
 		Login:  login,
 		Hash:   hash,

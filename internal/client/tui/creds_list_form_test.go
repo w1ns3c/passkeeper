@@ -3,9 +3,11 @@ package tui
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"passkeeper/internal/entities"
 	"testing"
 	"time"
+
+	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/structs"
 
 	"github.com/stretchr/testify/require"
 )
@@ -15,7 +17,7 @@ func TestSave(t *testing.T) {
 	sum2 := md5.Sum([]byte("2"))
 	sum3 := md5.Sum([]byte("3"))
 
-	creds := []*entities.Credential{
+	creds := []*structs.Credential{
 		{
 			ID:          hex.EncodeToString(sum1[:]),
 			Resource:    "contoso.local",
@@ -42,15 +44,15 @@ func TestSave(t *testing.T) {
 		},
 	}
 
-	creds1 := make([]*entities.Credential, len(creds))
-	creds2 := make([]*entities.Credential, len(creds))
-	creds3 := make([]*entities.Credential, len(creds))
+	creds1 := make([]*structs.Credential, len(creds))
+	creds2 := make([]*structs.Credential, len(creds))
+	creds3 := make([]*structs.Credential, len(creds))
 
 	_ = copy(creds1, creds)
 	_ = copy(creds2, creds)
 	_ = copy(creds3, creds)
 
-	tmpCred := entities.Credential{
+	tmpCred := structs.Credential{
 		ID:          hex.EncodeToString(sum3[:]),
 		Date:        time.Time{},
 		Resource:    "new_example.com",
@@ -59,17 +61,8 @@ func TestSave(t *testing.T) {
 		Description: "Your favorite neighbour",
 	}
 
-	//t.Log(creds)
-	//t.Log("123")
-	//err := entities.Save(creds, 0, tmpCred.Resource, tmpCred.Login, tmpCred.Password, tmpCred.Description)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//t.Log(creds)
-	//return
-
 	type args struct {
-		creds    []*entities.Credential
+		creds    []*structs.Credential
 		ind      int
 		res      string
 		login    string
@@ -137,7 +130,7 @@ func TestSave(t *testing.T) {
 }
 
 func TestAdd(t *testing.T) {
-	cred1 := &entities.Credential{
+	cred1 := &structs.Credential{
 		ID:          entities.GenHash("1"),
 		Resource:    "contoso.local",
 		Login:       "username",
@@ -146,7 +139,7 @@ func TestAdd(t *testing.T) {
 		Description: "Current Description",
 	}
 
-	cred2 := &entities.Credential{
+	cred2 := &structs.Credential{
 		ID:          entities.GenHash("2"),
 		Resource:    "example.com",
 		Login:       "mike",
@@ -155,7 +148,7 @@ func TestAdd(t *testing.T) {
 		Description: "Zip zip zip",
 	}
 
-	cred3 := &entities.Credential{
+	cred3 := &structs.Credential{
 		ID:          entities.GenHash("3"),
 		Resource:    "wiki.org",
 		Login:       "juice",
@@ -164,7 +157,7 @@ func TestAdd(t *testing.T) {
 		Description: "main info from site",
 	}
 
-	newCred := &entities.Credential{
+	newCred := &structs.Credential{
 		ID:          entities.GenHash("new"),
 		Resource:    "new",
 		Login:       "new_login",
@@ -173,24 +166,24 @@ func TestAdd(t *testing.T) {
 		Description: "new_description",
 	}
 
-	creds0 := []*entities.Credential{}
-	creds1 := []*entities.Credential{cred1}
-	creds2 := []*entities.Credential{cred1, cred2}
-	creds3 := []*entities.Credential{cred1, cred2, cred3}
+	creds0 := []*structs.Credential{}
+	creds1 := []*structs.Credential{cred1}
+	creds2 := []*structs.Credential{cred1, cred2}
+	creds3 := []*structs.Credential{cred1, cred2, cred3}
 
-	newCreds0 := []*entities.Credential{newCred}
-	newCreds1 := []*entities.Credential{newCred, cred1}
-	newCreds2 := []*entities.Credential{newCred, cred1, cred2}
-	newCreds3 := []*entities.Credential{newCred, cred1, cred2, cred3}
+	newCreds0 := []*structs.Credential{newCred}
+	newCreds1 := []*structs.Credential{newCred, cred1}
+	newCreds2 := []*structs.Credential{newCred, cred1, cred2}
+	newCreds3 := []*structs.Credential{newCred, cred1, cred2, cred3}
 
 	type args struct {
-		creds []*entities.Credential
-		new   *entities.Credential
+		creds []*structs.Credential
+		new   *structs.Credential
 	}
 	tests := []struct {
 		name         string
 		args         args
-		wantNewCreds []*entities.Credential
+		wantNewCreds []*structs.Credential
 		wantErr      bool
 	}{
 		{

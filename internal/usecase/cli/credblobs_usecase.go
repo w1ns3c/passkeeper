@@ -9,6 +9,7 @@ import (
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/structs"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
 
@@ -21,13 +22,13 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 		return err
 	}
 
-	creds := make([]*entities.Credential, 0)
-	cards := make([]*entities.Card, 0)
-	notes := make([]*entities.Note, 0)
-	files := make([]*entities.File, 0)
+	creds := make([]*structs.Credential, 0)
+	cards := make([]*structs.Card, 0)
+	notes := make([]*structs.Note, 0)
+	files := make([]*structs.File, 0)
 
 	for i := 0; i < len(resp.Blobs); i++ {
-		blob := &entities.CryptoBlob{
+		blob := &structs.CryptoBlob{
 			ID:     resp.Blobs[i].ID,
 			UserID: c.User.ID,
 			Blob:   resp.Blobs[i].Blob,
@@ -42,14 +43,14 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 		}
 
 		switch tmp.(type) {
-		case *entities.Card:
-			cards = append(cards, tmp.(*entities.Card))
-		case *entities.Note:
-			notes = append(notes, tmp.(*entities.Note))
-		case *entities.Credential:
-			creds = append(creds, tmp.(*entities.Credential))
-		case *entities.File:
-			files = append(files, tmp.(*entities.File))
+		case *structs.Card:
+			cards = append(cards, tmp.(*structs.Card))
+		case *structs.Note:
+			notes = append(notes, tmp.(*structs.Note))
+		case *structs.Credential:
+			creds = append(creds, tmp.(*structs.Credential))
+		case *structs.File:
+			files = append(files, tmp.(*structs.File))
 		default:
 			c.log.Error().
 				Err(fmt.Errorf("unknown type of blob")).Send()
@@ -80,22 +81,22 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 }
 
 // EditBlob change user blob, encrypt it and save changes in storage on server side
-func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int) (err error) {
+func (c *ClientUC) EditBlob(ctx context.Context, cred structs.CredInf, ind int) (err error) {
 	// check that blob with ind exist
 	switch cred.(type) {
-	case *entities.Credential:
+	case *structs.Credential:
 		if ind < 0 && ind >= len(c.Creds) {
 			return fmt.Errorf("invalid index of creds")
 		}
-	case *entities.Card:
+	case *structs.Card:
 		if ind < 0 && ind >= len(c.Cards) {
 			return fmt.Errorf("invalid index of cards")
 		}
-	case *entities.Note:
+	case *structs.Note:
 		if ind < 0 && ind >= len(c.Notes) {
 			return fmt.Errorf("invalid index of notes")
 		}
-	case *entities.File:
+	case *structs.File:
 		if ind < 0 && ind >= len(c.Files) {
 			return fmt.Errorf("invalid index of files")
 		}
@@ -131,26 +132,26 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 
 	// save creds in local app
 	switch cred.(type) {
-	case *entities.Credential:
-		if err = entities.SaveCred(c.Creds, ind, cred.(*entities.Credential)); err != nil {
+	case *structs.Credential:
+		if err = entities.SaveCred(c.Creds, ind, cred.(*structs.Credential)); err != nil {
 			return err
 		}
 		blobT = "credential"
 
-	case *entities.Card:
-		if err = entities.SaveCard(c.Cards, ind, cred.(*entities.Card)); err != nil {
+	case *structs.Card:
+		if err = entities.SaveCard(c.Cards, ind, cred.(*structs.Card)); err != nil {
 			return err
 		}
 		blobT = "card"
 
-	case *entities.Note:
-		if err = entities.SaveNote(c.Notes, ind, cred.(*entities.Note)); err != nil {
+	case *structs.Note:
+		if err = entities.SaveNote(c.Notes, ind, cred.(*structs.Note)); err != nil {
 			return err
 		}
 		blobT = "note"
 
-	case *entities.File:
-		if err = entities.SaveFile(c.Files, ind, cred.(*entities.File)); err != nil {
+	case *structs.File:
+		if err = entities.SaveFile(c.Files, ind, cred.(*structs.File)); err != nil {
 			return err
 		}
 		blobT = "file"
@@ -166,7 +167,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred entities.CredInf, ind int)
 }
 
 // AddBlob encrypt new blob and save in storage on server side
-func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err error) {
+func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error) {
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
 	if err != nil {
@@ -198,8 +199,8 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 
 	var blobT string
 	switch cred.(type) {
-	case *entities.Credential:
-		tmpCreds, err := entities.AddCred(c.Creds, cred.(*entities.Credential))
+	case *structs.Credential:
+		tmpCreds, err := entities.AddCred(c.Creds, cred.(*structs.Credential))
 		if err != nil {
 			// can't save creds localy
 			c.log.Error().
@@ -209,8 +210,8 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 		c.Creds = tmpCreds
 		blobT = "credential"
 
-	case *entities.Card:
-		tmpCards, err := entities.AddCard(c.Cards, cred.(*entities.Card))
+	case *structs.Card:
+		tmpCards, err := entities.AddCard(c.Cards, cred.(*structs.Card))
 		if err != nil {
 			// can't save creds localy
 			c.log.Error().
@@ -220,8 +221,8 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 		c.Cards = tmpCards
 		blobT = "card"
 
-	case *entities.Note:
-		tmpNotes, err := entities.AddNote(c.Notes, cred.(*entities.Note))
+	case *structs.Note:
+		tmpNotes, err := entities.AddNote(c.Notes, cred.(*structs.Note))
 		if err != nil {
 			// can't save creds localy
 			c.log.Error().
@@ -231,8 +232,8 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 		c.Notes = tmpNotes
 		blobT = "note"
 
-	case *entities.File:
-		tmpFiles, err := entities.AddFile(c.Files, cred.(*entities.File))
+	case *structs.File:
+		tmpFiles, err := entities.AddFile(c.Files, cred.(*structs.File))
 		if err != nil {
 			// can't save creds localy
 			c.log.Error().
@@ -254,33 +255,33 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred entities.CredInf) (err erro
 
 // DelBlob search blobID by ind and blobType on client side,
 // then delete crypto blob from storage by blobID on server side
-func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobType) (err error) {
+func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType structs.BlobType) (err error) {
 	var delID string
 
 	// check that blob with ind exist
 	switch blobType {
-	case entities.BlobCred:
+	case structs.BlobCred:
 		tmp, err := c.GetCredByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of creds")
 		}
 		delID = tmp.ID
 
-	case entities.BlobCard:
+	case structs.BlobCard:
 		tmp, err := c.GetCardByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of creds")
 		}
 		delID = tmp.ID
 
-	case entities.BlobNote:
+	case structs.BlobNote:
 		tmp, err := c.GetNoteByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of notes")
 		}
 		delID = tmp.ID
 
-	case entities.BlobFile:
+	case structs.BlobFile:
 		tmp, err := c.GetFileByIND(ind)
 		if err != nil {
 			return fmt.Errorf("invalid index of files")
@@ -305,7 +306,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 
 	// update blobs values
 	switch blobType {
-	case entities.BlobCred:
+	case structs.BlobCred:
 		newCreds, err := entities.DeleteCred(c.Creds, ind)
 		if err != nil {
 			return err
@@ -313,7 +314,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 		c.Creds = newCreds
 		blobT = "credential"
 
-	case entities.BlobCard:
+	case structs.BlobCard:
 		newCards, err := entities.DeleteCard(c.Cards, ind)
 		if err != nil {
 			return err
@@ -321,7 +322,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 		c.Cards = newCards
 		blobT = "card"
 
-	case entities.BlobNote:
+	case structs.BlobNote:
 		newNotes, err := entities.DeleteNote(c.Notes, ind)
 		if err != nil {
 			return err
@@ -329,7 +330,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 		c.Notes = newNotes
 		blobT = "note"
 
-	case entities.BlobFile:
+	case structs.BlobFile:
 		newFiles, err := entities.DeleteFile(c.Files, ind)
 		if err != nil {
 			return err
@@ -348,7 +349,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType entities.BlobT
 }
 
 // GetCredByIND return cred by it's ind in slice (safety)
-func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) {
+func (c *ClientUC) GetCredByIND(ind int) (cred *structs.Credential, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Creds) {
@@ -359,7 +360,7 @@ func (c *ClientUC) GetCredByIND(ind int) (cred *entities.Credential, err error) 
 }
 
 // GetCardByIND return cred by it's ind in slice (safety)
-func (c *ClientUC) GetCardByIND(ind int) (card *entities.Card, err error) {
+func (c *ClientUC) GetCardByIND(ind int) (card *structs.Card, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Cards) {
@@ -370,7 +371,7 @@ func (c *ClientUC) GetCardByIND(ind int) (card *entities.Card, err error) {
 }
 
 // GetNoteByIND return note by it's ind in slice (safety)
-func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
+func (c *ClientUC) GetNoteByIND(ind int) (note *structs.Note, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Notes) {
@@ -381,7 +382,7 @@ func (c *ClientUC) GetNoteByIND(ind int) (note *entities.Note, err error) {
 }
 
 // GetFileByIND return cred by it's ind in slice (safety)
-func (c *ClientUC) GetFileByIND(ind int) (file *entities.File, err error) {
+func (c *ClientUC) GetFileByIND(ind int) (file *structs.File, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
 	if ind < 0 || ind >= len(c.Files) {
@@ -392,7 +393,7 @@ func (c *ClientUC) GetFileByIND(ind int) (file *entities.File, err error) {
 }
 
 // SortCredsByDate sort creds, now the first cred is the latest added
-func SortCredsByDate(creds []*entities.Credential) {
+func SortCredsByDate(creds []*structs.Credential) {
 	sort.Slice(creds, func(i, j int) bool {
 		if creds[i].Date.After(creds[j].Date) {
 			return true
@@ -402,7 +403,7 @@ func SortCredsByDate(creds []*entities.Credential) {
 }
 
 // SortNotesByDate sort cards, now the first cred is the latest added
-func SortNotesByDate(notes []*entities.Note) {
+func SortNotesByDate(notes []*structs.Note) {
 	sort.Slice(notes, func(i, j int) bool {
 		if notes[i].Date.After(notes[j].Date) {
 			return true
@@ -412,10 +413,10 @@ func SortNotesByDate(notes []*entities.Note) {
 }
 
 // GetCreds return a copy of creds to view
-func (c *ClientUC) GetCreds() []*entities.Credential {
+func (c *ClientUC) GetCreds() []*structs.Credential {
 	c.m.Lock()
 
-	tmpCreds := make([]*entities.Credential, len(c.Creds))
+	tmpCreds := make([]*structs.Credential, len(c.Creds))
 	copy(tmpCreds, c.Creds)
 
 	c.m.Unlock()
@@ -424,16 +425,16 @@ func (c *ClientUC) GetCreds() []*entities.Credential {
 }
 
 // GetCards return a copy of cards to view
-func (c *ClientUC) GetCards() []*entities.Card {
+func (c *ClientUC) GetCards() []*structs.Card {
 	return c.Cards
 }
 
 // GetNotes return a copy of notes to view
-func (c *ClientUC) GetNotes() []*entities.Note {
+func (c *ClientUC) GetNotes() []*structs.Note {
 	return c.Notes
 }
 
 // GetFiles return a copy of files to view
-func (c *ClientUC) GetFiles() []*entities.File {
+func (c *ClientUC) GetFiles() []*structs.File {
 	return c.Files
 }

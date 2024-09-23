@@ -6,9 +6,9 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/srv/blobsUC"
 )
@@ -39,7 +39,7 @@ func (h *BlobsHandler) BlobAdd(ctx context.Context, req *pb.BlobAddRequest) (*em
 		return nil, err
 	}
 
-	blob := &entities.CryptoBlob{
+	blob := &structs.CryptoBlob{
 		ID:     req.Cred.ID,
 		UserID: userID,
 		Blob:   req.Cred.Blob,
@@ -93,7 +93,7 @@ func (h *BlobsHandler) BlobUpd(ctx context.Context, req *pb.BlobUpdRequest) (*em
 		return nil, err
 	}
 
-	blob := &entities.CryptoBlob{
+	blob := &structs.CryptoBlob{
 		ID:     req.Blob.ID,
 		UserID: userID,
 		Blob:   req.Blob.Blob,

@@ -5,9 +5,9 @@ import (
 
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/structs"
 )
 
 type Details struct {
@@ -27,7 +27,7 @@ type Details struct {
 	SaveLabel   string
 	CancelLabel string
 
-	CurrentCred  *entities.Credential
+	CurrentCred  *structs.Credential
 	HiddenPass   bool
 	CurrentField int
 
@@ -107,9 +107,9 @@ func (form *Details) Add(ind int, list CredListInf) {
 
 		res, login, password, desc := form.GetCurrentValues()
 
-		newCred := &entities.Credential{
-			Type:        entities.BlobCred,
-			ID:          hashes.GeneratePassID2(),
+		newCred := &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          hashes.GeneratePassID(),
 			Date:        time.Now(),
 			Resource:    res,
 			Login:       login,
@@ -343,7 +343,7 @@ func (form *Details) EmptyFields() {
 	}
 }
 
-func (form *Details) SetHiddenCred(cred *entities.Credential) *Details {
+func (form *Details) SetHiddenCred(cred *structs.Credential) *Details {
 	if form.FieldRes != nil {
 		form.FieldRes.SetText(cred.Resource)
 	}
@@ -364,7 +364,7 @@ func (form *Details) SetHiddenCred(cred *entities.Credential) *Details {
 	return form
 }
 
-func (form *Details) SetCurrentCred(cred *entities.Credential) *Details {
+func (form *Details) SetCurrentCred(cred *structs.Credential) *Details {
 	if form.FieldRes != nil {
 		form.FieldRes.SetText(cred.Resource)
 	}
@@ -413,7 +413,7 @@ func (form *Details) ShowSwitchPass() {
 }
 
 // FillFields alias for SetCurrentCred
-func (form *Details) FillFields(cred *entities.Credential) {
+func (form *Details) FillFields(cred *structs.Credential) {
 	form.SetCurrentCred(cred)
 }
 

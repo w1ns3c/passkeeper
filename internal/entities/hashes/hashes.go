@@ -3,7 +3,6 @@ package hashes
 import (
 	"crypto/md5"
 	"crypto/sha256"
-	"crypto/sha512"
 	"encoding/hex"
 	"fmt"
 	"hash"
@@ -14,16 +13,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var (
-	ErrInvalidToken = fmt.Errorf("token sign is not valid")
-)
-
 // GenerateHash func gen sha256 hash of (password with salt)
 func GenerateHash(password, salt string) string {
 	password = fmt.Sprintf("%s-%s.%s.%s", string(salt), string(password), string(password), string(salt))
-	hash := sha256.Sum256([]byte(password))
+	h := sha256.Sum256([]byte(password))
 
-	return fmt.Sprintf("%x", hash)
+	return fmt.Sprintf("%x", h)
 }
 
 // GenerateCryptoHash func
@@ -47,28 +42,19 @@ func ComparePassAndCryptoHash(password, hash string, salt string) bool {
 
 // GenerateUserID func to generate ID for any user before save it to storage
 func GenerateUserID(secret, salt string) string {
-	//hash := md5.Sum([]byte(fmt.Sprintf("%s.%s.%s", salt, secret, salt)))
-	//return hex.EncodeToString(hash[:])
-
 	h := md5.New()
 
 	return genID(secret, salt, h)
 }
 
 // GeneratePassID func to generate ID for any credential before save it to storage
-func GeneratePassID(secret, salt string) string {
-	h := sha512.New()
-
-	return genID(secret, salt, h)
-}
-
-func GeneratePassID2() string {
+func GeneratePassID() string {
 	h := sha256.New()
 	n := 32
 	uid, err := crypto.GenRandStr(n)
 	if err != nil {
 		// TODO
-
+		return ""
 	}
 
 	_, _ = io.WriteString(h, uid)

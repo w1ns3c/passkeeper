@@ -3,8 +3,8 @@ package memstorage
 import (
 	"context"
 
-	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/structs"
 )
 
 // CheckUserExist check user's login in memory storage
@@ -17,18 +17,18 @@ func (m *MemStorage) CheckUserExist(ctx context.Context, login string) (exist bo
 }
 
 // SaveUser save entities.User in memory storage
-func (m *MemStorage) SaveUser(ctx context.Context, u *entities.User) error {
+func (m *MemStorage) SaveUser(ctx context.Context, u *structs.User) error {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
 
 	m.users[u.Login] = u
-	m.blobs[u.ID] = make([]*entities.CryptoBlob, 0)
+	m.blobs[u.ID] = make([]*structs.CryptoBlob, 0)
 
 	return nil
 }
 
 // GetUserByID return entities.User by userID from memory storage
-func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *entities.User, err error) {
+func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *structs.User, err error) {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
 	for _, u := range m.users {
@@ -41,7 +41,7 @@ func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *enti
 }
 
 // GetUserByLogin return entities.User by login from memory storage
-func (m *MemStorage) GetUserByLogin(cxt context.Context, login string) (user *entities.User, err error) {
+func (m *MemStorage) GetUserByLogin(cxt context.Context, login string) (user *structs.User, err error) {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
 

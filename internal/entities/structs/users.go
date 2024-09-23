@@ -1,5 +1,6 @@
-package entities
+package structs
 
+// User is a main entity of any user account
 type User struct {
 	ID    string // generated on Hash and Salt
 	Login string // nickname
