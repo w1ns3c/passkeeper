@@ -70,7 +70,7 @@ func main() {
 
 	srv, err := server.NewServer(
 		server.WithAddr(conf.Addr),
-		server.WithUCcreds(credsUC),
+		server.WithUCblobs(credsUC),
 		server.WithUCusers(uc),
 		server.WithLogger(lg),
 	)

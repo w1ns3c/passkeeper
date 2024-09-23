@@ -30,6 +30,10 @@ var (
 	ErrUserNotFound = fmt.Errorf("user not exist")
 
 	// Server
+	ErrNoUCusers = fmt.Errorf("no users usecase")
+	ErrNoUCcreds = fmt.Errorf("no creds usecase")
+
+	// Server Usecase
 	ErrBlobsUserIDdifferent = errors.New("blob.UserID and userID in JWT are not the same")
 
 	ErrGetUser = fmt.Errorf("can't get user by ID")

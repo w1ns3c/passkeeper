@@ -1,17 +1,17 @@
 package server
 
 import (
-	"fmt"
-
 	"github.com/rs/zerolog"
 
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/logger"
+	"passkeeper/internal/entities/myerrors"
 	mygrpc "passkeeper/internal/transport/grpc"
 	"passkeeper/internal/usecase/srv/blobsUC"
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
+// Server consist of all server' parts: transport, storage, usecase
 type Server struct {
 	addr  string // ex: localhost:8000
 	users usersUC.UserUsecaseInf
@@ -22,11 +22,7 @@ type Server struct {
 	log *zerolog.Logger
 }
 
-var (
-	errNoUCusers = fmt.Errorf("no users usecase")
-	errNoUCcreds = fmt.Errorf("no creds usecase")
-)
-
+// newEmptyServer is an empty constructor for Server
 func newEmptyServer() *Server {
 	return &Server{
 		addr: config.DefaultAddr,
@@ -34,8 +30,10 @@ func newEmptyServer() *Server {
 	}
 }
 
+// SrvOption new type for Server constructor
 type SrvOption func(*Server)
 
+// NewServer is a constructor for Server with SrvOption
 func NewServer(opts ...SrvOption) (srv *Server, err error) {
 	srv = newEmptyServer()
 
@@ -45,15 +43,15 @@ func NewServer(opts ...SrvOption) (srv *Server, err error) {
 
 	if srv.users == nil {
 		srv.log.Error().
-			Err(errNoUCusers).Send()
+			Err(myerrors.ErrNoUCusers).Send()
 
-		return nil, errNoUCusers
+		return nil, myerrors.ErrNoUCusers
 	}
 	if srv.creds == nil {
 		srv.log.Error().
-			Err(errNoUCcreds).Send()
+			Err(myerrors.ErrNoUCcreds).Send()
 
-		return nil, errNoUCcreds
+		return nil, myerrors.ErrNoUCcreds
 	}
 
 	transport, err := mygrpc.NewTransportGRPC(
@@ -74,34 +72,40 @@ func NewServer(opts ...SrvOption) (srv *Server, err error) {
 	return srv, nil
 }
 
+// WithAddr setup add for Server
 func WithAddr(addr string) SrvOption {
 	return func(srv *Server) {
 		srv.addr = addr
 	}
 }
 
+// WithUCusers setup user usecase for Server
 func WithUCusers(uc usersUC.UserUsecaseInf) SrvOption {
 	return func(srv *Server) {
 		srv.users = uc
 	}
 }
 
-func WithUCcreds(uc blobsUC.BlobUsecaseInf) SrvOption {
+// WithUCblobs setup blob usecase for Server
+func WithUCblobs(uc blobsUC.BlobUsecaseInf) SrvOption {
 	return func(srv *Server) {
 		srv.creds = uc
 	}
 }
 
+// WithLogger setup add for Server
 func WithLogger(lg *zerolog.Logger) SrvOption {
 	return func(srv *Server) {
 		srv.log = lg
 	}
 }
 
+// Run will start Server
 func (s Server) Run() error {
 	return s.transport.Run()
 }
 
+// Stop will stop Server
 func (s Server) Stop() error {
 	s.users = nil
 	s.creds = nil
