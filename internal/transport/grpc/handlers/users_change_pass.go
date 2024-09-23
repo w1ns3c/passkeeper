@@ -11,12 +11,14 @@ import (
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
+// UserChangePassHandler handle user's request to change password
 type UserChangePassHandler struct {
 	pb.UnimplementedUserChangePassSvcServer
 	service usersUC.UserUsecaseInf
 	log     *zerolog.Logger
 }
 
+// NewUserChangePassHandler is a constructor for UserChangePassHandler
 func NewUserChangePassHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *UserChangePassHandler {
 	return &UserChangePassHandler{
 		UnimplementedUserChangePassSvcServer: pb.UnimplementedUserChangePassSvcServer{},
@@ -25,6 +27,7 @@ func NewUserChangePassHandler(logger *zerolog.Logger, service usersUC.UserUsecas
 	}
 }
 
+// ChangePass handle user request to change password
 func (h *UserChangePassHandler) ChangePass(ctx context.Context, req *pb.UserChangePassReq) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {

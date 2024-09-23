@@ -7,6 +7,7 @@ import (
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 
+	"passkeeper/internal/entities/myerrors"
 	"passkeeper/internal/transport/grpc/handlers"
 	"passkeeper/internal/transport/grpc/interceptors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
@@ -14,13 +15,9 @@ import (
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
-var (
-	errHndNotRegistered = fmt.Errorf("can't register some handlers")
-	errNotEnoughOptions = fmt.Errorf("not enough options for grpc constructor")
-)
-
 type TransportOption func(*TransportGRPC)
 
+// TransportGRPC describe transport server with GRPC
 type TransportGRPC struct {
 	//ctx    context.Context
 	addr   *net.TCPAddr
@@ -38,6 +35,7 @@ type TransportGRPC struct {
 	log *zerolog.Logger
 }
 
+// NewTransportGRPC is a constructor for TransportGRPC
 func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	srv = new(TransportGRPC)
 
@@ -52,7 +50,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 				Err(err).Msg("no users usecase")
 		}
 
-		return nil, errNotEnoughOptions
+		return nil, myerrors.ErrNotEnoughOptions
 	}
 
 	// check creds usecase
@@ -62,7 +60,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 				Err(err).Msg("no creds usecase")
 		}
 
-		return nil, errNotEnoughOptions
+		return nil, myerrors.ErrNotEnoughOptions
 	}
 
 	// init intercepters
@@ -81,24 +79,28 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	return
 }
 
+// WithLogger add logger to TransportGRPC
 func WithLogger(logger *zerolog.Logger) TransportOption {
 	return func(srv *TransportGRPC) {
 		srv.log = logger
 	}
 }
 
+// WithUCusers add user usecase to TransportGRPC
 func WithUCusers(users usersUC.UserUsecaseInf) TransportOption {
 	return func(srv *TransportGRPC) {
 		srv.users = users
 	}
 }
 
-func WithUCcreds(creds blobsUC.BlobUsecaseInf) TransportOption {
+// WithUCcreds add blob usecase to TransportGRPC
+func WithUCcreds(blobs blobsUC.BlobUsecaseInf) TransportOption {
 	return func(srv *TransportGRPC) {
-		srv.creds = creds
+		srv.creds = blobs
 	}
 }
 
+// WithAddr add user usecase to TransportGRPC
 func WithAddr(addr string) TransportOption {
 	netAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
@@ -118,7 +120,7 @@ func (srv *TransportGRPC) Run() error {
 			srv.log.Error().
 				Msgf("grpc handlers is <nil>")
 		}
-		return errHndNotRegistered
+		return myerrors.ErrHndNotRegistered
 	}
 
 	pb.RegisterUserSvcServer(srv.srvRPC, srv.hndUsers)
@@ -141,6 +143,7 @@ func (srv *TransportGRPC) Run() error {
 	return srv.srvRPC.Serve(l)
 }
 
+// Stop will stop GRPC server
 func (srv *TransportGRPC) Stop() error {
 	srv.srvRPC.GracefulStop()
 	srv.log.Info().Msgf("[+] Server stopped")

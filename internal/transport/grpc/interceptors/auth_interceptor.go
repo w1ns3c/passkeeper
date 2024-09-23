@@ -11,18 +11,17 @@ import (
 
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/myerrors"
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
-var (
-	ErrWrongAuth = "not authorized"
-)
-
+// AuthInterceptor using for check user auth
 type AuthInterceptor struct {
 	service usersUC.UserUsecaseInf
 	grpc.UnaryServerInterceptor
 }
 
+// AuthFunc check user token in each request
 func (in *AuthInterceptor) AuthFunc() grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 
@@ -45,7 +44,7 @@ func (in *AuthInterceptor) AuthFunc() grpc.UnaryServerInterceptor {
 		salt := in.service.GetTokenSalt(ctx, uncheckedID)
 		userID, err := hashes.CheckToken(token, salt)
 		if err != nil {
-			return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
+			return nil, status.Errorf(codes.Unauthenticated, myerrors.ErrWrongAuth)
 		}
 
 		md, ok := metadata.FromIncomingContext(ctx)
@@ -60,32 +59,7 @@ func (in *AuthInterceptor) AuthFunc() grpc.UnaryServerInterceptor {
 	}
 }
 
+// NewAuthInterceptor is a constructor for AuthInterceptor
 func NewAuthInterceptor(service usersUC.UserUsecaseInf) *AuthInterceptor {
 	return &AuthInterceptor{service: service}
 }
-
-// Will use `grpc-ecosystem/go-grpc-middleware/blob/main/interceptors/auth`
-//
-//func (in *AuthInterceptor) Intercept(ctx context.Context, req interface{},
-//	info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-//
-//	token, err := handlers.ExtractUserInfo(ctx)
-//	if err != nil {
-//		in.log.Error().Err(err).
-//			Msg(ErrWrongAuth)
-//
-//		return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
-//	}
-//
-//	userID, err := usecase.CheckToken(token, in.service.GetTokenSalt())
-//	if err != nil {
-//		in.log.Error().Err(err).
-//			Msg(ErrWrongAuth)
-//
-//		return nil, status.Errorf(codes.Unauthenticated, ErrWrongAuth)
-//	}
-//
-//	metadata.AppendToOutgoingContext(ctx, config.TokenHeader, userID)
-//
-//	return handler(ctx, req)
-//}

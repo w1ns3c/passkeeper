@@ -5,38 +5,22 @@ import (
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/rs/zerolog"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/myerrors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/srv/blobsUC"
 )
 
-var (
-	ErrCredAddMsg = "cred not added"
-	ErrCredAdd    = status.Error(codes.Internal, ErrCredAddMsg)
-
-	ErrCredGetMsg = "cred can't get"
-	ErrCredGet    = status.Error(codes.Internal, ErrCredGetMsg)
-
-	ErrCredUpdMsg = "cred not updated"
-	ErrCredUpd    = status.Error(codes.Internal, ErrCredUpdMsg)
-
-	ErrCredDelMsg = "cred not deleted"
-	ErrCredDel    = status.Error(codes.Internal, ErrCredDelMsg)
-
-	ErrCredListMsg = "creds not listed"
-	ErrCredList    = status.Error(codes.Internal, ErrCredListMsg)
-)
-
+// BlobsHandler handle blobs requests
 type BlobsHandler struct {
 	pb.UnimplementedBlobSvcServer
 	service blobsUC.BlobUsecaseInf
 	log     *zerolog.Logger
 }
 
+// NewBlobsHandler is a constructor for BlobsHandler
 func NewBlobsHandler(logger *zerolog.Logger, service blobsUC.BlobUsecaseInf) *BlobsHandler {
 	return &BlobsHandler{
 		UnimplementedBlobSvcServer: pb.UnimplementedBlobSvcServer{},
@@ -45,6 +29,7 @@ func NewBlobsHandler(logger *zerolog.Logger, service blobsUC.BlobUsecaseInf) *Bl
 	}
 }
 
+// BlobAdd handle blob add request
 func (h *BlobsHandler) BlobAdd(ctx context.Context, req *pb.BlobAddRequest) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
@@ -63,14 +48,15 @@ func (h *BlobsHandler) BlobAdd(ctx context.Context, req *pb.BlobAddRequest) (*em
 	err = h.service.AddBlob(ctx, userID, blob)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(ErrCredAddMsg)
+			Err(err).Msg(myerrors.ErrCredAddMsg)
 
-		return nil, ErrCredAdd
+		return nil, myerrors.ErrCredAdd
 	}
 
 	return new(empty.Empty), nil
 }
 
+// BlobGet handle blob get request
 func (h *BlobsHandler) BlobGet(ctx context.Context, req *pb.BlobGetRequest) (resp *pb.BlobGetResponse, err error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
@@ -83,9 +69,9 @@ func (h *BlobsHandler) BlobGet(ctx context.Context, req *pb.BlobGetRequest) (res
 	cr, err := h.service.GetBlob(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(ErrCredGetMsg)
+			Err(err).Msg(myerrors.ErrCredGetMsg)
 
-		return nil, ErrCredGet
+		return nil, myerrors.ErrCredGet
 	}
 
 	resp = &pb.BlobGetResponse{
@@ -97,6 +83,7 @@ func (h *BlobsHandler) BlobGet(ctx context.Context, req *pb.BlobGetRequest) (res
 	return resp, nil
 }
 
+// BlobUpd handle blob update request
 func (h *BlobsHandler) BlobUpd(ctx context.Context, req *pb.BlobUpdRequest) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
@@ -115,14 +102,15 @@ func (h *BlobsHandler) BlobUpd(ctx context.Context, req *pb.BlobUpdRequest) (*em
 	err = h.service.UpdBlob(ctx, userID, blob)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(ErrCredUpdMsg)
+			Err(err).Msg(myerrors.ErrCredUpdMsg)
 
-		return nil, ErrCredUpd
+		return nil, myerrors.ErrCredUpd
 	}
 
 	return new(empty.Empty), nil
 }
 
+// BlobDel handle blob delete request
 func (h *BlobsHandler) BlobDel(ctx context.Context, req *pb.BlobDelRequest) (*empty.Empty, error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
@@ -135,14 +123,15 @@ func (h *BlobsHandler) BlobDel(ctx context.Context, req *pb.BlobDelRequest) (*em
 	err = h.service.DelBlob(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(ErrCredDelMsg)
+			Err(err).Msg(myerrors.ErrCredDelMsg)
 
-		return nil, ErrCredDel
+		return nil, myerrors.ErrCredDel
 	}
 
 	return new(empty.Empty), nil
 }
 
+// BlobList handle request that ask to return all blobs
 func (h *BlobsHandler) BlobList(ctx context.Context, req *empty.Empty) (resp *pb.BlobListResponse, err error) {
 	userID, err := hashes.ExtractUserInfo(ctx)
 	if err != nil {
@@ -158,9 +147,9 @@ func (h *BlobsHandler) BlobList(ctx context.Context, req *empty.Empty) (resp *pb
 	blobs, err := h.service.ListBlobs(ctx, userID)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(ErrCredListMsg)
+			Err(err).Msg(myerrors.ErrCredListMsg)
 
-		return nil, ErrCredList
+		return nil, myerrors.ErrCredList
 	}
 
 	h.log.Info().

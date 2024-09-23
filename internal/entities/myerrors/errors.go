@@ -40,6 +40,36 @@ var (
 	ErrPassIsEmpty   = fmt.Errorf("password is empty")
 	ErrRePassIsEmpty = fmt.Errorf("password repeat is empty")
 
+	// Server Transport
+	ErrHndNotRegistered = fmt.Errorf("can't register some handlers")
+	ErrNotEnoughOptions = fmt.Errorf("not enough options for grpc constructor")
+	ErrWrongAuth        = "not authorized"
+
+	// Server Transport Handlers
+	ErrCredAddMsg = "cred not added"
+	ErrCredAdd    = status.Error(codes.Internal, ErrCredAddMsg)
+
+	ErrCredGetMsg = "cred can't get"
+	ErrCredGet    = status.Error(codes.Internal, ErrCredGetMsg)
+
+	ErrCredUpdMsg = "cred not updated"
+	ErrCredUpd    = status.Error(codes.Internal, ErrCredUpdMsg)
+
+	ErrCredDelMsg = "cred not deleted"
+	ErrCredDel    = status.Error(codes.Internal, ErrCredDelMsg)
+
+	ErrCredListMsg = "creds not listed"
+	ErrCredList    = status.Error(codes.Internal, ErrCredListMsg)
+
+	ErrAlreadyExistMsg = "user already exist"
+	ErrAlreadyExist    = status.Error(codes.AlreadyExists, ErrAlreadyExistMsg)
+
+	ErrRegisterMsg = "can't register user"
+	ErrRegister    = status.Error(codes.Internal, ErrRegisterMsg)
+
+	ErrWrongLoginMsg = "can't login user, wrong login/password"
+	ErrWrongLogin    = status.Errorf(codes.PermissionDenied, ErrWrongLoginMsg)
+
 	// Client usecase
 	ErrPassNotSame         = fmt.Errorf("pass and pass repeat are not the same")
 	ErrInvalidEmail        = fmt.Errorf("email is not valid by new regexp")
