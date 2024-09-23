@@ -7,10 +7,12 @@ import (
 	"passkeeper/internal/entities/myerrors"
 )
 
+// GetBlob return blob from storage by userID and blobID
 func (u *BlobUsecase) GetBlob(ctx context.Context, userID, blobID string) (blob *entities.CryptoBlob, err error) {
 	return u.storage.GetBlob(ctx, userID, blobID)
 }
 
+// AddBlob add blob to specific user
 func (u *BlobUsecase) AddBlob(ctx context.Context,
 	userID string, blob *entities.CryptoBlob) error {
 
@@ -22,6 +24,7 @@ func (u *BlobUsecase) AddBlob(ctx context.Context,
 	return u.storage.AddBlob(ctx, blob)
 }
 
+// UpdBlob change specific blob
 func (u *BlobUsecase) UpdBlob(ctx context.Context,
 	userID string, blob *entities.CryptoBlob) error {
 
@@ -33,6 +36,7 @@ func (u *BlobUsecase) UpdBlob(ctx context.Context,
 	return u.storage.UpdateBlob(ctx, blob)
 }
 
+// DelBlob delete specific blob
 func (u *BlobUsecase) DelBlob(ctx context.Context,
 	userID, blobID string) error {
 
@@ -49,6 +53,7 @@ func (u *BlobUsecase) DelBlob(ctx context.Context,
 	return u.storage.DeleteBlob(ctx, userID, blobID)
 }
 
+// ListBlobs return all blobs for specific user
 func (u *BlobUsecase) ListBlobs(ctx context.Context,
 	userID string) (blobs []*entities.CryptoBlob, err error) {
 

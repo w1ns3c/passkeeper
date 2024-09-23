@@ -104,7 +104,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		tuiApp.SubPages.SwitchToPage(SubPageCreds)
 
 		tuiApp.wg.Add(1)
-		go tuiApp.RerenderCreds()
+		go tuiApp.RerenderBlobs()
 
 	})
 

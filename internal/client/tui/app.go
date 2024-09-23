@@ -150,7 +150,7 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 	return tuiApp, nil
 }
 
-func (tuiApp *TUI) Logout() error {
+func (tuiApp *TUI) Logout() {
 	tuiApp.Ctx = context.Background()
 	tuiApp.Usecase.Logout()
 
@@ -159,7 +159,6 @@ func (tuiApp *TUI) Logout() error {
 	tuiApp.SubPages.RemovePage(SubPageBank)
 	tuiApp.SubPages.RemovePage(SubPageNotes)
 
-	return nil
 }
 
 func (tuiApp *TUI) Run(ctx context.Context) error {

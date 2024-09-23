@@ -4,38 +4,40 @@ import (
 	"context"
 
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/myerrors"
 )
 
+// ChangePassword func to change user password on server side
 func (u *UserUsecase) ChangePassword(ctx context.Context, userID, oldPass, newPass, reNewPass string) (err error) {
 	user, err := u.storage.GetUserByID(ctx, userID)
 	if err != nil {
 		u.log.Error().Err(err).
-			Msg(ErrGetUser.Error())
+			Msg(myerrors.ErrGetUser.Error())
 
-		return ErrGetUser
+		return myerrors.ErrGetUser
 	}
 
 	equal := hashes.ComparePassAndCryptoHash(oldPass, user.Hash, user.Salt)
 	if !equal {
 		u.log.Error().
-			Err(ErrWrongOldPassword).Send()
+			Err(myerrors.ErrWrongOldPassword).Send()
 
-		return ErrWrongOldPassword
+		return myerrors.ErrWrongOldPassword
 	}
 
 	if newPass != reNewPass {
 		u.log.Error().
-			Err(ErrRepassNotSame).Send()
+			Err(myerrors.ErrRepassNotSame).Send()
 
-		return ErrRepassNotSame
+		return myerrors.ErrRepassNotSame
 	}
 
 	hNew1, err := hashes.GenerateCryptoHash(newPass, user.Salt)
 	if err != nil {
 		u.log.Error().Err(err).
-			Msg(ErrGenHash.Error())
+			Msg(myerrors.ErrGenHash.Error())
 
-		return ErrGenHash
+		return myerrors.ErrGenHash
 	}
 
 	user.Hash = hNew1

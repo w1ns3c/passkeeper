@@ -2,7 +2,6 @@ package usersUC
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -12,24 +11,7 @@ import (
 	"passkeeper/internal/storage/memstorage"
 )
 
-var (
-	ErrGetUser = fmt.Errorf("can't get user by ID")
-	ErrGenHash = fmt.Errorf("can't generate hash of password")
-
-	ErrWrongOldPassword = fmt.Errorf("old password is wrong")
-	ErrRepassNotSame    = fmt.Errorf("new pass and repeat not the same")
-
-	ErrWrongPassword = fmt.Errorf("wrong password for username")
-	ErrWrongUsername = fmt.Errorf("username not found")
-	ErrWrongAuth     = fmt.Errorf("wrong user/password")
-
-	ErrUserSecret = fmt.Errorf("can't generate user secret hash")
-
-	//ErrPassNotTheSame = fmt.Errorf("passwords not match")
-	ErrPassIsEmpty   = fmt.Errorf("password is empty")
-	ErrRePassIsEmpty = fmt.Errorf("password repeat is empty")
-)
-
+// UserUsecaseInf describe main user functional on server side
 type UserUsecaseInf interface {
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token, secret string, err error)
 
@@ -39,6 +21,7 @@ type UserUsecaseInf interface {
 	LoginUser(ctx context.Context, login string, password string) (token, secret string, err error)
 }
 
+// UserUsecase implement UserUsecaseInf
 type UserUsecase struct {
 	ctx             context.Context
 	storage         storage.UserStorage
@@ -48,18 +31,7 @@ type UserUsecase struct {
 	log             *zerolog.Logger
 }
 
-func (u *UserUsecase) GetTokenSalt(ctx context.Context, userID string) string {
-	user, err := u.storage.GetUserByID(ctx, userID)
-	if err != nil {
-		u.log.Error().
-			Err(err).Msg("can't get user's salt from storage")
-
-		return ""
-	}
-
-	return user.Salt
-}
-
+// NewUserUsecase is constructo for UserUsecase
 func NewUserUsecase(ctx context.Context) *UserUsecase {
 	return &UserUsecase{
 		storage:         memstorage.NewMemStorage(ctx),
@@ -69,36 +41,42 @@ func NewUserUsecase(ctx context.Context) *UserUsecase {
 	}
 }
 
+// SetStorage set storage to UserUsecase
 func (u *UserUsecase) SetStorage(storage storage.UserStorage) *UserUsecase {
 	u.storage = storage
 
 	return u
 }
 
+// SetTokenLifeTime set tokenLifeTime to UserUsecase
 func (u *UserUsecase) SetTokenLifeTime(tokenLifeTime time.Duration) *UserUsecase {
 	u.tokenLifeTime = tokenLifeTime
 
 	return u
 }
 
+// SetLog add logger to UserUsecase
 func (u *UserUsecase) SetLog(logger *zerolog.Logger) *UserUsecase {
 	u.log = logger
 
 	return u
 }
 
+// SetContext add context to UserUsecase
 func (u *UserUsecase) SetContext(ctx context.Context) *UserUsecase {
 	u.ctx = ctx
 
 	return u
 }
 
+// SetSecretLen set len of user's secret string
 func (u *UserUsecase) SetSecretLen(length int) *UserUsecase {
 	u.userSecretLen = length
 
 	return u
 }
 
+// SetSaltLen set len of user's salt string
 func (u *UserUsecase) SetSaltLen(length int) *UserUsecase {
 	u.userPassSaltLen = length
 

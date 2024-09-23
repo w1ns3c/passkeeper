@@ -2,7 +2,8 @@ package tui
 
 import "time"
 
-func (tuiApp *TUI) RerenderCreds() {
+// RerenderBlobs rerender all windows with blobs
+func (tuiApp *TUI) RerenderBlobs() {
 	tuiApp.log.Info().
 		Msg("start syncing creds")
 
@@ -22,19 +23,13 @@ func (tuiApp *TUI) RerenderCreds() {
 			// don't rerender forms if user edit/add new cred in tui
 			if tuiApp.Usecase.CheckSync() {
 				tuiApp.log.Info().
-					Msg("not time to sync blobs: user changing them")
+					Msg("not time to rerender blobs")
 
 				continue
 			}
 
 			tuiApp.log.Info().
 				Msg("get new list of blobs, time to rerender all")
-
-			//// check that is focused
-			//if !tuiApp.SubformCreds.HasFocus() {
-			//
-			//	continue
-			//}
 
 			// reinit subpages
 			tuiApp.SubformCreds = NewCredsList(tuiApp)

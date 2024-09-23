@@ -9,6 +9,7 @@ import (
 	"passkeeper/internal/entities/config"
 )
 
+// SyncBlobs sync blobs to rerender them later
 func (c *ClientUC) SyncBlobs(ctx context.Context) {
 
 	ticker := time.NewTicker(c.SyncTime)
@@ -42,18 +43,21 @@ func (c *ClientUC) SyncBlobs(ctx context.Context) {
 
 }
 
+// StopSync stop blob syncing
 func (c *ClientUC) StopSync() {
 	c.m.Lock()
 	c.viewPageFocus = true
 	c.m.Unlock()
 }
 
+// ContinueSync resume blob syncing
 func (c *ClientUC) ContinueSync() {
 	c.m.Lock()
 	c.viewPageFocus = false
 	c.m.Unlock()
 }
 
+// CheckSync let tui understand when should sync blobs
 func (c *ClientUC) CheckSync() bool {
 	c.m.Lock()
 	defer c.m.Unlock()

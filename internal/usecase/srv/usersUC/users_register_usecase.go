@@ -10,29 +10,29 @@ import (
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
-	errors2 "passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/myerrors"
 )
 
-// RegisterUser function for register user in app
+// RegisterUser function for register user in app on server side
 func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	password string, rePass string) (token, secretForCreds string, err error) {
 
 	// here password should be hashes.Hash(password)
 	if password != rePass {
-		return "", "", ErrRepassNotSame
+		return "", "", myerrors.ErrRepassNotSame
 	}
 
 	if password == "" {
-		return "", "", ErrPassIsEmpty
+		return "", "", myerrors.ErrPassIsEmpty
 	}
 
 	if rePass == "" {
-		return "", "", ErrRePassIsEmpty
+		return "", "", myerrors.ErrRePassIsEmpty
 	}
 
 	// checking login free
 	exist, err := u.storage.CheckUserExist(ctx, login)
-	if (!errors.Is(err, errors2.ErrUserNotExist) && err != nil) || exist {
+	if (!errors.Is(err, myerrors.ErrUserNotExist) && err != nil) || exist {
 		return "", "", fmt.Errorf("user is already exist:%v", err)
 	}
 
@@ -68,14 +68,6 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 		return "", "", err
 	}
 
-	//hashedSecret, err := HashSecret(user.FullSecret)
-	//if err != nil {
-	//	u.log.Error().Err(err).
-	//		Msg(ErrUserSecret.Error())
-	//
-	//	return "", "", ErrWrongOldPassword
-	//}
-
 	token, err = hashes.GenerateToken(user.ID, userSalt, u.tokenLifeTime)
 	if err != nil {
 		return "", "", fmt.Errorf("can't generate user token: %v", err)
@@ -84,20 +76,3 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 	// user.CredsSecret is hashes.EncryptSecret(secret, hashes.Hash(clearPassword))
 	return token, user.Secret, nil
 }
-
-//
-//// HashSecret save secret before sent to client
-//// User secret
-//// Send secret: 		md5(aes256(user.secret, key:user.secret))
-//// FullSecret for token: 	user.secret
-//func HashSecret(secret string) (hash string, err error) {
-//	key := sha256.Sum256([]byte(secret))
-//	secretAES, err := crypto.EncryptAES([]byte(secret), key[:])
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	hashedSecret := fmt.Sprintf("%x", md5.Sum(secretAES))
-//
-//	return hashedSecret, nil
-//}

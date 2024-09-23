@@ -159,6 +159,8 @@ func (c *ClientUC) Logout() {
 	c.Creds = nil
 	c.Authed = false
 
+	c.StopSync()
+
 	return
 }
 

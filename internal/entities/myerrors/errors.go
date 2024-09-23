@@ -27,4 +27,16 @@ var (
 
 	// Server
 	ErrBlobsUserIDdifferent = errors.New("blob.UserID and userID in JWT are not the same")
+
+	ErrGetUser = fmt.Errorf("can't get user by ID")
+	ErrGenHash = fmt.Errorf("can't generate hash of password")
+
+	ErrWrongOldPassword = fmt.Errorf("old password is wrong")
+	ErrRepassNotSame    = fmt.Errorf("new pass and repeat not the same")
+
+	ErrWrongPassword = fmt.Errorf("wrong password for username")
+	ErrWrongUsername = fmt.Errorf("username not found")
+
+	ErrPassIsEmpty   = fmt.Errorf("password is empty")
+	ErrRePassIsEmpty = fmt.Errorf("password repeat is empty")
 )

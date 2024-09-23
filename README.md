@@ -81,4 +81,4 @@ C:\Windows\Temp\passkeeper.log
 
 ## Fill Readme.md
 - [ ] Add gif to show functionality
-- [ ] Write about program logs
+- [x] Write about program logs

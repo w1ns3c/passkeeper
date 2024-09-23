@@ -149,11 +149,11 @@ func (pg *PostgresStorage) DeleteBlob(ctx context.Context, userID, blobID string
 func (pg *PostgresStorage) UpdateBlob(ctx context.Context, blob *entities.CryptoBlob) error {
 	var (
 		query = fmt.Sprintf("UPDATE %s SET %s=$1 WHERE %s=$2",
-			TableBlobs, fieldBlobID,
+			TableBlobs, fieldBlobData, fieldBlobID,
 		)
 	)
 
-	rows, err := pg.db.ExecContext(ctx, query, blob.ID)
+	rows, err := pg.db.ExecContext(ctx, query, blob.Blob, blob.ID)
 	if err != nil {
 		return err
 	}
