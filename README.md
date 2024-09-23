@@ -1,14 +1,20 @@
 # Passkeeper
 Credential manager on Go (client/server)
 
-## Check
-I know, that project is far from finish line, but...
-Please, give me some comments and advices for my code in review.
+## Client app logs location
+```
+# Linux
+/var/log/passkeeper.log
+
+# Windows
+C:\Windows\Temp\passkeeper.log
+
+```
 
 # TODO Functionality
 ## Main Functionality
 - [x] Use gRPC protocol
-- [ ] Add terminal user interface with main functionality
+- [x] Add terminal user interface with main functionality
 - [ ] Fix bugs in TUI terminal user interface
 - [x] User login
 - [x] User register
@@ -33,7 +39,7 @@ Please, give me some comments and advices for my code in review.
 - [x] Add user files (upload)
 - [x] Del user files
 - [x] Asynchronous sync blobs (bugs fix)
-- [ ] Add DB storage
+- [x] Add DB storage
 - [x] Gracefull shutdown (client)
 - [ ] Gracefull shutdown (server)
 - [x] Client parse args/env
