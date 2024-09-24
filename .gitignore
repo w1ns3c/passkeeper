@@ -41,6 +41,7 @@ cmd/server/test_data.go
 
 # mocks
 mock/
+mocks/
 
 # cover
 cover*
@@ -48,3 +49,6 @@ cover.out
 coverage.out
 *.out
 *.html
+
+# tmp tests
+tmp_test/*

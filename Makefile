@@ -32,17 +32,17 @@ BUILD_DATE=main.BuildDate=${DATE}
 LD_FLAGS="-X \"${BUILD_DATE}\" -X \"${BUILD_VER}\" -X \"${BUILD_GIT}\""
 
 client:
-	mkdir -p builds
-	go build -o builds/client.elf -ldflags ${LD_FLAGS} cmd/client/client.go
+	@mkdir -p builds
+	@go build -o builds/client.elf -ldflags ${LD_FLAGS} cmd/client/client.go
 	GOOS=windows go build -o builds/client.exe cmd/client/client.go
 
 server:
-	mkdir -p builds
-	go build -o builds/server.elf cmd/server/server.go
+	@mkdir -p builds
+	@go build -o builds/server.elf cmd/server/server.go
 	GOOS=windows go build -o builds/server.exe cmd/server/server.go
 
 clean:
-	rm -rf builds
+	@rm -rf builds
 
 cover:
 	#for p in `go list ./... | grep -viE "(cmd|tui|proto)"`; do echo -en "$p/... "; done
@@ -50,8 +50,13 @@ cover:
 	@go tool cover -html=cover.out -o cover.html
 	@go tool cover -func=cover.out | grep -i total | tr -s '\t'
 
-mock:
-	mockgen -source internal/storage/storage.go -destination mock/storage_mock.go -package=mocks
+MOCKS_DESTINATION="mocks"
+
+mocks: internal/storage/storage.go
+	@echo "Generating mocks..."
+	@rm -rf $(MOCKS_DESTINATION)
+	mockgen -source internal/storage/storage.go -destination mocks/storage_mock.go -package=mocks
+	#@for file in $^; do mockgen -source=$$file -destination=$(MOCKS_DESTINATION)/$$file; done
 
 
 tools:

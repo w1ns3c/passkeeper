@@ -9,7 +9,18 @@ import (
 
 // GetBlob return blob from storage by userID and blobID
 func (u *BlobUsecase) GetBlob(ctx context.Context, userID, blobID string) (blob *structs.CryptoBlob, err error) {
-	return u.storage.GetBlob(ctx, userID, blobID)
+
+	blob, err = u.storage.GetBlob(ctx, userID, blobID)
+	if err != nil {
+		return nil, err
+	}
+
+	// storage return someone else's blob
+	if userID != blob.UserID {
+		return nil, myerrors.ErrBlobsUserIDdifferent
+	}
+
+	return blob, nil
 }
 
 // AddBlob add blob to specific user
@@ -45,7 +56,7 @@ func (u *BlobUsecase) DelBlob(ctx context.Context,
 		return err
 	}
 
-	// user try to delete someone else's blob
+	// storage return someone else's blob for deletion
 	if blob.UserID != userID {
 		return myerrors.ErrBlobsUserIDdifferent
 	}
