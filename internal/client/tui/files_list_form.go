@@ -100,6 +100,17 @@ func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 			ind := list.GetCurrentItem()
 			list.Delete(tuiApp, ind)
 			list.Rerender(tuiApp.Usecase.GetFiles())
+		case ' ':
+			// download current selected file
+			ind := list.GetCurrentItem()
+			file, err := tuiApp.Usecase.GetFileByIND(ind)
+			if err != nil {
+				return nil
+			}
+
+			tuiApp.Usecase.StopSync()
+			form := tuiApp.NewDownloadForm(file)
+			tuiApp.Pages.AddAndSwitchToPage("download", form, true)
 		}
 
 		return event

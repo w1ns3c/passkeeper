@@ -72,7 +72,7 @@ func (c *ClientUC) GetBlobs(ctx context.Context) error {
 	c.log.Info().Msgf("sync sum blobs:  %d", len(resp.Blobs))
 	c.log.Info().Msgf("decrypted blobs: %d", len(c.Creds)+len(c.Cards)+len(c.Notes))
 	c.log.Info().
-		Int("creds", len(c.Creds)).
+		Int("notes", len(c.Creds)).
 		Int("cards", len(c.Cards)).
 		Int("notes", len(c.Notes)).
 		Int("files", len(c.Files)).Msgf("blobs by type:")
@@ -86,7 +86,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred structs.CredInf, ind int) 
 	switch cred.(type) {
 	case *structs.Credential:
 		if ind < 0 && ind >= len(c.Creds) {
-			return fmt.Errorf("invalid index of creds")
+			return fmt.Errorf("invalid index of notes")
 		}
 	case *structs.Card:
 		if ind < 0 && ind >= len(c.Cards) {
@@ -130,7 +130,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred structs.CredInf, ind int) 
 
 	var blobT string
 
-	// save creds in local app
+	// save notes in local app
 	switch cred.(type) {
 	case *structs.Credential:
 		if err = entities.SaveCred(c.Creds, ind, cred.(*structs.Credential)); err != nil {
@@ -187,8 +187,8 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 
 	_, err = c.credsSvc.BlobAdd(ctx, req)
 	if err != nil {
-		// can't save creds on server
-		// can't save creds localy
+		// can't save notes on server
+		// can't save notes localy
 		c.log.Error().
 			Err(err).Msg("can't save new cred remotely")
 		return err
@@ -202,7 +202,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 	case *structs.Credential:
 		tmpCreds, err := entities.AddCred(c.Creds, cred.(*structs.Credential))
 		if err != nil {
-			// can't save creds localy
+			// can't save notes localy
 			c.log.Error().
 				Err(err).Msg("can't save new cred locally")
 			return err
@@ -213,7 +213,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 	case *structs.Card:
 		tmpCards, err := entities.AddCard(c.Cards, cred.(*structs.Card))
 		if err != nil {
-			// can't save creds localy
+			// can't save notes localy
 			c.log.Error().
 				Err(err).Msg("can't save new cred locally")
 			return err
@@ -224,7 +224,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 	case *structs.Note:
 		tmpNotes, err := entities.AddNote(c.Notes, cred.(*structs.Note))
 		if err != nil {
-			// can't save creds localy
+			// can't save notes localy
 			c.log.Error().
 				Err(err).Msg("can't save new cred locally")
 			return err
@@ -235,7 +235,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 	case *structs.File:
 		tmpFiles, err := entities.AddFile(c.Files, cred.(*structs.File))
 		if err != nil {
-			// can't save creds localy
+			// can't save notes localy
 			c.log.Error().
 				Err(err).Msg("can't save new cred locally")
 			return err
@@ -263,14 +263,14 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType structs.BlobTy
 	case structs.BlobCred:
 		tmp, err := c.GetCredByIND(ind)
 		if err != nil {
-			return fmt.Errorf("invalid index of creds")
+			return fmt.Errorf("invalid index of notes")
 		}
 		delID = tmp.ID
 
 	case structs.BlobCard:
 		tmp, err := c.GetCardByIND(ind)
 		if err != nil {
-			return fmt.Errorf("invalid index of creds")
+			return fmt.Errorf("invalid index of notes")
 		}
 		delID = tmp.ID
 
@@ -392,7 +392,7 @@ func (c *ClientUC) GetFileByIND(ind int) (file *structs.File, err error) {
 	return c.Files[ind], nil
 }
 
-// SortCredsByDate sort creds, now the first cred is the latest added
+// SortCredsByDate sort notes, now the first cred is the latest added
 func SortCredsByDate(creds []*structs.Credential) {
 	sort.Slice(creds, func(i, j int) bool {
 		if creds[i].Date.After(creds[j].Date) {
@@ -412,7 +412,7 @@ func SortNotesByDate(notes []*structs.Note) {
 	})
 }
 
-// GetCreds return a copy of creds to view
+// GetCreds return a copy of notes to view
 func (c *ClientUC) GetCreds() []*structs.Credential {
 	c.m.Lock()
 

@@ -98,7 +98,7 @@ func NewLoginForm(tuiApp *TUI) *tview.Flex {
 		f := tuiApp.FormLogin.GetItem(0).(*tview.Form)
 		f = clearForm(f)
 
-		tuiApp.SubformCreds = NewCredsList(tuiApp)
+		tuiApp.SubformCreds = tuiApp.NewCredsList()
 		tuiApp.Pages.SwitchToPage(PageAuthed)
 
 		item := tuiApp.FormCredsMenu.GetItem(0).(*Header)

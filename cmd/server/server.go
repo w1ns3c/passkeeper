@@ -37,24 +37,6 @@ func main() {
 			Msg("[+] Storage init: done (successfully connected to DB)")
 	}
 
-	//// 	 TODO Change this
-	//users, blobs := InitTestData()
-
-	//storage := memstorage.NewMemStorage(
-	//	memstorage.WithUsers(users),
-	//	memstorage.WithBlobs(blobs))
-	//lg.Info().Msg("[i] Storage init: done")
-
-	//errs := InitTestDB(storage, users, blobs)
-	//for _, err = range errs {
-	//	lg.Error().Err(err).Send()
-	//}
-	//
-	//err = TestGetUser(storage)
-	//if err != nil {
-	//	lg.Error().Err(err).Send()
-	//}
-
 	blobsUC := blobsUC.NewBlobUCWithOpts(
 		blobsUC.WithContext(ctx),
 		blobsUC.WithStorage(storage),

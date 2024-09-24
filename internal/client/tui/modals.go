@@ -27,7 +27,7 @@ func DeleteModal(tuiApp *TUI, ind int, blobType structs.BlobType) *tview.Modal {
 					return
 				}
 
-				credsForm := NewCredsList(tuiApp)
+				credsForm := tuiApp.NewCredsList()
 				tuiApp.Pages.RemovePage(SubPageCreds)
 				tuiApp.Pages.AddPage(SubPageCreds, credsForm, true, false)
 

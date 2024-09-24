@@ -31,23 +31,7 @@ func (tuiApp *TUI) RerenderBlobs() {
 			tuiApp.log.Info().
 				Msg("get new list of blobs, time to rerender all")
 
-			// reinit subpages
-			tuiApp.SubformCreds = NewCredsList(tuiApp)
-			tuiApp.SubformBank = tuiApp.NewBanking(tuiApp.Usecase.GetCards())
-			tuiApp.SubformNotes = tuiApp.NewNotes(tuiApp.Usecase.GetNotes())
-
-			tuiApp.SubPages.RemovePage(SubPageCreds)
-			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
-
-			tuiApp.SubPages.RemovePage(SubPageBank)
-			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
-
-			tuiApp.SubPages.RemovePage(SubPageNotes)
-			tuiApp.SubPages.AddPage(SubPageCreds, tuiApp.SubformCreds, true, false)
-
-			pageName, _ := tuiApp.SubPages.GetFrontPage()
-
-			tuiApp.SubPages.SwitchToPage(pageName)
+			tuiApp.Rerender()
 
 		case <-tuiApp.Ctx.Done():
 			tuiApp.log.Info().

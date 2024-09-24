@@ -39,7 +39,7 @@ func NewList(tuiApp *TUI) *CredList {
 }
 
 // NewCredsList draws subpage with list of text credential
-func NewCredsList(tuiApp *TUI) *tview.Flex {
+func (tuiApp *TUI) NewCredsList() *tview.Flex {
 
 	credList := NewList(tuiApp)
 	credList.Rerender()

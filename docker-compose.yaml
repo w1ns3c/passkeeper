@@ -1,0 +1,27 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16.4-alpine
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: keeper
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: keeper
+    ports:
+      - "5432:5432"
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U keeper -d keeper" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9000:8080

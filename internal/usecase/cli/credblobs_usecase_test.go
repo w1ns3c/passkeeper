@@ -51,13 +51,62 @@ func TestSortCredsByDate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if len(tt.orderID) != len(tt.creds) {
-				t.Errorf("wrong test, len of order: %d and len of creds: %d, should be the same",
+				t.Errorf("wrong test, len of order: %d and len of notes: %d, should be the same",
 					len(tt.orderID), len(tt.creds))
 			}
 			SortCredsByDate(tt.creds)
 
 			for ind, id := range tt.orderID {
 				require.Equal(t, tt.creds[ind].ID, id, "id not the same")
+			}
+
+		})
+	}
+}
+
+func TestSortNotesByDate(t *testing.T) {
+	var (
+		t1    = time.Now()
+		notes = []*structs.Note{
+			{
+				ID:   "1111",
+				Body: "res_1111",
+				Date: t1,
+			},
+			{
+				ID:   "2222",
+				Body: "res_2222",
+				Date: t1.Add(time.Hour * 4), // t1 + 4 hour
+			},
+			{
+				ID:   "3333",
+				Body: "res_3333",
+				Date: t1.Add(time.Hour * -2), // t1 - 2 hour
+			},
+		}
+		order1 = []string{"2222", "1111", "3333"}
+	)
+	tests := []struct {
+		name    string
+		notes   []*structs.Note
+		orderID []string
+	}{
+		{
+			name:    "Check 1",
+			notes:   notes,
+			orderID: order1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if len(tt.orderID) != len(tt.notes) {
+				t.Errorf("wrong test, len of order: %d and len of notes: %d, should be the same",
+					len(tt.orderID), len(tt.notes))
+			}
+			SortNotesByDate(tt.notes)
+
+			for ind, id := range tt.orderID {
+				require.Equal(t, tt.notes[ind].ID, id, "id not the same")
 			}
 
 		})
