@@ -48,7 +48,7 @@ func (u *UserUsecase) SetStorage(storage storage.UserStorage) *UserUsecase {
 	return u
 }
 
-// SetTokenLifeTime set tokenLifeTime to UserUsecase
+// SetTokenLifeTime set secretlen to UserUsecase
 func (u *UserUsecase) SetTokenLifeTime(tokenLifeTime time.Duration) *UserUsecase {
 	u.tokenLifeTime = tokenLifeTime
 

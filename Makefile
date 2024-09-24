@@ -46,5 +46,15 @@ clean:
 
 cover:
 	#for p in `go list ./... | grep -viE "(cmd|tui|proto)"`; do echo -en "$p/... "; done
-	@go test -coverprofile=cover.out passkeeper/internal/entities/... passkeeper/internal/entities/compress/... passkeeper/internal/entities/config/... passkeeper/internal/entities/config/client/... passkeeper/internal/entities/config/server/... passkeeper/internal/entities/hashes/... passkeeper/internal/entities/logger/... passkeeper/internal/entities/myerrors/... passkeeper/internal/entities/structs/... passkeeper/internal/server/... passkeeper/internal/storage/... passkeeper/internal/storage/dbstorage/postgres/... passkeeper/internal/storage/memstorage/... passkeeper/internal/transport/grpc/... passkeeper/internal/transport/grpc/handlers/... passkeeper/internal/transport/grpc/interceptors/... passkeeper/internal/usecase/cli/... passkeeper/internal/usecase/cli/filesUC/... passkeeper/internal/usecase/srv/blobsUC/... passkeeper/internal/usecase/srv/usersUC/...
+	@go test -coverprofile=cover.out passkeeper/internal/entities/... passkeeper/internal/entities/compress/... passkeeper/internal/entities/config/... passkeeper/internal/entities/config/client/... passkeeper/internal/entities/config/server/... passkeeper/internal/entities/hashes/... passkeeper/internal/entities/logger/... passkeeper/internal/entities/myerrors/... passkeeper/internal/entities/structs/... passkeeper/internal/server/... passkeeper/internal/storage/... passkeeper/internal/storage/dbstorage/postgres/... passkeeper/internal/storage/memstorage/... passkeeper/internal/transport/grpc/handlers/... passkeeper/internal/transport/grpc/interceptors/... passkeeper/internal/usecase/cli/... passkeeper/internal/usecase/cli/filesUC/... passkeeper/internal/usecase/srv/blobsUC/... passkeeper/internal/usecase/srv/usersUC/...
 	@go tool cover -func=cover.out | grep -i total
+
+mock:
+	mockgen -source internal/storage/storage.go -destination mock/storage_mock.go -package=mocks
+
+
+tools:
+	@go install github.com/golang/mock/mockgen@1.6.0
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28.1
+

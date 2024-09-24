@@ -6,6 +6,7 @@ toolchain go1.22.3
 
 require (
 	github.com/gdamore/tcell/v2 v2.7.4
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.4
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/rivo/tview v0.0.0-20240524063012-037df494fb76
@@ -13,7 +14,6 @@ require (
 	github.com/stretchr/testify v1.9.0
 	github.com/w1ns3c/go-examples v0.0.4
 	golang.org/x/crypto v0.27.0
-	golang.org/x/sync v0.8.0
 	google.golang.org/grpc v1.64.1
 	google.golang.org/protobuf v1.34.2
 )
@@ -27,6 +27,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 

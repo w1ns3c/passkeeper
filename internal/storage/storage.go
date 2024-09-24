@@ -7,6 +7,8 @@ import (
 )
 
 // Storage describe main storage functionality
+//
+//go:generate mockgen -source internal/storage/storage.go -destination mock/storage_mock.go -package=mocks
 type Storage interface {
 	Init(ctx context.Context) error
 	Close() error
@@ -17,6 +19,8 @@ type Storage interface {
 }
 
 // UserStorage describe store that keep entities.User
+//
+//go:generate mockgen -source internal/storage/storage.go -destination mock/storage_mock.go -package=mocks
 type UserStorage interface {
 	GetUserByID(cxt context.Context, userID string) (user *structs.User, err error)
 	GetUserByLogin(cxt context.Context, login string) (user *structs.User, err error)
@@ -25,6 +29,8 @@ type UserStorage interface {
 }
 
 // BlobStorage describe store that keep entities.CryptoBlob
+//
+//go:generate mockgen -source internal/storage/storage.go -destination mock/storage_mock.go -package=mocks
 type BlobStorage interface {
 	AddBlob(ctx context.Context, blob *structs.CryptoBlob) error
 	GetBlob(ctx context.Context, userID, blobID string) (blob *structs.CryptoBlob, err error)

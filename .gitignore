@@ -8,7 +8,7 @@
 *.so
 *.dylib
 
-# Test binary, built with `go test -h`
+# Test binary, built with `go test -h`new(error)
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
@@ -38,3 +38,13 @@ builds/
 
 # test data
 cmd/server/test_data.go
+
+# mocks
+mock/
+
+# cover
+cover*
+cover.out
+coverage.out
+*.out
+*.html
