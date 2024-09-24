@@ -21,7 +21,7 @@ func GenerateHash(password, salt string) string {
 	return fmt.Sprintf("%x", h)
 }
 
-// GenerateCryptoHash func
+// GenerateCryptoHash generate bcrypt hash with salt
 func GenerateCryptoHash(password, salt string) (hash string, err error) {
 	password = GenerateHash(password, salt)
 	h, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
@@ -31,6 +31,7 @@ func GenerateCryptoHash(password, salt string) (hash string, err error) {
 	return string(h), nil
 }
 
+// ComparePassAndCryptoHash compare password and bcrypt hash from GenerateCryptoHash
 func ComparePassAndCryptoHash(password, hash string, salt string) bool {
 	genHash := GenerateHash(password, salt)
 

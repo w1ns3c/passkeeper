@@ -19,7 +19,7 @@ const (
 	SyncMin     = time.Second * 1    // min blobs sync time
 	SyncDefault = time.Second * 10   // default blobs sync time
 
-	MaxNameLen     = 10   // max len for blob's name in card/note list
+	MaxNameLen     = 15   // max len for blob's name in card/note list
 	MaxFilenameLen = 40   // max len for blob's name in file list
 	MaxTextAreaLen = 200  // max len for blob's description
 	MaxNoteLen     = 1000 // max len for note blob body

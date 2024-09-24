@@ -26,6 +26,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 		key, _ = GenerateCredsSecret(pass, userID, ss)
 
 		cred1 = &structs.Credential{
+			Type:        structs.BlobCred,
 			ID:          GeneratePassID(),
 			Date:        time.Now(),
 			Resource:    "res1",
@@ -174,7 +175,7 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				require.Equal(t, putCard.Person, gotCard.Person, "Encrypt/DecryptBlob() card Person are not the same")
 				require.Equal(t, putCard.Number, gotCard.Number, "Encrypt/DecryptBlob() card Bank are not the same")
 				require.Equal(t, putCard.CVC, gotCard.CVC, "Encrypt/DecryptBlob() card CVC are not the same")
-				require.Equal(t, putCard.Expiration, gotCard.Expiration, "Encrypt/DecryptBlob() card Expiration are not the same")
+				require.Equal(t, putCard.Expiration.Format(time.DateTime), gotCard.Expiration.Format(time.DateTime), "Encrypt/DecryptBlob() card Expiration are not the same")
 				require.Equal(t, putCard.PIN, gotCard.PIN, "Encrypt/DecryptBlob() card PIN are not the same")
 				require.Equal(t, putCard.Description, gotCard.Description, "Encrypt/DecryptBlob() card Description are not the same")
 
@@ -186,6 +187,15 @@ func TestEncryptDecryptBlob(t *testing.T) {
 				require.Equal(t, putNote.Name, gotNote.Name, "Encrypt/DecryptBlob() note Name are not the same")
 				//require.Equal(t, putNote.Date, gotNote.Date, "Encrypt/DecryptBlob() note Date are not the same")
 				require.Equal(t, putNote.Body, gotNote.Body, "Encrypt/DecryptBlob() note Body are not the same")
+			case *structs.File:
+				gotFile := got.(*structs.File)
+				putNote := tt.args.cred.(*structs.File)
+
+				require.Equal(t, putNote.ID, gotFile.ID, "Encrypt/DecryptBlob() file ID are not the same")
+				require.Equal(t, putNote.Name, gotFile.Name, "Encrypt/DecryptBlob() file Name are not the same")
+				require.Equal(t, putNote.Type, gotFile.Type, "Encrypt/DecryptBlob() file Type are not the same")
+				require.Equal(t, putNote.Body, gotFile.Body, "Encrypt/DecryptBlob() file Body are not the same")
+
 			}
 
 		})

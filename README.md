@@ -56,6 +56,7 @@ C:\Windows\Temp\passkeeper.log
 - [ ] Setup TLS 
 - [ ] Test cover more than 80%
 - [x] Doc every function
+- [x] Client build version from specification
 - [ ] Refactor client TUI code
 - [ ] Review all app code
 - [ ] Check all TODO

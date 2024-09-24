@@ -1,8 +1,6 @@
 package tui
 
 import (
-	"strings"
-
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
@@ -130,31 +128,23 @@ func (list *NotesList) Rerender(notes []*structs.Note) {
 	}
 }
 
+// GenNoteShortName
 func GenNoteShortName(note *structs.Note) string {
 	if note == nil {
 		return ""
 	}
 
 	var (
-		res string
-		m   = config.MaxNameLen
+		m      = config.MaxNameLen
+		prefix = " ..."
 	)
 
 	if len(note.Name) > m {
-		parts := strings.Split(note.Name, " ")
-		if len(parts) == 1 {
-			res = parts[0]
-		} else {
-			res = strings.Join(parts[:1], "_")
-			if len(res) > m {
-				res = res[:m]
-			}
-		}
-	} else {
-		res = note.Name
+
+		return note.Name[0:m-len(prefix)] + prefix
 	}
 
-	return res
+	return note.Name
 }
 
 // Delete is a form to confirm note deletion

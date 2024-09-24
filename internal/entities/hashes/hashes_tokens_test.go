@@ -1,6 +1,11 @@
 package hashes
 
-import "testing"
+import (
+	"testing"
+	"time"
+
+	"passkeeper/internal/entities/config"
+)
 
 func TestCheckToken(t *testing.T) {
 	type args struct {
@@ -8,9 +13,11 @@ func TestCheckToken(t *testing.T) {
 		secret string
 	}
 
-	t1 := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQ5MDYwODcsIlVzZXJJRCI6InVzZXIxIn0.n-n9x8swkhCByPwvn9e6mtoH4sKx53B_qOpODjMmZl0"
-	id1 := "user1"
-	secret1 := "3ec6b6e734d97a3392e08052c50a167f"
+	var (
+		id1        = "user1"
+		secret1, _ = GenerateSecret(config.UserSecretLen)
+		token1, _  = GenerateToken(id1, secret1, time.Second*200)
+	)
 
 	tests := []struct {
 		name       string
@@ -22,7 +29,7 @@ func TestCheckToken(t *testing.T) {
 		{
 			name: "Test 1",
 			args: args{
-				token:  t1,
+				token:  token1,
 				secret: secret1,
 			},
 			wantUserID: id1,
@@ -44,8 +51,11 @@ func TestCheckToken(t *testing.T) {
 }
 
 func TestExtractUserID(t *testing.T) {
-	t1 := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjQ5MDYwODcsIlVzZXJJRCI6InVzZXIxIn0.n-n9x8swkhCByPwvn9e6mtoH4sKx53B_qOpODjMmZl0"
-	id1 := "user1"
+	var (
+		id1        = "user1"
+		secret1, _ = GenerateSecret(config.UserSecretLen)
+		token1, _  = GenerateToken(id1, secret1, time.Second*200)
+	)
 
 	tests := []struct {
 		name       string
@@ -56,7 +66,7 @@ func TestExtractUserID(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			name:       "Test 1",
-			token:      t1,
+			token:      token1,
 			wantUserID: id1,
 			wantErr:    false,
 		},
