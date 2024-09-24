@@ -2,6 +2,10 @@ package entities
 
 import "strings"
 
+var (
+	errDBpass = "can't correctly hide db password"
+)
+
 // HideDBpass return dbURL without password
 func HideDBpass(dbURL string) string {
 	var (
@@ -17,5 +21,5 @@ func HideDBpass(dbURL string) string {
 		return dbURL[:userInd+passInd1+1] + hiddenPass + dbURL[passInd2:]
 	}
 
-	return "can't correctly hide db password"
+	return errDBpass
 }

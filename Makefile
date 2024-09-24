@@ -47,7 +47,8 @@ clean:
 cover:
 	#for p in `go list ./... | grep -viE "(cmd|tui|proto)"`; do echo -en "$p/... "; done
 	@go test -coverprofile=cover.out passkeeper/internal/entities/... passkeeper/internal/entities/compress/... passkeeper/internal/entities/config/... passkeeper/internal/entities/config/client/... passkeeper/internal/entities/config/server/... passkeeper/internal/entities/hashes/... passkeeper/internal/entities/logger/... passkeeper/internal/entities/myerrors/... passkeeper/internal/entities/structs/... passkeeper/internal/server/... passkeeper/internal/storage/... passkeeper/internal/storage/dbstorage/postgres/... passkeeper/internal/storage/memstorage/... passkeeper/internal/transport/grpc/handlers/... passkeeper/internal/transport/grpc/interceptors/... passkeeper/internal/usecase/cli/... passkeeper/internal/usecase/cli/filesUC/... passkeeper/internal/usecase/srv/blobsUC/... passkeeper/internal/usecase/srv/usersUC/...
-	@go tool cover -func=cover.out | grep -i total
+	@go tool cover -html=cover.out -o cover.html
+	@go tool cover -func=cover.out | grep -i total | tr -s '\t'
 
 mock:
 	mockgen -source internal/storage/storage.go -destination mock/storage_mock.go -package=mocks

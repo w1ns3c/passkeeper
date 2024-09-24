@@ -22,12 +22,8 @@ func (u *UserUsecase) RegisterUser(ctx context.Context, login string,
 		return "", "", myerrors.ErrRepassNotSame
 	}
 
-	if password == "" {
+	if password == "" || rePass == "" {
 		return "", "", myerrors.ErrPassIsEmpty
-	}
-
-	if rePass == "" {
-		return "", "", myerrors.ErrRePassIsEmpty
 	}
 
 	// checking login free

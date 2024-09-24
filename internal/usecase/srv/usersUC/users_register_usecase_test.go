@@ -73,7 +73,7 @@ func TestUserUsecase_RegisterUser(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test 1: register existed user",
+			name: "Test 2: register existed user",
 			fields: fields{
 				ctx:             ctx,
 				storage:         storage,
@@ -87,6 +87,42 @@ func TestUserUsecase_RegisterUser(t *testing.T) {
 				login:    login2,
 				password: "test",
 				rePass:   "test",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test 3: password and rePass are not match",
+			fields: fields{
+				ctx:             ctx,
+				storage:         storage,
+				tokenLifeTime:   110,
+				userSecretLen:   222,
+				userPassSaltLen: 333,
+				log:             &zerolog.Logger{},
+			},
+			args: args{
+				ctx:      ctx,
+				login:    login2,
+				password: "test",
+				rePass:   "test1",
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test 4: password is empty",
+			fields: fields{
+				ctx:             ctx,
+				storage:         storage,
+				tokenLifeTime:   110,
+				userSecretLen:   222,
+				userPassSaltLen: 333,
+				log:             &zerolog.Logger{},
+			},
+			args: args{
+				ctx:      ctx,
+				login:    login2,
+				password: "",
+				rePass:   "",
 			},
 			wantErr: true,
 		},

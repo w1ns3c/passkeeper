@@ -11,7 +11,7 @@ import (
 var (
 	// Hashes
 	ErrInvalidToken = fmt.Errorf("token sign is not valid")
-	
+
 	// token
 	ErrNoTokenMsg = "no token in context"
 	ErrNoToken    = status.Error(codes.Unauthenticated, ErrNoTokenMsg)
@@ -47,8 +47,7 @@ var (
 	ErrWrongPassword = fmt.Errorf("wrong password for username")
 	ErrWrongUsername = fmt.Errorf("username not found")
 
-	ErrPassIsEmpty   = fmt.Errorf("password is empty")
-	ErrRePassIsEmpty = fmt.Errorf("password repeat is empty")
+	ErrPassIsEmpty = fmt.Errorf("password is empty")
 
 	// Server Transport
 	ErrHndNotRegistered = fmt.Errorf("can't register some handlers")

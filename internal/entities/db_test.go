@@ -24,6 +24,11 @@ func TestHideDBpass(t *testing.T) {
 			dbURL: "postgres://username:\"12:@3456\"@127.0.0.1:5432/dbname",
 			want:  "postgres://username:******@127.0.0.1:5432/dbname",
 		},
+		{
+			name:  "Test43: invalid url",
+			dbURL: "postgres://us@ern:ame:\"123456\"127.0.0.1:5432/dbname",
+			want:  errDBpass,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
