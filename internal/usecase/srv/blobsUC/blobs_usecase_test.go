@@ -32,7 +32,6 @@ func TestNewBlobUCWithOpts(t *testing.T) {
 		opts []BlobsOption
 		want *BlobUsecase
 	}{
-		// TODO: Add test cases.
 		{
 			name: "Test 1: success",
 			want: uc1,
@@ -59,7 +58,6 @@ func Test_newBlobUC(t *testing.T) {
 		name string
 		want *BlobUsecase
 	}{
-		// TODO: Add test cases.
 		{
 			name: "Test: empty blobsUC",
 			want: want,

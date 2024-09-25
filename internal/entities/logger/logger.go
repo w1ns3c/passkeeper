@@ -36,7 +36,7 @@ func InitFile(level, filepath string) *zerolog.Logger {
 
 	f, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		panic(err)
+		return nil
 	}
 
 	logger := zerolog.New(f).With().
