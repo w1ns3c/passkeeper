@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"sync"
 	"time"
 
@@ -12,44 +11,19 @@ import (
 	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/structs"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
+	"passkeeper/internal/usecase/cli/blobsUC"
 	"passkeeper/internal/usecase/cli/filesUC"
+	"passkeeper/internal/usecase/cli/syncUC"
+	"passkeeper/internal/usecase/cli/usersUC"
 )
 
 // ClientUsecase describe client functionality
 type ClientUsecase interface {
-	Login(ctx context.Context, login, password string) (err error)
-	Register(ctx context.Context, email, login, password, repeat string) error
-	Logout()
-	IsAuthed() bool
-
-	GetBlobs(ctx context.Context) (err error)
-	EditBlob(ctx context.Context, cred structs.CredInf, ind int) (err error)
-	AddBlob(ctx context.Context, cred structs.CredInf) (err error)
-	DelBlob(ctx context.Context, ind int, blobType structs.BlobType) (err error)
-
-	GetCredByIND(credIND int) (cred *structs.Credential, err error)
-	GetCardByIND(cardIND int) (cred *structs.Card, err error)
-	GetNoteByIND(noteIND int) (cred *structs.Note, err error)
-	GetFileByIND(ind int) (file *structs.File, err error)
-
-	CredsLen() int
-	CredsNotNil() bool
-
-	SyncBlobs(ctx context.Context)
-	StopSync()
-	ContinueSync()
-	CheckSync() bool
-
-	GetCreds() []*structs.Credential
-	GetCards() []*structs.Card
-	GetNotes() []*structs.Note
-	GetFiles() []*structs.File
-
-	// moved from tuiApp
-	GetToken() string
-	GetSyncTime() time.Duration
-
+	usersUC.UsersUsecase
+	blobsUC.BlobsActionsUsecase
+	blobsUC.GetBlobsUsecase
 	filesUC.FilesUsecaseInf
+	syncUC.SyncUsecase
 }
 
 // ClientUC implement ClientUsecase

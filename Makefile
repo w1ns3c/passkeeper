@@ -32,13 +32,13 @@ BUILD_DATE=main.BuildDate=${DATE}
 LD_FLAGS="-X \"${BUILD_DATE}\" -X \"${BUILD_VER}\" -X \"${BUILD_GIT}\""
 
 client:
-	@mkdir -p builds
-	@go build -o builds/client.elf -ldflags ${LD_FLAGS} cmd/client/client.go
+	mkdir -p builds
+	go build -o builds/client.elf -ldflags ${LD_FLAGS} cmd/client/client.go
 	GOOS=windows go build -o builds/client.exe cmd/client/client.go
 
 server:
-	@mkdir -p builds
-	@go build -o builds/server.elf cmd/server/server.go
+	mkdir -p builds
+	go build -o builds/server.elf cmd/server/server.go
 	GOOS=windows go build -o builds/server.exe cmd/server/server.go
 
 clean:
@@ -52,7 +52,7 @@ cover:
 
 MOCKS_DESTINATION="mocks"
 
-mocks: internal/storage/storage.go
+mocks:
 	@echo "Generating mocks..."
 	@rm -rf $(MOCKS_DESTINATION)
 	mockgen -source internal/storage/storage.go -destination mocks/storage_mock.go -package=mocks
