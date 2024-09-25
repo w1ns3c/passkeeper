@@ -30,7 +30,7 @@ type TransportGRPC struct {
 	authInterceptor *interceptors.AuthInterceptor
 
 	users usersUC.UserUsecaseInf
-	creds blobsUC.BlobUsecaseInf
+	blobs blobsUC.BlobUsecaseInf
 
 	log *zerolog.Logger
 }
@@ -53,11 +53,11 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 		return nil, myerrors.ErrNotEnoughOptions
 	}
 
-	// check creds usecase
-	if srv.creds == nil {
+	// check blobs usecase
+	if srv.blobs == nil {
 		if srv.log != nil {
 			srv.log.Error().
-				Err(err).Msg("no creds usecase")
+				Err(err).Msg("no blobs usecase")
 		}
 
 		return nil, myerrors.ErrNotEnoughOptions
@@ -67,7 +67,7 @@ func NewTransportGRPC(opts ...TransportOption) (srv *TransportGRPC, err error) {
 	srv.authInterceptor = interceptors.NewAuthInterceptor(srv.users)
 
 	// init handlers
-	srv.hndCreds = handlers.NewBlobsHandler(srv.log, srv.creds)
+	srv.hndCreds = handlers.NewBlobsHandler(srv.log, srv.blobs)
 	srv.hndUsers = handlers.NewUsersHandler(srv.log, srv.users)
 
 	srv.hndChangePass = handlers.NewUserChangePassHandler(srv.log, srv.users)
@@ -96,7 +96,7 @@ func WithUCusers(users usersUC.UserUsecaseInf) TransportOption {
 // WithUCcreds add blob usecase to TransportGRPC
 func WithUCcreds(blobs blobsUC.BlobUsecaseInf) TransportOption {
 	return func(srv *TransportGRPC) {
-		srv.creds = blobs
+		srv.blobs = blobs
 	}
 }
 

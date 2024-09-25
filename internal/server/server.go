@@ -15,7 +15,7 @@ import (
 type Server struct {
 	addr  string // ex: localhost:8000
 	users usersUC.UserUsecaseInf
-	creds blobsUC.BlobUsecaseInf
+	blobs blobsUC.BlobUsecaseInf
 
 	transport *mygrpc.TransportGRPC
 
@@ -47,7 +47,7 @@ func NewServer(opts ...SrvOption) (srv *Server, err error) {
 
 		return nil, myerrors.ErrNoUCusers
 	}
-	if srv.creds == nil {
+	if srv.blobs == nil {
 		srv.log.Error().
 			Err(myerrors.ErrNoUCcreds).Send()
 
@@ -55,7 +55,7 @@ func NewServer(opts ...SrvOption) (srv *Server, err error) {
 	}
 
 	transport, err := mygrpc.NewTransportGRPC(
-		mygrpc.WithUCcreds(srv.creds),
+		mygrpc.WithUCcreds(srv.blobs),
 		mygrpc.WithUCusers(srv.users),
 		mygrpc.WithAddr(srv.addr),
 		mygrpc.WithLogger(srv.log),
@@ -89,7 +89,7 @@ func WithUCusers(uc usersUC.UserUsecaseInf) SrvOption {
 // WithUCblobs setup blob usecase for Server
 func WithUCblobs(uc blobsUC.BlobUsecaseInf) SrvOption {
 	return func(srv *Server) {
-		srv.creds = uc
+		srv.blobs = uc
 	}
 }
 
@@ -101,14 +101,14 @@ func WithLogger(lg *zerolog.Logger) SrvOption {
 }
 
 // Run will start Server
-func (s Server) Run() error {
+func (s *Server) Run() error {
 	return s.transport.Run()
 }
 
 // Stop will stop Server
-func (s Server) Stop() error {
+func (s *Server) Stop() error {
 	s.users = nil
-	s.creds = nil
+	s.blobs = nil
 	s.transport = nil
 	return nil
 }
