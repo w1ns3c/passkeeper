@@ -4,5 +4,7 @@
 package config
 
 var (
-	CliLogFilePath = "C:\\Windows\\Temp\\passkeeper.log" // path to log file on Windows machines
+	// path to log file on Windows machines
+	TmpDir    = "C:\\Windows\\Temp\\"
+	CliLogDir = TmpDir
 )

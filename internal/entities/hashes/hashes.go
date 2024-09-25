@@ -54,8 +54,7 @@ func GeneratePassID() string {
 	n := 32
 	uid, err := crypto.GenRandStr(n)
 	if err != nil {
-		// TODO
-		return ""
+		return "can't generate random uid"
 	}
 
 	_, _ = io.WriteString(h, uid)

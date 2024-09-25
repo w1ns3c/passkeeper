@@ -1,6 +1,9 @@
 package config
 
-import "time"
+import (
+	"path/filepath"
+	"time"
+)
 
 const (
 	TokenLifeTime   = time.Duration(time.Hour * 10) // how often token will be valid
@@ -24,4 +27,9 @@ const (
 	MaxTextAreaLen = 200  // max len for blob's description
 	MaxNoteLen     = 1000 // max len for note blob body
 
+	CliLogFileFile = "passkeeper.log"
+)
+
+var (
+	CliLogFilePath = filepath.Join(CliLogDir, CliLogFileFile)
 )

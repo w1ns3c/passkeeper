@@ -1,8 +1,11 @@
 package hashes
 
 import (
+	"context"
 	"testing"
 	"time"
+
+	"google.golang.org/grpc/metadata"
 
 	"passkeeper/internal/entities/config"
 )
@@ -44,7 +47,7 @@ func TestCheckToken(t *testing.T) {
 				return
 			}
 			if gotUserID != tt.wantUserID {
-				t.Errorf("CheckToken() gotUserID = %v, want %v", gotUserID, tt.wantUserID)
+				t.Errorf("CheckToken() gotUserID = %v, same %v", gotUserID, tt.wantUserID)
 			}
 		})
 	}
@@ -79,7 +82,53 @@ func TestExtractUserID(t *testing.T) {
 				return
 			}
 			if gotUserID != tt.wantUserID {
-				t.Errorf("ExtractUserID() gotUserID = %v, want %v", gotUserID, tt.wantUserID)
+				t.Errorf("ExtractUserID() gotUserID = %v, same %v", gotUserID, tt.wantUserID)
+			}
+		})
+	}
+}
+
+func TestExtractUserInfo(t *testing.T) {
+	type args struct {
+		ctx context.Context
+	}
+	tests := []struct {
+		name      string
+		args      args
+		wantToken string
+		wantErr   bool
+	}{
+		{
+			name: "Test 1: valid token",
+			args: args{
+				ctx: metadata.NewIncomingContext(context.Background(),
+					metadata.New(map[string]string{config.TokenHeader: "mytoken"})),
+			},
+			wantToken: "mytoken",
+			wantErr:   false,
+		},
+		{
+			name: "Test 3: error wrong token ",
+			args: args{
+				ctx: metadata.NewIncomingContext(context.Background(),
+					metadata.New(map[string]string{})),
+			},
+			wantToken: "mytoken123",
+			wantErr:   true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotToken, err := ExtractUserInfo(tt.args.ctx)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExtractUserInfo() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err != nil {
+				return
+			}
+			if gotToken != tt.wantToken {
+				t.Errorf("ExtractUserInfo() gotToken = %v, want %v", gotToken, tt.wantToken)
 			}
 		})
 	}

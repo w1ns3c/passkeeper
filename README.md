@@ -50,7 +50,8 @@ C:\Windows\Temp\passkeeper.log
 - [x] Move User entity from tuiApp to Usecase only
 - [x] Move Token from tuiApp to Usecase only
 - [x] Client set logger in file
-- [ ] Split client interface to multi inf
+- [x] Split client interface to multi inf
+- [ ] Split client struct to multi structs
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
 - [ ] Setup TLS 
