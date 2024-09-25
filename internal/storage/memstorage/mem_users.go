@@ -21,6 +21,11 @@ func (m *MemStorage) SaveUser(ctx context.Context, u *structs.User) error {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
 
+	// check user exist
+	if _, ok := m.users[u.Login]; ok {
+		return myerrors.ErrAlreadyExist
+	}
+
 	m.users[u.Login] = u
 	m.blobs[u.ID] = make([]*structs.CryptoBlob, 0)
 
@@ -28,7 +33,7 @@ func (m *MemStorage) SaveUser(ctx context.Context, u *structs.User) error {
 }
 
 // GetUserByID return entities.User by userID from memory storage
-func (m *MemStorage) GetUserByID(cxt context.Context, userID string) (user *structs.User, err error) {
+func (m *MemStorage) GetUserByID(ctx context.Context, userID string) (user *structs.User, err error) {
 	m.usersMU.Lock()
 	defer m.usersMU.Unlock()
 	for _, u := range m.users {
