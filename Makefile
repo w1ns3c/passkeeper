@@ -55,7 +55,13 @@ MOCKS_DESTINATION="mocks"
 mocks:
 	@echo "Generating mocks..."
 	@rm -rf $(MOCKS_DESTINATION)
-	mockgen -source internal/storage/storage.go -destination mocks/storage_mock.go -package=mocks
+	mockgen -source internal/storage/storage.go -destination mocks/mockstorage/storage_mock.go -package=mocks
+	mockgen -source internal/transport/grpc/protofiles/proto/users_change_pwd_grpc.pb.go -destination mocks/gservice/user_change_pass.go -package=mocks
+	mockgen -source internal/transport/grpc/protofiles/proto/users_service_grpc.pb.go -destination mocks/gservice/user_auth.go -package=mocks
+	mockgen -source internal/transport/grpc/protofiles/proto/credentials_service_grpc.pb.go -destination=mocks/gservice/blobs.go -package=mocks
+
+	mockgen -source internal/usecase/srv/blobsUC/blobs_usecase.go -destination mocks/usecase/blobs_usecase/blobs_usecase.go -package mocks
+	mockgen -source internal/usecase/srv/usersUC/users_usecase.go -destination mocks/usecase/users_usecase/users_usecase.go -package mocks
 	#@for file in $^; do mockgen -source=$$file -destination=$(MOCKS_DESTINATION)/$$file; done
 
 

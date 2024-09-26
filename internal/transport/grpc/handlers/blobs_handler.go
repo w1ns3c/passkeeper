@@ -14,6 +14,8 @@ import (
 )
 
 // BlobsHandler handle blobs requests
+//
+//go:generate mockgen -source=../protofiles/proto/credentials_service_grpc.pb.go -destination=../../../../mocks/gservice/blobs.go -package=mocks
 type BlobsHandler struct {
 	pb.UnimplementedBlobSvcServer
 	service blobsUC.BlobUsecaseInf
@@ -48,9 +50,9 @@ func (h *BlobsHandler) BlobAdd(ctx context.Context, req *pb.BlobAddRequest) (*em
 	err = h.service.AddBlob(ctx, userID, blob)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(myerrors.ErrCredAddMsg)
+			Err(err).Msg(myerrors.ErrBlobAddMsg)
 
-		return nil, myerrors.ErrCredAdd
+		return nil, myerrors.ErrBlobAdd
 	}
 
 	return new(empty.Empty), nil
@@ -69,9 +71,9 @@ func (h *BlobsHandler) BlobGet(ctx context.Context, req *pb.BlobGetRequest) (res
 	cr, err := h.service.GetBlob(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(myerrors.ErrCredGetMsg)
+			Err(err).Msg(myerrors.ErrBlobGetMsg)
 
-		return nil, myerrors.ErrCredGet
+		return nil, myerrors.ErrBlobGet
 	}
 
 	resp = &pb.BlobGetResponse{
@@ -102,9 +104,9 @@ func (h *BlobsHandler) BlobUpd(ctx context.Context, req *pb.BlobUpdRequest) (*em
 	err = h.service.UpdBlob(ctx, userID, blob)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(myerrors.ErrCredUpdMsg)
+			Err(err).Msg(myerrors.ErrBlobUpdMsg)
 
-		return nil, myerrors.ErrCredUpd
+		return nil, myerrors.ErrBlobUpd
 	}
 
 	return new(empty.Empty), nil
@@ -123,9 +125,9 @@ func (h *BlobsHandler) BlobDel(ctx context.Context, req *pb.BlobDelRequest) (*em
 	err = h.service.DelBlob(ctx, userID, req.CredID)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(myerrors.ErrCredDelMsg)
+			Err(err).Msg(myerrors.ErrBlobDelMsg)
 
-		return nil, myerrors.ErrCredDel
+		return nil, myerrors.ErrBlobDel
 	}
 
 	return new(empty.Empty), nil
@@ -147,9 +149,9 @@ func (h *BlobsHandler) BlobList(ctx context.Context, req *empty.Empty) (resp *pb
 	blobs, err := h.service.ListBlobs(ctx, userID)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(myerrors.ErrCredListMsg)
+			Err(err).Msg(myerrors.ErrBlobListMsg)
 
-		return nil, myerrors.ErrCredList
+		return nil, myerrors.ErrBlobList
 	}
 
 	h.log.Info().

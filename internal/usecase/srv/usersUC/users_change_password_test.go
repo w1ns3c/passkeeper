@@ -14,7 +14,7 @@ import (
 	"passkeeper/internal/entities/myerrors"
 	"passkeeper/internal/entities/structs"
 	"passkeeper/internal/storage"
-	"passkeeper/mocks"
+	"passkeeper/mocks/mockstorage"
 )
 
 func TestUserUsecase_ChangePassword(t *testing.T) {

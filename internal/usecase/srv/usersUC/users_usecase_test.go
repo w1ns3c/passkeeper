@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"passkeeper/internal/storage"
-	"passkeeper/mocks"
+	"passkeeper/mocks/mockstorage"
 )
 
 func TestNewUserUsecase(t *testing.T) {

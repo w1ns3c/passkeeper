@@ -12,6 +12,8 @@ import (
 )
 
 // UserUsecaseInf describe main user functional on server side
+//
+//go:generate mockgen -source users_usecase.go -destination ../../../../mocks/usecase/users_usecase/users_usecase.go -package mocks
 type UserUsecaseInf interface {
 	RegisterUser(ctx context.Context, login string, password string, rePass string) (token, secret string, err error)
 

@@ -10,6 +10,8 @@ import (
 )
 
 // BlobUsecaseInf describe main blob functional on server side
+//
+//go:generate mockgen -source blobs_usecase.go -destination ../../../../mocks/usecase/blobs_usecase/blobs_usecase.go -package mocks
 type BlobUsecaseInf interface {
 	GetBlob(ctx context.Context, userID, blobID string) (cred *structs.CryptoBlob, err error)
 	AddBlob(ctx context.Context, userID string, blob *structs.CryptoBlob) error

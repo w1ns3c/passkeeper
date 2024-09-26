@@ -15,7 +15,7 @@ import (
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/entities/myerrors"
 	"passkeeper/internal/entities/structs"
-	"passkeeper/mocks"
+	"passkeeper/mocks/mockstorage"
 )
 
 func TestBlobUsecase_AddBlob(t *testing.T) {

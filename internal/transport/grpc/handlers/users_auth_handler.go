@@ -6,12 +6,14 @@ import (
 
 	"github.com/rs/zerolog"
 
-	errors2 "passkeeper/internal/entities/myerrors"
+	"passkeeper/internal/entities/myerrors"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 	"passkeeper/internal/usecase/srv/usersUC"
 )
 
 // UsersHandler handle user auth requests
+//
+//go:generate mockgen -source=../protofiles/proto/users_service_grpc.pb.go -destination=../../../../mocks/gservice/user_auth.go -package=mocks
 type UsersHandler struct {
 	pb.UnimplementedUserSvcServer
 	service usersUC.UserUsecaseInf
@@ -31,15 +33,17 @@ func NewUsersHandler(logger *zerolog.Logger, service usersUC.UserUsecaseInf) *Us
 func (h *UsersHandler) RegisterUser(ctx context.Context, request *pb.UserRegisterRequest) (resp *pb.UserRegisterResponse, err error) {
 	token, secret, err := h.service.RegisterUser(ctx, request.Login, request.Password, request.RePassword)
 	if err != nil {
-		if !errors.Is(err, errors2.ErrUserNotExist) {
+		if errors.Is(err, myerrors.ErrAlreadyExist) {
 			h.log.Error().
-				Err(err).Msg(errors2.ErrAlreadyExistMsg)
-			return nil, errors2.ErrAlreadyExist
+				Err(err).Msg(myerrors.ErrAlreadyExistMsg)
+
+			return nil, myerrors.ErrAlreadyExist
 		}
 
 		h.log.Error().
-			Err(err).Msg(errors2.ErrRegisterMsg)
-		return nil, errors2.ErrRegister
+			Err(err).Msg(myerrors.ErrRegisterMsg)
+
+		return nil, myerrors.ErrRegister
 	}
 
 	resp = &pb.UserRegisterResponse{
@@ -59,9 +63,9 @@ func (h *UsersHandler) LoginUser(ctx context.Context,
 	token, secret, err := h.service.LoginUser(ctx, req.Login, req.Password)
 	if err != nil {
 		h.log.Error().
-			Err(err).Msg(errors2.ErrWrongLoginMsg)
+			Err(err).Msg(myerrors.ErrWrongLoginMsg)
 
-		return nil, errors2.ErrWrongLogin
+		return nil, myerrors.ErrWrongLogin
 	}
 
 	resp = &pb.UserLoginResponse{

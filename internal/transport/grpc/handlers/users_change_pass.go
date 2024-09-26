@@ -12,6 +12,8 @@ import (
 )
 
 // UserChangePassHandler handle user's request to change password
+//
+//go:generate mockgen -source=../protofiles/proto/users_change_pwd_grpc.pb.go -destination=../../../../mocks/gservice/user_change_pass.go -package=mocks
 type UserChangePassHandler struct {
 	pb.UnimplementedUserChangePassSvcServer
 	service usersUC.UserUsecaseInf

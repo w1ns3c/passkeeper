@@ -55,20 +55,20 @@ var (
 	ErrWrongAuth        = "not authorized"
 
 	// Server Transport Handlers
-	ErrCredAddMsg = "cred not added"
-	ErrCredAdd    = status.Error(codes.Internal, ErrCredAddMsg)
+	ErrBlobAddMsg = "cred not added"
+	ErrBlobAdd    = status.Error(codes.Internal, ErrBlobAddMsg)
 
-	ErrCredGetMsg = "cred can't get"
-	ErrCredGet    = status.Error(codes.Internal, ErrCredGetMsg)
+	ErrBlobGetMsg = "cred can't get"
+	ErrBlobGet    = status.Error(codes.Internal, ErrBlobGetMsg)
 
-	ErrCredUpdMsg = "cred not updated"
-	ErrCredUpd    = status.Error(codes.Internal, ErrCredUpdMsg)
+	ErrBlobUpdMsg = "cred not updated"
+	ErrBlobUpd    = status.Error(codes.Internal, ErrBlobUpdMsg)
 
-	ErrCredDelMsg = "cred not deleted"
-	ErrCredDel    = status.Error(codes.Internal, ErrCredDelMsg)
+	ErrBlobDelMsg = "cred not deleted"
+	ErrBlobDel    = status.Error(codes.Internal, ErrBlobDelMsg)
 
-	ErrCredListMsg = "creds not listed"
-	ErrCredList    = status.Error(codes.Internal, ErrCredListMsg)
+	ErrBlobListMsg = "creds not listed"
+	ErrBlobList    = status.Error(codes.Internal, ErrBlobListMsg)
 
 	ErrAlreadyExistMsg = "user already exist"
 	ErrAlreadyExist    = status.Error(codes.AlreadyExists, ErrAlreadyExistMsg)

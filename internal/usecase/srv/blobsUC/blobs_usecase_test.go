@@ -9,7 +9,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/rs/zerolog"
 
-	"passkeeper/mocks"
+	"passkeeper/mocks/mockstorage"
 )
 
 func TestNewBlobUCWithOpts(t *testing.T) {
