@@ -70,6 +70,8 @@ type TUI struct {
 	SubformBank  *tview.Flex
 	SubformNotes *tview.Flex
 	SubformFiles *tview.Flex
+
+	// some modals
 }
 
 // NewTUIconf is wrapper for NewTUI constructor with config parser
@@ -279,10 +281,12 @@ func genHelp(page string) string {
 
 // Rerender redraw terminal interface
 func (tuiApp *TUI) Rerender() {
-	page, _ := tuiApp.SubPages.GetFrontPage()
+	page, _ := tuiApp.Pages.GetFrontPage()
+
+	subPage, _ := tuiApp.SubPages.GetFrontPage()
 	var ind int
 
-	switch page {
+	switch subPage {
 	case SubPageCreds:
 		ind = 1
 	case SubPageBank:
@@ -308,5 +312,7 @@ func (tuiApp *TUI) Rerender() {
 	item := tuiApp.FormCredsMenu.GetItem(0).(*Header)
 	item.ChangePage(ind)
 
-	tuiApp.SubPages.SwitchToPage(page)
+	tuiApp.SubPages.SwitchToPage(subPage)
+	tuiApp.Pages.SwitchToPage(page)
+	tuiApp.App.SetFocus(tuiApp.Pages)
 }

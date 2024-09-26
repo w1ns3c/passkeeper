@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -36,7 +37,8 @@ func InitFile(level, filepath string) *zerolog.Logger {
 
 	f, err := os.OpenFile(filepath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		return nil
+		lg := zerolog.New(io.Discard)
+		return &lg
 	}
 
 	logger := zerolog.New(f).With().

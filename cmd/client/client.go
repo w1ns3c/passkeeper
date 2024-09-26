@@ -28,7 +28,11 @@ func main() {
 		return
 	}
 
-	tuiApp, _ := tui.NewTUIconf(args)
+	tuiApp, err := tui.NewTUIconf(args)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	ctx, stop := signal.NotifyContext(context.Background(),
 		syscall.SIGINT, syscall.SIGTERM, syscall.SIGKILL, syscall.SIGHUP, syscall.SIGQUIT)

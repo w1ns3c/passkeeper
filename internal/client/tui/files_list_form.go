@@ -78,6 +78,7 @@ func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 			tuiApp.Usecase.StopSync()
 			form := tuiApp.NewDownloadForm(file)
 			tuiApp.Pages.AddAndSwitchToPage("download", form, true)
+			tuiApp.App.SetFocus(tuiApp.Pages)
 		}
 
 		switch event.Rune() {
@@ -111,6 +112,7 @@ func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 			tuiApp.Usecase.StopSync()
 			form := tuiApp.NewDownloadForm(file)
 			tuiApp.Pages.AddAndSwitchToPage("download", form, true)
+			tuiApp.App.SetFocus(tuiApp.Pages)
 		}
 
 		return event
