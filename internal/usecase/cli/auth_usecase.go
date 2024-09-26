@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -110,11 +109,11 @@ func (c *ClientUC) FilterUserRegValues(username, password, passRepeat, email str
 	}
 
 	if password != passRepeat {
-		return myerrors.ErrPassDiff
+		return myerrors.ErrPassNotSame
 	}
 
 	if len(password) < config.MinPassLen {
-		return fmt.Errorf("password len should be a least %d signs", config.MinPassLen)
+		return myerrors.ErrMinPasswordLen
 	}
 
 	return nil
@@ -141,7 +140,12 @@ func FilterEmail(email string) error {
 func (c *ClientUC) Logout() {
 	c.Token = ""
 	c.User = nil
+
 	c.Creds = nil
+	c.Cards = nil
+	c.Notes = nil
+	c.Files = nil
+
 	c.Authed = false
 
 	c.StopSync()

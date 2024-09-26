@@ -6,6 +6,8 @@ import (
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"passkeeper/internal/entities/config"
 )
 
 var (
@@ -82,9 +84,9 @@ var (
 	// Client usecase
 	ErrPassNotSame         = fmt.Errorf("pass and pass repeat are not the same")
 	ErrInvalidEmail        = fmt.Errorf("email is not valid by new regexp")
-	ErrPassDiff            = fmt.Errorf("passwords are not the same")
 	ErrEmptyUsername       = fmt.Errorf("username is empty")
 	ErrEmptyEmail          = fmt.Errorf("email is empty")
 	ErrEmptyPassword       = fmt.Errorf("pass is empty")
 	ErrEmptyPasswordRepeat = fmt.Errorf("pass repeat is empty")
+	ErrMinPasswordLen      = fmt.Errorf("password len should be a least %d signs", config.MinPassLen)
 )
