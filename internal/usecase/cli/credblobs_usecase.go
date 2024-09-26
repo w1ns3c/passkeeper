@@ -17,7 +17,7 @@ import (
 // to get credential blobs from server and decrypt them to Credential/Card/Note entities
 func (c *ClientUC) GetBlobs(ctx context.Context) error {
 
-	resp, err := c.credsSvc.BlobList(ctx, new(empty.Empty))
+	resp, err := c.blobsSvc.BlobList(ctx, new(empty.Empty))
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred structs.CredInf, ind int) 
 		},
 	}
 
-	_, err = c.credsSvc.BlobUpd(ctx, req)
+	_, err = c.blobsSvc.BlobUpd(ctx, req)
 	if err != nil {
 		return err
 	}
@@ -185,7 +185,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 		},
 	}
 
-	_, err = c.credsSvc.BlobAdd(ctx, req)
+	_, err = c.blobsSvc.BlobAdd(ctx, req)
 	if err != nil {
 		// can't save notes on server
 		// can't save notes localy
@@ -293,7 +293,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType structs.BlobTy
 	}
 
 	req := &pb.BlobDelRequest{CredID: delID}
-	_, err = c.credsSvc.BlobDel(ctx, req)
+	_, err = c.blobsSvc.BlobDel(ctx, req)
 	if err != nil {
 
 		return err

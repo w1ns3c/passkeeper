@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"io"
 	"sync"
 	"time"
 
@@ -44,7 +45,7 @@ type ClientUC struct {
 
 	userSvc  pb.UserSvcClient
 	passSvc  pb.UserChangePassSvcClient
-	credsSvc pb.BlobSvcClient
+	blobsSvc pb.BlobSvcClient
 
 	log *zerolog.Logger
 
@@ -77,10 +78,15 @@ func NewClientUC(opts ...ClientUCoptions) (cli *ClientUC, err error) {
 	// transport
 	cli.userSvc = pb.NewUserSvcClient(conn)
 	cli.passSvc = pb.NewUserChangePassSvcClient(conn)
-	cli.credsSvc = pb.NewBlobSvcClient(conn)
+	cli.blobsSvc = pb.NewBlobSvcClient(conn)
 
 	cli.m = &sync.RWMutex{}
 	cli.FilesUC = new(filesUC.FilesUC)
+
+	if cli.log == nil {
+		lg := zerolog.New(io.Discard)
+		cli.log = &lg
+	}
 
 	return cli, nil
 }
