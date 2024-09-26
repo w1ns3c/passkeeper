@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"io"
 	"os"
 	"reflect"
 	"testing"
@@ -132,11 +133,12 @@ func TestInitFile(t *testing.T) {
 	logger := zerolog.New(f).With().
 		Timestamp().Logger().Level(lvl)
 
+	discardLogger := zerolog.New(io.Discard)
+
 	logger = logger.Output(zerolog.ConsoleWriter{
 		Out:        f,
 		TimeFormat: time.DateTime,
 	})
-
 	tests := []struct {
 		name string
 		args args
@@ -152,12 +154,12 @@ func TestInitFile(t *testing.T) {
 			want: &logger,
 		},
 		{
-			name: "Test 2: errror",
+			name: "Test 2: errror unexisting file",
 			args: args{
 				level:    level,
 				filepath: "/t111/123",
 			},
-			want: nil,
+			want: &discardLogger,
 		},
 	}
 	for _, tt := range tests {
