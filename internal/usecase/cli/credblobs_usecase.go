@@ -416,26 +416,43 @@ func SortNotesByDate(notes []*structs.Note) {
 // GetCreds return a copy of notes to view
 func (c *ClientUC) GetCreds() []*structs.Credential {
 	c.m.Lock()
+	defer c.m.Unlock()
 
 	tmpCreds := make([]*structs.Credential, len(c.Creds))
 	copy(tmpCreds, c.Creds)
-
-	c.m.Unlock()
 
 	return tmpCreds
 }
 
 // GetCards return a copy of cards to view
 func (c *ClientUC) GetCards() []*structs.Card {
-	return c.Cards
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	tmpCards := make([]*structs.Card, len(c.Cards))
+	copy(tmpCards, c.Cards)
+
+	return tmpCards
 }
 
 // GetNotes return a copy of notes to view
 func (c *ClientUC) GetNotes() []*structs.Note {
-	return c.Notes
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	tmpNotes := make([]*structs.Note, len(c.Notes))
+	copy(tmpNotes, c.Notes)
+
+	return tmpNotes
 }
 
 // GetFiles return a copy of files to view
 func (c *ClientUC) GetFiles() []*structs.File {
-	return c.Files
+	c.m.Lock()
+	defer c.m.Unlock()
+
+	tmpFiles := make([]*structs.File, len(c.Files))
+	copy(tmpFiles, c.Files)
+
+	return tmpFiles
 }

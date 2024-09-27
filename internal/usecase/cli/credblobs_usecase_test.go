@@ -1,16 +1,17 @@
 package cli
 
 import (
+	"bufio"
 	"context"
+	"os"
 	"path/filepath"
 	"reflect"
-	"sync"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 	"github.com/w1ns3c/go-examples/crypto"
 
@@ -129,9 +130,89 @@ func TestSortNotesByDate(t *testing.T) {
 	}
 }
 
+type invType struct {
+}
+
+func (i invType) GetID() string {
+	return ""
+}
+
+func (i invType) SetID(id string) {
+	return
+}
+
 func TestClientUC_GetBlobs(t *testing.T) {
+	filename1 := "testfile1"
+	file, err := os.CreateTemp(config.TmpDir, filename1)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file.Name())
+
+	buf := bufio.NewWriter(file)
+	buf.WriteString(strings.Repeat("123123", 1000))
+	err = buf.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename2 := "testfile2"
+	file2, err := os.CreateTemp(config.TmpDir, filename2)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file2.Name())
+
+	buf2 := bufio.NewWriter(file2)
+	buf2.WriteString(strings.Repeat("222222errerr", 1000))
+	err = buf2.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file2.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename3 := "testfile3"
+	file3, err := os.CreateTemp(config.TmpDir, filename3)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file3.Name())
+
+	buf3 := bufio.NewWriter(file3)
+	buf3.WriteString(strings.Repeat("3333abc", 1000))
+	err = buf3.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file3.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
 
 	var (
+		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
+		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
+		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+
 		login1  = "user1"
 		pass1   = "123"
 		userid1 = login1 + "_ID"
@@ -251,32 +332,23 @@ func TestClientUC_GetBlobs(t *testing.T) {
 			},
 		}
 
-		dir   = "/tmp/files/"
-		file1 = "file1_bin"
-		file2 = "files2_compress.txt"
-		file3 = "new file number 1"
-
-		zipData1, _ = compress.CompressFile(filepath.Join(dir, file1))
-		zipData2, _ = compress.CompressFile(filepath.Join(dir, file2))
-		zipData3, _ = compress.CompressFile(filepath.Join(dir, file3))
-
 		testFiles = []*structs.File{
 			{
 				ID:   "FILE_ID_1",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file1),
+				Name: filesUC.GenFileShortName(filename1),
 				Body: zipData1,
 			},
 			{
 				ID:   "FILE_ID_2",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file2),
+				Name: filesUC.GenFileShortName(filename2),
 				Body: zipData2,
 			},
 			{
 				ID:   "FILE_ID_3",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file3),
+				Name: filesUC.GenFileShortName(filename3),
 				Body: zipData3,
 			},
 		}
@@ -419,6 +491,72 @@ func TestClientUC_GetBlobs(t *testing.T) {
 }
 
 func TestClientUC_AddBlob(t *testing.T) {
+	filename1 := "testfile1"
+	file, err := os.CreateTemp(config.TmpDir, filename1)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file.Name())
+
+	buf := bufio.NewWriter(file)
+	buf.WriteString(strings.Repeat("123123", 1000))
+	err = buf.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename2 := "testfile2"
+	file2, err := os.CreateTemp(config.TmpDir, filename2)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file2.Name())
+
+	buf2 := bufio.NewWriter(file2)
+	buf2.WriteString(strings.Repeat("222222errerr", 1000))
+	err = buf2.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file2.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename3 := "testfile3"
+	file3, err := os.CreateTemp(config.TmpDir, filename3)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file3.Name())
+
+	buf3 := bufio.NewWriter(file3)
+	buf3.WriteString(strings.Repeat("3333abc", 1000))
+	err = buf3.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file3.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
 	var (
 		login1  = "user1"
 		pass1   = "123"
@@ -568,32 +706,27 @@ func TestClientUC_AddBlob(t *testing.T) {
 			Body: "Hello\nWorld! Amigo! I should finish it...",
 		}
 
-		dir   = "/tmp/files/"
-		file1 = "file1_bin"
-		file2 = "files2_compress.txt"
-		file3 = "new file number 1"
-
-		zipData1, _ = compress.CompressFile(filepath.Join(dir, file1))
-		zipData2, _ = compress.CompressFile(filepath.Join(dir, file2))
-		zipData3, _ = compress.CompressFile(filepath.Join(dir, file3))
+		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
+		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
+		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
 
 		testFiles = []*structs.File{
 			{
 				ID:   "FILE_ID_1",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file1),
+				Name: filesUC.GenFileShortName(filename1),
 				Body: zipData1,
 			},
 			{
 				ID:   "FILE_ID_2",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file2),
+				Name: filesUC.GenFileShortName(filename2),
 				Body: zipData2,
 			},
 			{
 				ID:   "FILE_ID_3",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file3),
+				Name: filesUC.GenFileShortName(filename3),
 				Body: zipData3,
 			},
 		}
@@ -601,7 +734,7 @@ func TestClientUC_AddBlob(t *testing.T) {
 		addFile = &structs.File{
 			ID:   "new_FILE_ID_2",
 			Type: structs.BlobFile,
-			Name: filesUC.GenFileShortName(file3),
+			Name: filesUC.GenFileShortName(filename2),
 			Body: zipData3,
 		}
 	)
@@ -633,15 +766,6 @@ func TestClientUC_AddBlob(t *testing.T) {
 	blob11.UserID = userid1
 	blob12, _ := hashes.EncryptBlob(testFiles[2], key1)
 	blob12.UserID = userid1
-
-	//editPassBlob, _ := hashes.EncryptBlob(editPass, key1)
-	//editCardBlob, _ := hashes.EncryptBlob(editCard, key1)
-	//editNoteBlob, _ := hashes.EncryptBlob(editNote, key1)
-	//editFileBlob, _ := hashes.EncryptBlob(addFile, key1)
-
-	//invalidBlob1, _ := hashes.EncryptBlob(testNotes[0], key1+"123")
-
-	//invalidBlob2, _ := hashes.EncryptBlob(inv, key1)
 
 	type args struct {
 		cred structs.CredInf
@@ -853,7 +977,77 @@ func TestClientUC_AddBlob(t *testing.T) {
 }
 
 func TestClientUC_DelBlob(t *testing.T) {
+	filename1 := "testfile1"
+	file, err := os.CreateTemp(config.TmpDir, filename1)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file.Name())
+
+	buf := bufio.NewWriter(file)
+	buf.WriteString(strings.Repeat("123123", 1000))
+	err = buf.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename2 := "testfile2"
+	file2, err := os.CreateTemp(config.TmpDir, filename2)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file2.Name())
+
+	buf2 := bufio.NewWriter(file2)
+	buf2.WriteString(strings.Repeat("222222errerr", 1000))
+	err = buf2.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file2.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename3 := "testfile3"
+	file3, err := os.CreateTemp(config.TmpDir, filename3)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file3.Name())
+
+	buf3 := bufio.NewWriter(file3)
+	buf3.WriteString(strings.Repeat("3333abc", 1000))
+	err = buf3.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file3.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
 	var (
+		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
+		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
+		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+
 		login1  = "user1"
 		pass1   = "123"
 		userid1 = login1 + "_ID"
@@ -973,32 +1167,23 @@ func TestClientUC_DelBlob(t *testing.T) {
 			},
 		}
 
-		dir   = "/tmp/files/"
-		file1 = "file1_bin"
-		file2 = "files2_compress.txt"
-		file3 = "new file number 1"
-
-		zipData1, _ = compress.CompressFile(filepath.Join(dir, file1))
-		zipData2, _ = compress.CompressFile(filepath.Join(dir, file2))
-		zipData3, _ = compress.CompressFile(filepath.Join(dir, file3))
-
 		testFiles = []*structs.File{
 			{
 				ID:   "FILE_ID_1",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file1),
+				Name: filesUC.GenFileShortName(filename1),
 				Body: zipData1,
 			},
 			{
 				ID:   "FILE_ID_2",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file2),
+				Name: filesUC.GenFileShortName(filename2),
 				Body: zipData2,
 			},
 			{
 				ID:   "FILE_ID_3",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file3),
+				Name: filesUC.GenFileShortName(filename3),
 				Body: zipData3,
 			},
 		}
@@ -1031,15 +1216,6 @@ func TestClientUC_DelBlob(t *testing.T) {
 	blob11.UserID = userid1
 	blob12, _ := hashes.EncryptBlob(testFiles[2], key1)
 	blob12.UserID = userid1
-
-	//editPassBlob, _ := hashes.EncryptBlob(editPass, key1)
-	//editCardBlob, _ := hashes.EncryptBlob(editCard, key1)
-	//editNoteBlob, _ := hashes.EncryptBlob(editNote, key1)
-	//editFileBlob, _ := hashes.EncryptBlob(editFile, key1)
-
-	//invalidBlob1, _ := hashes.EncryptBlob(testNotes[0], key1+"123")
-
-	//invalidBlob2, _ := hashes.EncryptBlob(inv, key1)
 
 	type args struct {
 		blobType structs.BlobType
@@ -1077,7 +1253,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test EditBlob 2: valid ind card",
+			name: "Test DelBlob 2: valid ind card",
 			args: args{
 				blobType: structs.BlobCard,
 				ind:      2,
@@ -1095,7 +1271,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test EditBlob 3: valid ind note",
+			name: "Test DelBlob 3: valid ind note",
 			args: args{
 				blobType: structs.BlobNote,
 				ind:      2,
@@ -1113,7 +1289,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test EditBlob 4: valid ind file",
+			name: "Test DelBlob 4: valid ind file",
 			args: args{
 				blobType: structs.BlobFile,
 				ind:      2,
@@ -1131,7 +1307,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "Test EditBlob 5: invalid ind cred",
+			name: "Test DelBlob 5: invalid ind cred",
 			args: args{
 				blobType: structs.BlobCred,
 				ind:      25,
@@ -1147,7 +1323,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Test EditBlob 6: invalid ind card",
+			name: "Test DelBlob 6: invalid ind card",
 			args: args{
 				blobType: structs.BlobCard,
 				ind:      25,
@@ -1163,7 +1339,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Test EditBlob 7: invalid ind note",
+			name: "Test DelBlob 7: invalid ind note",
 			args: args{
 				blobType: structs.BlobNote,
 				ind:      25,
@@ -1179,7 +1355,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Test EditBlob 8: invalid ind file",
+			name: "Test DelBlob 8: invalid ind file",
 			args: args{
 				blobType: structs.BlobFile,
 				ind:      25,
@@ -1195,7 +1371,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Test EditBlob 9: invalid blob type",
+			name: "Test DelBlob 9: invalid blob type",
 			args: args{
 				blobType: 0,
 				ind:      1,
@@ -1211,7 +1387,7 @@ func TestClientUC_DelBlob(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "Test EditBlob 10: err on server side",
+			name: "Test DelBlob 10: err on server side",
 			args: args{
 				blobType: structs.BlobFile,
 				ind:      1,
@@ -1260,19 +1436,78 @@ func TestClientUC_DelBlob(t *testing.T) {
 	}
 }
 
-type invType struct {
-}
-
-func (i invType) GetID() string {
-	return ""
-}
-
-func (i invType) SetID(id string) {
-	return
-}
-
 func TestClientUC_EditBlob(t *testing.T) {
+	filename1 := "testfile1"
+	file, err := os.CreateTemp(config.TmpDir, filename1)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file.Name())
+
+	buf := bufio.NewWriter(file)
+	buf.WriteString(strings.Repeat("123123", 1000))
+	err = buf.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename2 := "testfile2"
+	file2, err := os.CreateTemp(config.TmpDir, filename2)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file2.Name())
+
+	buf2 := bufio.NewWriter(file2)
+	buf2.WriteString(strings.Repeat("222222errerr", 1000))
+	err = buf2.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file2.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename3 := "testfile3"
+	file3, err := os.CreateTemp(config.TmpDir, filename3)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file3.Name())
+
+	buf3 := bufio.NewWriter(file3)
+	buf3.WriteString(strings.Repeat("3333abc", 1000))
+	err = buf3.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file3.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
 	var (
+		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
+		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
+		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+
 		login1  = "user1"
 		pass1   = "123"
 		userid1 = login1 + "_ID"
@@ -1421,32 +1656,23 @@ func TestClientUC_EditBlob(t *testing.T) {
 			Body: "Hello\nWorld! Amigo! I should finish it...",
 		}
 
-		dir   = "/tmp/files/"
-		file1 = "file1_bin"
-		file2 = "files2_compress.txt"
-		file3 = "new file number 1"
-
-		zipData1, _ = compress.CompressFile(filepath.Join(dir, file1))
-		zipData2, _ = compress.CompressFile(filepath.Join(dir, file2))
-		zipData3, _ = compress.CompressFile(filepath.Join(dir, file3))
-
 		testFiles = []*structs.File{
 			{
 				ID:   "FILE_ID_1",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file1),
+				Name: filesUC.GenFileShortName(filename1),
 				Body: zipData1,
 			},
 			{
 				ID:   "FILE_ID_2",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file2),
+				Name: filesUC.GenFileShortName(filename2),
 				Body: zipData2,
 			},
 			{
 				ID:   "FILE_ID_3",
 				Type: structs.BlobFile,
-				Name: filesUC.GenFileShortName(file3),
+				Name: filesUC.GenFileShortName(filename3),
 				Body: zipData3,
 			},
 		}
@@ -1454,7 +1680,7 @@ func TestClientUC_EditBlob(t *testing.T) {
 		editFile = &structs.File{
 			ID:   "FILE_ID_2",
 			Type: structs.BlobFile,
-			Name: filesUC.GenFileShortName(file3),
+			Name: filesUC.GenFileShortName(filename2),
 			Body: zipData3,
 		}
 	)
@@ -1748,174 +1974,85 @@ func TestClientUC_EditBlob(t *testing.T) {
 	}
 }
 
-func TestClientUC_GetCardByIND(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
-	type args struct {
-		ind int
-	}
-	tests := []struct {
-		name     string
-		fields   fields
-		args     args
-		wantCard *structs.Card
-		wantErr  bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			gotCard, err := c.GetCardByIND(tt.args.ind)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetCardByIND() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(gotCard, tt.wantCard) {
-				t.Errorf("GetCardByIND() gotCard = %v, want %v", gotCard, tt.wantCard)
-			}
-		})
-	}
-}
-
-func TestClientUC_GetCards(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []*structs.Card
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			if got := c.GetCards(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetCards() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestClientUC_GetCredByIND(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
+	var (
+		password1 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          "ID1111",
+			Date:        time.Now().Add(time.Second * -200),
+			Resource:    "localhost1111",
+			Login:       "my_favorite_username1111",
+			Password:    "my_favorite_password1111",
+			Description: "some description1111",
+		}
+		password2 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          "ID2222",
+			Date:        time.Now().Add(time.Second * -500),
+			Resource:    "localhost2222",
+			Login:       "admin2222",
+			Password:    "secret password2222",
+			Description: "some new description2222",
+		}
+		password3 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          "superID3333",
+			Date:        time.Now(),
+			Resource:    "localhost3333",
+			Login:       "my_favorite_username333",
+			Password:    "my_favorite_password3333",
+			Description: "some description3333",
+		}
+
+		tmpCreds = []*structs.Credential{
+			password1,
+			password2,
+			password3,
+		}
+	)
+
 	type args struct {
-		ind int
+		ind      int
+		tmpCreds []*structs.Credential
 	}
 	tests := []struct {
 		name     string
-		fields   fields
 		args     args
 		wantCred *structs.Credential
 		wantErr  bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Test GetByInd Cred 1: valid ind",
+			args: args{
+				ind:      1,
+				tmpCreds: tmpCreds,
+			},
+			wantCred: password2,
+			wantErr:  false,
+		},
+		{
+			name: "Test GetByInd Cred 2: ind < 0",
+			args: args{
+				ind:      -10,
+				tmpCreds: tmpCreds,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test GetByInd Cred 3: ind > len(creds)",
+			args: args{
+				ind:      100,
+				tmpCreds: tmpCreds,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			gotCred, err := c.GetCredByIND(tt.args.ind)
+			usecase, _ := NewClientUC()
+			usecase.Creds = tt.args.tmpCreds
+
+			gotCred, err := usecase.GetCredByIND(tt.args.ind)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetCredByIND() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -1927,227 +2064,170 @@ func TestClientUC_GetCredByIND(t *testing.T) {
 	}
 }
 
-func TestClientUC_GetCreds(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []*structs.Credential
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			if got := c.GetCreds(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetCreds() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+func TestClientUC_GetCardByIND(t *testing.T) {
+	var (
+		tmpCards = []*structs.Card{
+			{
+				ID:          "ID_CARD_1111",
+				Type:        structs.BlobCard,
+				Name:        "test1",
+				Bank:        entities.Banks[0],
+				Person:      "string",
+				Number:      122222222222,
+				CVC:         232,
+				Expiration:  time.Now(),
+				PIN:         3333,
+				Description: "test description only",
+			},
+			{
+				ID:          "ID_CARD_22222",
+				Type:        structs.BlobCard,
+				Name:        "test333331",
+				Bank:        entities.Banks[2],
+				Person:      "Major Tom",
+				Number:      234872398472,
+				CVC:         23244444,
+				Expiration:  time.Now().Add(time.Second * 100),
+				PIN:         11111,
+				Description: "test description2",
+			},
+			{
+				ID:          "ID_CARD_33",
+				Type:        structs.BlobCard,
+				Name:        "super secret card",
+				Bank:        entities.Banks[4],
+				Person:      "Major Jerry",
+				Number:      2348723984721111,
+				CVC:         232444443333,
+				Expiration:  time.Now().Add(time.Second * -500),
+				PIN:         2323,
+				Description: "test myself",
+			},
+		}
+	)
 
-func TestClientUC_GetFileByIND(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
 	type args struct {
-		ind int
+		ind      int
+		tmpCards []*structs.Card
 	}
 	tests := []struct {
 		name     string
-		fields   fields
 		args     args
-		wantFile *structs.File
+		wantCard *structs.Card
 		wantErr  bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Test GetByInd Card 1: valid ind",
+			args: args{
+				ind:      1,
+				tmpCards: tmpCards,
+			},
+			wantCard: tmpCards[1],
+			wantErr:  false,
+		},
+		{
+			name: "Test GetByInd Card 2: ind < 0",
+			args: args{
+				ind:      -10,
+				tmpCards: tmpCards,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test GetByInd Card 3: ind > len(cards)",
+			args: args{
+				ind:      100,
+				tmpCards: tmpCards,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			gotFile, err := c.GetFileByIND(tt.args.ind)
+
+			usecase, _ := NewClientUC()
+			usecase.Cards = tt.args.tmpCards
+
+			gotCard, err := usecase.GetCardByIND(tt.args.ind)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetFileByIND() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GetCardByIND() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotFile, tt.wantFile) {
-				t.Errorf("GetFileByIND() gotFile = %v, want %v", gotFile, tt.wantFile)
-			}
-		})
-	}
-}
-
-func TestClientUC_GetFiles(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   []*structs.File
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			if got := c.GetFiles(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetFiles() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(gotCard, tt.wantCard) {
+				t.Errorf("GetCardByIND() gotCard = %v, want %v", gotCard, tt.wantCard)
 			}
 		})
 	}
 }
 
 func TestClientUC_GetNoteByIND(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
-	}
+	var (
+		tmpNotes = []*structs.Note{
+			{
+				ID:   "ID_NOTE_1",
+				Type: structs.BlobNote,
+				Name: "test1",
+				Date: time.Now().Add(time.Second * -300000),
+				Body: "Hello\nWorld!",
+			},
+			{
+				ID:   "ID_NOTE_2",
+				Type: structs.BlobNote,
+				Name: "HELLO 222222",
+				Date: time.Now().Add(time.Second * -3000010),
+				Body: "Hello\nWorld! 9234928309482390480298340923809840",
+			},
+			{
+				ID:   "ID_NOTE_3",
+				Type: structs.BlobNote,
+				Name: "New Test Blob",
+				Date: time.Now().Add(time.Second * -500000),
+				Body: "Hello\nWorld! Amigo",
+			},
+		}
+	)
 	type args struct {
-		ind int
+		ind      int
+		tmpNotes []*structs.Note
 	}
 	tests := []struct {
 		name     string
-		fields   fields
 		args     args
 		wantNote *structs.Note
 		wantErr  bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Test GetByInd Note 1: valid ind",
+			args: args{
+				ind:      1,
+				tmpNotes: tmpNotes,
+			},
+			wantNote: tmpNotes[1],
+			wantErr:  false,
+		},
+		{
+			name: "Test GetByInd Note 2: ind < 0",
+			args: args{
+				ind:      -10,
+				tmpNotes: tmpNotes,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test GetByInd Note 3: ind > len(notes)",
+			args: args{
+				ind:      100,
+				tmpNotes: tmpNotes,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
-			}
-			gotNote, err := c.GetNoteByIND(tt.args.ind)
+			usecase, _ := NewClientUC()
+			usecase.Notes = tt.args.tmpNotes
+
+			gotNote, err := usecase.GetNoteByIND(tt.args.ind)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetNoteByIND() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -2159,55 +2239,387 @@ func TestClientUC_GetNoteByIND(t *testing.T) {
 	}
 }
 
-func TestClientUC_GetNotes(t *testing.T) {
-	type fields struct {
-		Addr          string
-		Authed        bool
-		User          *structs.User
-		Token         string
-		Creds         []*structs.Credential
-		Cards         []*structs.Card
-		Notes         []*structs.Note
-		Files         []*structs.File
-		viewPageFocus bool
-		SyncTime      time.Duration
-		m             *sync.RWMutex
-		userSvc       pb.UserSvcClient
-		passSvc       pb.UserChangePassSvcClient
-		blobsSvc      pb.BlobSvcClient
-		log           *zerolog.Logger
-		FilesUC       *filesUC.FilesUC
+func TestClientUC_GetFileByIND(t *testing.T) {
+	filename1 := "testfile1"
+	file, err := os.CreateTemp(config.TmpDir, filename1)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file.Name())
+
+	buf := bufio.NewWriter(file)
+	buf.WriteString(strings.Repeat("123123", 1000))
+	err = buf.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename2 := "testfile2"
+	file2, err := os.CreateTemp(config.TmpDir, filename2)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file2.Name())
+
+	buf2 := bufio.NewWriter(file2)
+	buf2.WriteString(strings.Repeat("222222errerr", 1000))
+	err = buf2.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file2.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename3 := "testfile3"
+	file3, err := os.CreateTemp(config.TmpDir, filename3)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file3.Name())
+
+	buf3 := bufio.NewWriter(file3)
+	buf3.WriteString(strings.Repeat("3333abc", 1000))
+	err = buf3.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file3.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	var (
+		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
+		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
+		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+
+		tmpFiles = []*structs.File{
+			{
+				ID:   "FILE_ID_1",
+				Type: structs.BlobFile,
+				Name: filesUC.GenFileShortName(filename1),
+				Body: zipData1,
+			},
+			{
+				ID:   "FILE_ID_2",
+				Type: structs.BlobFile,
+				Name: filesUC.GenFileShortName(filename2),
+				Body: zipData2,
+			},
+			{
+				ID:   "FILE_ID_3",
+				Type: structs.BlobFile,
+				Name: filesUC.GenFileShortName(filename3),
+				Body: zipData3,
+			},
+		}
+	)
+
+	type args struct {
+		ind      int
+		tmpFiles []*structs.File
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		want   []*structs.Note
+		name     string
+		args     args
+		wantFile *structs.File
+		wantErr  bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Test GetByInd File 1: valid ind",
+			args: args{
+				ind:      1,
+				tmpFiles: tmpFiles,
+			},
+			wantFile: tmpFiles[1],
+			wantErr:  false,
+		},
+		{
+			name: "Test GetByInd File 2: ind < 0",
+			args: args{
+				ind:      -10,
+				tmpFiles: tmpFiles,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test GetByInd File 3: ind > len(files)",
+			args: args{
+				ind:      100,
+				tmpFiles: tmpFiles,
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &ClientUC{
-				Addr:          tt.fields.Addr,
-				Authed:        tt.fields.Authed,
-				User:          tt.fields.User,
-				Token:         tt.fields.Token,
-				Creds:         tt.fields.Creds,
-				Cards:         tt.fields.Cards,
-				Notes:         tt.fields.Notes,
-				Files:         tt.fields.Files,
-				viewPageFocus: tt.fields.viewPageFocus,
-				SyncTime:      tt.fields.SyncTime,
-				m:             tt.fields.m,
-				userSvc:       tt.fields.userSvc,
-				passSvc:       tt.fields.passSvc,
-				blobsSvc:      tt.fields.blobsSvc,
-				log:           tt.fields.log,
-				FilesUC:       tt.fields.FilesUC,
+			usecase, _ := NewClientUC()
+			usecase.Files = tt.args.tmpFiles
+
+			gotFile, err := usecase.GetFileByIND(tt.args.ind)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetFileByIND() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
-			if got := c.GetNotes(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetNotes() = %v, want %v", got, tt.want)
+			if !reflect.DeepEqual(gotFile, tt.wantFile) {
+				t.Errorf("GetFileByIND() gotFile = %v, want %v", gotFile, tt.wantFile)
 			}
 		})
 	}
+}
+
+func TestClientUC_GetCreds(t *testing.T) {
+	var (
+		password1 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          "ID1111",
+			Date:        time.Now().Add(time.Second * -200),
+			Resource:    "localhost1111",
+			Login:       "my_favorite_username1111",
+			Password:    "my_favorite_password1111",
+			Description: "some description1111",
+		}
+		password2 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          "ID2222",
+			Date:        time.Now().Add(time.Second * -500),
+			Resource:    "localhost2222",
+			Login:       "admin2222",
+			Password:    "secret password2222",
+			Description: "some new description2222",
+		}
+		password3 = &structs.Credential{
+			Type:        structs.BlobCred,
+			ID:          "superID3333",
+			Date:        time.Now(),
+			Resource:    "localhost3333",
+			Login:       "my_favorite_username333",
+			Password:    "my_favorite_password3333",
+			Description: "some description3333",
+		}
+
+		tmpCreds = []*structs.Credential{
+			password1,
+			password2,
+			password3,
+		}
+	)
+
+	usecase, _ := NewClientUC()
+	usecase.Creds = tmpCreds
+
+	got := usecase.GetCreds()
+
+	if !reflect.DeepEqual(got, tmpCreds) {
+		t.Errorf("GetCreds() = %v, want %v", got, tmpCreds)
+	}
+
+}
+
+func TestClientUC_GetCards(t *testing.T) {
+	var (
+		tmpCards = []*structs.Card{
+			{
+				ID:          "ID_CARD_1111",
+				Type:        structs.BlobCard,
+				Name:        "test1",
+				Bank:        entities.Banks[0],
+				Person:      "string",
+				Number:      122222222222,
+				CVC:         232,
+				Expiration:  time.Now(),
+				PIN:         3333,
+				Description: "test description only",
+			},
+			{
+				ID:          "ID_CARD_22222",
+				Type:        structs.BlobCard,
+				Name:        "test333331",
+				Bank:        entities.Banks[2],
+				Person:      "Major Tom",
+				Number:      234872398472,
+				CVC:         23244444,
+				Expiration:  time.Now().Add(time.Second * 100),
+				PIN:         11111,
+				Description: "test description2",
+			},
+			{
+				ID:          "ID_CARD_33",
+				Type:        structs.BlobCard,
+				Name:        "super secret card",
+				Bank:        entities.Banks[4],
+				Person:      "Major Jerry",
+				Number:      2348723984721111,
+				CVC:         232444443333,
+				Expiration:  time.Now().Add(time.Second * -500),
+				PIN:         2323,
+				Description: "test myself",
+			},
+		}
+	)
+	usecase, _ := NewClientUC()
+	usecase.Cards = tmpCards
+
+	if got := usecase.GetCards(); !reflect.DeepEqual(got, tmpCards) {
+		t.Errorf("GetCards() = %v, want %v", got, tmpCards)
+	}
+
+}
+
+func TestClientUC_GetNotes(t *testing.T) {
+
+	var (
+		testNotes = []*structs.Note{
+			{
+				ID:   "ID_NOTE_1",
+				Type: structs.BlobNote,
+				Name: "test1",
+				Date: time.Now().Add(time.Second * -300000),
+				Body: "Hello\nWorld!",
+			},
+			{
+				ID:   "ID_NOTE_2",
+				Type: structs.BlobNote,
+				Name: "HELLO 222222",
+				Date: time.Now().Add(time.Second * -3000010),
+				Body: "Hello\nWorld! 9234928309482390480298340923809840",
+			},
+			{
+				ID:   "ID_NOTE_3",
+				Type: structs.BlobNote,
+				Name: "New Test Blob",
+				Date: time.Now().Add(time.Second * -500000),
+				Body: "Hello\nWorld! Amigo",
+			},
+		}
+	)
+
+	usecase, _ := NewClientUC()
+	usecase.Notes = testNotes
+
+	if got := usecase.GetNotes(); !reflect.DeepEqual(got, testNotes) {
+		t.Errorf("GetNotes() = %v, want %v", got, testNotes)
+	}
+
+}
+
+func TestClientUC_GetFiles(t *testing.T) {
+	filename1 := "testfile1"
+	file, err := os.CreateTemp(config.TmpDir, filename1)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file.Name())
+
+	buf := bufio.NewWriter(file)
+	buf.WriteString(strings.Repeat("123123", 1000))
+	err = buf.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename2 := "testfile2"
+	file2, err := os.CreateTemp(config.TmpDir, filename2)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file2.Name())
+
+	buf2 := bufio.NewWriter(file2)
+	buf2.WriteString(strings.Repeat("222222errerr", 1000))
+	err = buf2.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file2.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	filename3 := "testfile3"
+	file3, err := os.CreateTemp(config.TmpDir, filename3)
+	if err != nil {
+		t.Errorf("could not create temporary file: %v", err)
+		return
+	}
+	defer os.Remove(file3.Name())
+
+	buf3 := bufio.NewWriter(file3)
+	buf3.WriteString(strings.Repeat("3333abc", 1000))
+	err = buf3.Flush()
+	if err != nil {
+		t.Errorf("could not write to temporary file: %v", err)
+		return
+	}
+
+	err = file3.Close()
+	if err != nil {
+		t.Errorf("could not close temporary file: %v", err)
+		return
+	}
+
+	var (
+		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
+		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
+		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+
+		testFiles = []*structs.File{
+			{
+				ID:   "FILE_ID_1",
+				Type: structs.BlobFile,
+				Name: filesUC.GenFileShortName(filename1),
+				Body: zipData1,
+			},
+			{
+				ID:   "FILE_ID_2",
+				Type: structs.BlobFile,
+				Name: filesUC.GenFileShortName(filename2),
+				Body: zipData2,
+			},
+			{
+				ID:   "FILE_ID_3",
+				Type: structs.BlobFile,
+				Name: filesUC.GenFileShortName(filename3),
+				Body: zipData3,
+			},
+		}
+	)
+
+	usecase, _ := NewClientUC()
+	usecase.Files = testFiles
+
+	if got := usecase.GetFiles(); !reflect.DeepEqual(got, testFiles) {
+		t.Errorf("GetFiles() = %v, want %v", got, testFiles)
+	}
+
 }
