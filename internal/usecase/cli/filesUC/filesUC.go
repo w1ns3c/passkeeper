@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"passkeeper/internal/entities/compress"
+	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/hashes"
 	"passkeeper/internal/entities/structs"
 )
@@ -48,4 +49,15 @@ func (f *FilesUC) UnzipAndDownload(dirToDownload string, file *structs.File) err
 	}
 
 	return nil
+}
+
+// GenFileShortName beautify file name to show it in the list
+func GenFileShortName(filePath string) string {
+	var m = config.MaxFilenameLen
+
+	if len(filePath) > m {
+		return filePath[:m-4] + " ..."
+	}
+
+	return filePath
 }

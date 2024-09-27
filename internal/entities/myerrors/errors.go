@@ -89,4 +89,5 @@ var (
 	ErrEmptyPassword       = fmt.Errorf("pass is empty")
 	ErrEmptyPasswordRepeat = fmt.Errorf("pass repeat is empty")
 	ErrMinPasswordLen      = fmt.Errorf("password len should be a least %d signs", config.MinPassLen)
+	ErrUnknownBlobType     = fmt.Errorf("unknown credential type")
 )

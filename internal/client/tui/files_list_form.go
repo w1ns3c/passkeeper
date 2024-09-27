@@ -6,8 +6,8 @@ import (
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 
-	"passkeeper/internal/entities/config"
 	"passkeeper/internal/entities/structs"
+	"passkeeper/internal/usecase/cli/filesUC"
 )
 
 var (
@@ -133,7 +133,7 @@ func (list *FileList) Rerender(files []*structs.File) {
 
 	if files != nil {
 		for ind, file := range files {
-			res := GenFileShortName(file.Name)
+			res := filesUC.GenFileShortName(file.Name)
 			if ind < 9 {
 				list.AddItem(res, "", rune(49+ind), nil)
 			} else if ind == 9 {
@@ -144,17 +144,6 @@ func (list *FileList) Rerender(files []*structs.File) {
 			}
 		}
 	}
-}
-
-// GenFileShortName beautify file name to show it in the list
-func GenFileShortName(filePath string) string {
-	var m = config.MaxFilenameLen
-
-	if len(filePath) > m {
-		return filePath[:m-4] + " ..."
-	}
-
-	return filePath
 }
 
 // Delete is a form to confirm file deletion

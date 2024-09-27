@@ -9,6 +9,7 @@ import (
 
 	"passkeeper/internal/entities"
 	"passkeeper/internal/entities/hashes"
+	"passkeeper/internal/entities/myerrors"
 	"passkeeper/internal/entities/structs"
 	pb "passkeeper/internal/transport/grpc/protofiles/proto"
 )
@@ -85,23 +86,23 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred structs.CredInf, ind int) 
 	// check that blob with ind exist
 	switch cred.(type) {
 	case *structs.Credential:
-		if ind < 0 && ind >= len(c.Creds) {
+		if ind < 0 || ind >= len(c.Creds) {
 			return fmt.Errorf("invalid index of notes")
 		}
 	case *structs.Card:
-		if ind < 0 && ind >= len(c.Cards) {
+		if ind < 0 || ind >= len(c.Cards) {
 			return fmt.Errorf("invalid index of cards")
 		}
 	case *structs.Note:
-		if ind < 0 && ind >= len(c.Notes) {
+		if ind < 0 || ind >= len(c.Notes) {
 			return fmt.Errorf("invalid index of notes")
 		}
 	case *structs.File:
-		if ind < 0 && ind >= len(c.Files) {
+		if ind < 0 || ind >= len(c.Files) {
 			return fmt.Errorf("invalid index of files")
 		}
 	default:
-		return fmt.Errorf("unknown type of blob")
+		return myerrors.ErrUnknownBlobType
 	}
 
 	blob, err := hashes.EncryptBlob(cred, c.User.Secret)
@@ -157,7 +158,7 @@ func (c *ClientUC) EditBlob(ctx context.Context, cred structs.CredInf, ind int) 
 		blobT = "file"
 
 	default:
-		return fmt.Errorf("unknown credential type")
+		return myerrors.ErrUnknownBlobType
 	}
 
 	c.log.Info().
@@ -244,7 +245,7 @@ func (c *ClientUC) AddBlob(ctx context.Context, cred structs.CredInf) (err error
 		blobT = "file"
 
 	default:
-		return fmt.Errorf("unknown credential type")
+		return myerrors.ErrUnknownBlobType
 	}
 
 	c.log.Info().
@@ -289,7 +290,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType structs.BlobTy
 		delID = tmp.ID
 
 	default:
-		return fmt.Errorf("unknown type of blob")
+		return myerrors.ErrUnknownBlobType
 	}
 
 	req := &pb.BlobDelRequest{CredID: delID}
@@ -339,7 +340,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType structs.BlobTy
 		blobT = "note"
 
 	default:
-		return fmt.Errorf("unknown type of blob")
+		return myerrors.ErrUnknownBlobType
 	}
 
 	c.log.Info().
@@ -348,7 +349,7 @@ func (c *ClientUC) DelBlob(ctx context.Context, ind int, blobType structs.BlobTy
 	return err
 }
 
-// GetCredByIND return cred by it's ind in slice (safety)
+// GetCredByIND return cred by its ind in slice (safety)
 func (c *ClientUC) GetCredByIND(ind int) (cred *structs.Credential, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -359,7 +360,7 @@ func (c *ClientUC) GetCredByIND(ind int) (cred *structs.Credential, err error) {
 	return c.Creds[ind], nil
 }
 
-// GetCardByIND return cred by it's ind in slice (safety)
+// GetCardByIND return cred by its ind in slice (safety)
 func (c *ClientUC) GetCardByIND(ind int) (card *structs.Card, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -370,7 +371,7 @@ func (c *ClientUC) GetCardByIND(ind int) (card *structs.Card, err error) {
 	return c.Cards[ind], nil
 }
 
-// GetNoteByIND return note by it's ind in slice (safety)
+// GetNoteByIND return note by its ind in slice (safety)
 func (c *ClientUC) GetNoteByIND(ind int) (note *structs.Note, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
@@ -381,7 +382,7 @@ func (c *ClientUC) GetNoteByIND(ind int) (note *structs.Note, err error) {
 	return c.Notes[ind], nil
 }
 
-// GetFileByIND return cred by it's ind in slice (safety)
+// GetFileByIND return cred by its ind in slice (safety)
 func (c *ClientUC) GetFileByIND(ind int) (file *structs.File, err error) {
 	c.m.Lock()
 	defer c.m.Unlock()
