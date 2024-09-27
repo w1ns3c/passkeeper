@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"os"
-	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -209,9 +208,9 @@ func TestClientUC_GetBlobs(t *testing.T) {
 	}
 
 	var (
-		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
-		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
-		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+		zipData1, _ = compress.CompressFile(file.Name())
+		zipData2, _ = compress.CompressFile(file2.Name())
+		zipData3, _ = compress.CompressFile(file3.Name())
 
 		login1  = "user1"
 		pass1   = "123"
@@ -706,9 +705,9 @@ func TestClientUC_AddBlob(t *testing.T) {
 			Body: "Hello\nWorld! Amigo! I should finish it...",
 		}
 
-		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
-		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
-		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+		zipData1, _ = compress.CompressFile(file.Name())
+		zipData2, _ = compress.CompressFile(file2.Name())
+		zipData3, _ = compress.CompressFile(file3.Name())
 
 		testFiles = []*structs.File{
 			{
@@ -1044,9 +1043,9 @@ func TestClientUC_DelBlob(t *testing.T) {
 	}
 
 	var (
-		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
-		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
-		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+		zipData1, _ = compress.CompressFile(file.Name())
+		zipData2, _ = compress.CompressFile(file2.Name())
+		zipData3, _ = compress.CompressFile(file3.Name())
 
 		login1  = "user1"
 		pass1   = "123"
@@ -1504,9 +1503,9 @@ func TestClientUC_EditBlob(t *testing.T) {
 	}
 
 	var (
-		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
-		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
-		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+		zipData1, _ = compress.CompressFile(file.Name())
+		zipData2, _ = compress.CompressFile(file2.Name())
+		zipData3, _ = compress.CompressFile(file3.Name())
 
 		login1  = "user1"
 		pass1   = "123"
@@ -2307,9 +2306,9 @@ func TestClientUC_GetFileByIND(t *testing.T) {
 	}
 
 	var (
-		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
-		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
-		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+		zipData1, _ = compress.CompressFile(file.Name())
+		zipData2, _ = compress.CompressFile(file2.Name())
+		zipData3, _ = compress.CompressFile(file3.Name())
 
 		tmpFiles = []*structs.File{
 			{
@@ -2589,9 +2588,9 @@ func TestClientUC_GetFiles(t *testing.T) {
 	}
 
 	var (
-		zipData1, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename1))
-		zipData2, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename2))
-		zipData3, _ = compress.CompressFile(filepath.Join(config.TmpDir, filename3))
+		zipData1, _ = compress.CompressFile(file.Name())
+		zipData2, _ = compress.CompressFile(file2.Name())
+		zipData3, _ = compress.CompressFile(file3.Name())
 
 		testFiles = []*structs.File{
 			{
