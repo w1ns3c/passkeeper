@@ -20,19 +20,12 @@ func (pg *PostgresStorage) AddBlob(ctx context.Context, blob *structs.CryptoBlob
 	ctx, cancel := context.WithTimeout(ctx, time.Second*8)
 	defer cancel()
 
-	tx, err := pg.db.Begin()
+	_, err := pg.db.ExecContext(ctx, query, blob.UserID, blob.ID, blob.Blob)
 	if err != nil {
-
-		return err
-	}
-	_, err = tx.ExecContext(ctx, query, blob.UserID, blob.ID, blob.Blob)
-	if err != nil {
-		tx.Rollback()
-
 		return err
 	}
 
-	return tx.Commit()
+	return nil
 }
 
 // GetBlob return crypto blob by blobID and userID
