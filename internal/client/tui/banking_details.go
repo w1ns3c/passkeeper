@@ -58,9 +58,9 @@ func NewCardDetails(card *structs.Card) *CardDetails {
 		FieldBank:       bank,
 		FieldPerson:     tview.NewInputField().SetLabel("Person:").SetText(card.Person),
 		FieldNumber:     tview.NewInputField().SetLabel("Number:").SetText(BeautifyCard(strconv.Itoa(card.Number))),
-		FieldExpiration: tview.NewInputField().SetLabel("Expiration").SetText(card.Expiration.Format(bankingExpirationFormat)),
-		FieldCVC:        tview.NewInputField().SetLabel("CVC").SetText(strconv.Itoa(card.CVC)),
-		FieldPIN:        tview.NewInputField().SetLabel("PIN").SetText(strconv.Itoa(card.PIN)),
+		FieldExpiration: tview.NewInputField().SetLabel("Expiration").SetText(BeautifyCardTime(card.Expiration)),
+		FieldCVC:        tview.NewInputField().SetLabel("CVC").SetText(BeautifyCard(strconv.Itoa(card.CVC))),
+		FieldPIN:        tview.NewInputField().SetLabel("PIN").SetText(BeautifyCard(strconv.Itoa(card.PIN))),
 		FieldDesc:       tview.NewTextArea().SetLabel("Description:").SetText(card.Description, true),
 		CurrentCard:     card,
 
@@ -370,6 +370,10 @@ func (form *CardDetails) GetCurrentValues() (newCard *structs.Card, err error) {
 
 // BeautifyCard try to beauty card number to "0000 0000 0000 0000"
 func BeautifyCard(number string) string {
+	if number == "0" {
+		return ""
+	}
+
 	var newNum string
 	for ind := 0; ind < len(number); ind++ {
 		newNum += string(number[ind])
@@ -380,4 +384,12 @@ func BeautifyCard(number string) string {
 	}
 
 	return strings.TrimSpace(newNum)
+}
+
+// BeautifyCardTime try to beauty card Expiration to bankingExpirationFormat: "01/06"
+func BeautifyCardTime(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format(bankingExpirationFormat)
 }

@@ -37,7 +37,7 @@ func NewNoteDetails(note *structs.Note) *NoteDetails {
 	form := &NoteDetails{
 		Form:        tview.NewForm(),
 		FieldName:   tview.NewInputField().SetLabel("Name:").SetText(note.Name),
-		FieldDate:   tview.NewInputField().SetLabel("Date").SetText(note.Date.Format(time.DateTime)),
+		FieldDate:   tview.NewInputField().SetLabel("Date").SetText(BeautifyNoteTime(note.Date)),
 		FieldBody:   tview.NewTextArea().SetLabel("Note:").SetText(note.Body, true),
 		CurrentNote: note,
 		FieldWidth:  40,
@@ -260,4 +260,12 @@ func (form *NoteDetails) HideFields() {
 	for ind := form.Form.GetFormItemCount() - 1; ind >= 0; ind-- {
 		form.Form.RemoveFormItem(ind)
 	}
+}
+
+// BeautifyNoteTime try to beauty note date creation to human format
+func BeautifyNoteTime(t time.Time) string {
+	if t.IsZero() {
+		return ""
+	}
+	return t.Format(time.DateTime)
 }

@@ -47,7 +47,7 @@ func (tuiApp *TUI) NewFiles(files []*structs.File) *tview.Flex {
 
 	flex := tview.NewFlex().
 		AddItem(list, 0, 3, true).
-		AddItem(helpFiles, 0, 1, false)
+		AddItem(helpFiles, 35, 1, false)
 
 	list.SetInputCapture(func(event *tcell.EventKey) *tcell.EventKey {
 

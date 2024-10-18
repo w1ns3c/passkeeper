@@ -130,8 +130,8 @@ func NewTUI(addr string, debugLevel, logFile string, syncTime int) (tui *TUI, er
 	header := NewHeader(0)
 	tuiApp.FormCredsMenu = tview.NewFlex().
 		SetDirection(tview.FlexRow).
-		AddItem(header, 0, 1, false).
-		AddItem(subPages, 0, 15, true)
+		AddItem(header, 3, 1, false).
+		AddItem(subPages, 0, 9, true)
 
 	// Main pages
 	tuiApp.Pages.AddPage(PageMain, tuiApp.FormAuth, true, true) // login/register select form

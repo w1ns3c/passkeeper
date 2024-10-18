@@ -42,7 +42,7 @@ func (tuiApp *TUI) NewNotes(notes []*structs.Note) *tview.Flex {
 	subFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(viewForm, 0, 2, false).
-		AddItem(helpNotes, 0, 1, false)
+		AddItem(helpNotes, 7, 1, false)
 
 	flex := tview.NewFlex().
 		AddItem(list, 0, 2, true).

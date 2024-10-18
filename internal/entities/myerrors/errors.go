@@ -83,7 +83,7 @@ var (
 
 	// Client usecase
 	ErrPassNotSame         = fmt.Errorf("pass and pass repeat are not the same")
-	ErrInvalidEmail        = fmt.Errorf("email is not valid by new regexp")
+	ErrInvalidEmail        = fmt.Errorf("email is not valid")
 	ErrEmptyUsername       = fmt.Errorf("username is empty")
 	ErrEmptyEmail          = fmt.Errorf("email is empty")
 	ErrEmptyPassword       = fmt.Errorf("pass is empty")

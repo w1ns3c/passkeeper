@@ -1,5 +1,7 @@
 # Passkeeper
 Credential manager on Go (client/server)
+This is my graduation project for Yandex Go-developer course.
+
 
 ## Client app logs location
 ```
@@ -15,7 +17,7 @@ C:\Windows\Temp\passkeeper.log
 ## Main Functionality
 - [x] Use gRPC protocol
 - [x] Add terminal user interface with main functionality
-- [ ] Fix bugs in TUI terminal user interface
+- [x] Fix bugs in TUI terminal user interface
 - [x] User login
 - [x] User register
 - [x] User logout
@@ -51,7 +53,7 @@ C:\Windows\Temp\passkeeper.log
 - [x] Move Token from tuiApp to Usecase only
 - [x] Client set logger in file
 - [x] Split client interface to multi inf
-- [ ] Split client struct to multi structs
+- [x] Split client struct to multi structs
 - [ ] Server logger interceptor
 - [ ] Server DDOS interceptor
 - [ ] Setup TLS 
@@ -66,20 +68,22 @@ C:\Windows\Temp\passkeeper.log
 - [ ] Generate app doc
 - [ ] Swagger
 - [ ] Add email validation with sending message
-- [ ] Add onetime blobs
+- [ ] Add onetime passwords
 - [ ] Change TUI to navigate with up/down arrow
 - [ ] Finall review all app code (again)
 
 ## TUI 
 - [x] TUI Order files by date
-- [ ] TUI clean fields (files->date, cards->number,cvc,pin)
+- [x] TUI clean fields (files->date, cards->number,cvc,pin)
 - [x] TUI beautify cards number fields to "0000 0000 0000 0000"
 - [ ] TUI move both login/register forms to center align 
 - [x] TUI subpage: bank cards not auto update after delete card
 - [x] TUI subpage: files not auto update after delete note
 - [ ] Fix bug with Banks DropDown on Bank cards
 - [ ] TUI form info about reconnect to server
-- 
+- [ ] Fix crashing console after close client app
+- [ ] Autodetecting Bank from card number
+- [ ] Hide/Show Card info functionality
 
 ## Fill Readme.md
 - [ ] Add gif to show functionality

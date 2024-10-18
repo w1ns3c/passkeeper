@@ -55,7 +55,7 @@ func (tuiApp *TUI) NewBanking(cards []*structs.Card) *tview.Flex {
 	subFlex := tview.NewFlex().
 		SetDirection(tview.FlexRow).
 		AddItem(viewForm, 0, 2, false).
-		AddItem(helpCards, 0, 1, false)
+		AddItem(helpCards, 7, 1, false)
 
 	flex := tview.NewFlex().
 		AddItem(list, 0, 2, true).
