@@ -1,0 +1,57 @@
+syntax = "proto3";
+option go_package = "passkeeper/internal/transport/grpc/protofiles/proto";
+import "google/protobuf/empty.proto";
+
+message UserRegisterRequest {
+  string Login = 1;
+  string Password = 2;
+  string RePassword = 3;
+  string Email = 4;
+
+}
+
+message UserRegisterResponse {
+  string Token = 1;
+  string SrvSecret = 2;
+}
+
+message UserLoginRequest {
+  string Login = 1;
+  string Password = 2;
+}
+
+message UserLoginResponse {
+  string Token = 1;
+  string SrvSecret = 2;
+}
+
+//// create challenge / response auth
+//// request challenge
+//message UserChallengeRequest {
+//  string Login = 1;
+//}
+//
+//// response challenge
+//message UserChallengeResponse {
+//  string Challenge = 1;
+//}
+//
+//// send challenge calculation
+//message UserChallengeResult {
+//  string Challenge = 1;
+//  string Login = 2;
+//}
+//
+
+
+service UserSvc {
+  // register service
+  rpc RegisterUser(UserRegisterRequest) returns (UserRegisterResponse);
+
+  // login service
+  rpc LoginUser(UserLoginRequest) returns (UserLoginResponse);
+
+  // old login service
+  //  rpc ChallengeRequest(UserChallengeRequest) returns (UserChallengeResponse);
+  //  rpc LoginUser(UserChallengeResult) returns (UserLoginResponse);
+  }

@@ -1,0 +1,13 @@
+syntax = "proto3";
+option go_package = "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto";
+import "google/protobuf/empty.proto";
+
+message UserChangePassReq {
+  string OldPass = 1;
+  string NewPass = 2;
+  string Repeat = 3;
+}
+
+service UserChangePassSvc {
+  rpc ChangePass(UserChangePassReq) returns (google.protobuf.Empty);
+}

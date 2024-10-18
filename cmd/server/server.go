@@ -1,0 +1,75 @@
+package main
+
+import (
+	"context"
+
+	"passkeeper/internal/entities"
+	"passkeeper/internal/entities/config"
+	srvconf "passkeeper/internal/entities/config/server"
+	"passkeeper/internal/entities/logger"
+	"passkeeper/internal/server"
+	"passkeeper/internal/storage/dbstorage/postgres"
+	"passkeeper/internal/storage/memstorage"
+	"passkeeper/internal/usecase/srv/blobsUC"
+	"passkeeper/internal/usecase/srv/usersUC"
+)
+
+func main() {
+
+	conf := srvconf.SrvParseArgs()
+
+	saltLen := config.UserPassSaltLen
+
+	ctx := context.Background()
+
+	lg := logger.Init(conf.LogLevel)
+	lg.Info().Msg("[+] Logger init:  done")
+
+	// try to connect to DB
+	storage, err := postgres.NewStorage(ctx, conf.DBurl)
+	if err != nil {
+		lg.Warn().Err(err).
+			Msg("fail to init DB storage, use memory storage")
+
+		storage = memstorage.NewMemStorage(ctx)
+	} else {
+		lg.Info().Str("db", entities.HideDBpass(conf.DBurl)).
+			Msg("[+] Storage init: done (successfully connected to DB)")
+	}
+
+	blobsUC := blobsUC.NewBlobUCWithOpts(
+		blobsUC.WithContext(ctx),
+		blobsUC.WithStorage(storage),
+		blobsUC.WithLogger(lg),
+	)
+
+	usersUC := usersUC.NewUserUsecase(ctx).
+		SetStorage(storage).
+		SetLog(lg).
+		SetSaltLen(saltLen)
+
+	lg.Info().Msg("[+] Usecase init: done")
+
+	srv, err := server.NewServer(
+		server.WithAddr(conf.Addr),
+		server.WithUCblobs(blobsUC),
+		server.WithUCusers(usersUC),
+		server.WithLogger(lg),
+	)
+	if err != nil {
+		lg.Error().Err(err).
+			Msg("Failed to create server")
+		return
+	}
+
+	lg.Info().Msg("[+] Server init:  done")
+
+	err = srv.Run()
+	if err != nil {
+		lg.Error().Err(err).
+			Msg("[+] Server stopping...")
+
+		defer srv.Stop()
+	}
+
+}

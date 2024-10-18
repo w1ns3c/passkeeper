@@ -1,0 +1,15 @@
+syntax = "proto3";
+option go_package = "github.com/w1ns3c/passkeeper/internal/transport/grpc/protofiles/proto";
+
+message SessionKeyReq {
+  string rsaN = 1;
+  int64 rsaE = 2;
+}
+
+message SessionKeyResp {
+  bytes encSessKey = 1;
+}
+
+service SessionKeySvc {
+  rpc KeyExchange(SessionKeyReq) returns (SessionKeyResp);
+}

@@ -8,14 +8,47 @@
 *.so
 *.dylib
 
-# Test binary, built with `go test -c`
+# Test binary, built with `go test -h`new(error)
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
+*.elf
+*.exe
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
 # Go workspace file
 go.work
+
+# IDE
+.idea/
+vendor/
+
+
+# old files
+*.old
+*_old
+*old
+
+# schemes
+schemes/
+builds/
+
+# test data
+cmd/server/test_data.go
+
+# mocks
+mock/
+mocks/
+
+# cover
+cover*
+cover.out
+coverage.out
+*.out
+*.html
+
+# tmp tests
+tmp_test/*
